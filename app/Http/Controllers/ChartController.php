@@ -6,22 +6,10 @@ use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-
 class ChartController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index(Request $request)
     {
-
         $invoice = Invoice::whereNotNull('patient_id')->with('patient');
 
         if ($request->date) {
@@ -31,6 +19,6 @@ class ChartController extends Controller
         }
 
         $data['invoice'] = $invoice->all();
-        return view('chart.index', $data);
+        return view('admin.chart.index', $data);
     }
 }

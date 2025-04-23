@@ -1,11 +1,7 @@
 import './bootstrap';
-import Alpine from 'alpinejs';
-import axios from 'axios';
-import jQuery from 'jquery';
-import Swal from 'sweetalert2';
 
-window.$ = window.jQuery = jQuery;
+import Alpine from 'alpinejs';
+
 window.Alpine = Alpine;
-window.Swal = Swal;
 
 Alpine.start();

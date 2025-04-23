@@ -12,16 +12,6 @@ use Illuminate\Http\Request;
 
 class PatientController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index(Request $request)
     {
 
@@ -37,7 +27,7 @@ class PatientController extends Controller
         }
 
         $data['patients'] = $place_query->orderBy('id', 'DESC')->paginate(5);
-        return view('patient.index', $data);
+        return view('admin.patient.index', $data);
     }
     public function list(Request $request)
     {
@@ -54,7 +44,7 @@ class PatientController extends Controller
         }
 
         $data['patients'] = $place_query->orderBy('id', 'DESC')->paginate(5);
-        return view('patient.list', $data);
+        return view('admin.patient.list', $data);
     }
 
     public function getSubCategory($id)
@@ -181,12 +171,12 @@ class PatientController extends Controller
             ->with('invoice.invoiceTreatment')
             ->find($id);
         $data['patient'] = $place;
-        return view('patient.show', $data);
+        return view('admin.patient.show', $data);
     }
 
     public function store()
     {
-        return view('patient.create');
+        return view('admin.patient.create');
     }
     public function createPatient(Request $request)
     {
@@ -208,7 +198,7 @@ class PatientController extends Controller
         $place_query = patient::whereNotNull('name');
 
         $data['patients'] = $place_query->orderBy('id', 'DESC')->paginate(5);
-        return view('patient.list', $data);
+        return view('admin.patient.list', $data);
     }
     public function destroy(patient $patient)
     {
@@ -218,13 +208,13 @@ class PatientController extends Controller
         $place_query = patient::whereNotNull('name');
 
         $data['patients'] = $place_query->orderBy('id', 'DESC')->paginate(5);
-        return view('patient.list', $data);
+        return view('admin.patient.list', $data);
     }
     public function edit($id)
     {
         $patient = patient::find($id);
         $data['patient'] = $patient;
-        return view('patient.edit', $data);
+        return view('admin.patient.edit', $data);
     }
     public function update(Request $request)
     {
@@ -248,6 +238,6 @@ class PatientController extends Controller
         $place_query = patient::whereNotNull('name');
 
         $data['patients'] = $place_query->orderBy('id', 'DESC')->paginate(5);
-        return view('patient.list', $data);
+        return view('admin.patient.list', $data);
     }
 }
