@@ -1,0 +1,1 @@
+@extends('admin.admin_logged.app')

@@ -1,19 +1,13 @@
 <?php
-
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\VehicleController;
-use App\Http\Controllers\DriverController;
-use App\Http\Controllers\LocalBookingController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\ReportController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ChartController;
+use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\RateController;
-use App\Models\Rate;
-
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -28,102 +22,61 @@ Route::get('/', function () {
             : redirect()->route('user.home');
     }
     return view('welcome');
-});
+})->name('home');
 
-Route::get('/dashboard', function () {
-    $user = Auth::user();
-    return $user->isAdmin()
-        ? redirect()->route('admin.dashboard')
-        : redirect()->route('user.home');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Redirect /dashboard based on role
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+        return $user->isAdmin()
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('user.home');
+    })->name('dashboard');
 
-Route::get('/about', function () {
-    return view('user.aboutus');
-})->name('user.aboutus');
+    // Admin dashboard
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
+        ->middleware('auth')
+        ->name('admin.dashboard');
 
-Route::get('/contact', function () {
-    return view('user.contactus',["rates"=>Rate::all()]);
-})->name('user.contactus');
+    // User dashboard
+    Route::get('/user/dashboard', [UserController::class, 'dashboard'])
+        ->middleware('auth')
+        ->name('user.user_dashboard');
 
-Route::get('/rental', function () {
-    return view('user.car-rental');
-})->name('user.car-rental');
-
-Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
-
-Route::post('/bookings/save', [LocalBookingController::class, 'store'])->name('bookings.save');
-
-Route::middleware('auth')->group(function () {
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/user/home', [UserController::class, 'home'])->name('user.home');
+    // Patient routes
+    Route::get('/', [PatientController::class, 'index'])->name('admin.patient.index');
+    Route::get('/patientList', [PatientController::class, 'list'])->name('admin.patient.list');
+    Route::get('/createPatient', [PatientController::class, 'store'])->name('admin.patient.store');
+    Route::post('/createPatient', [PatientController::class, 'createPatient'])->name('admin.patient.create');
+    Route::get('/showPatient/{id}', [PatientController::class, 'show'])->name('admin.patient.show');
+    Route::get('/editPatient/{id}', [PatientController::class, 'edit'])->name('admin.patient.edit');
+    Route::post('/editPatient', [PatientController::class, 'update'])->name('admin.patient.update');
+    Route::delete('/patient/{patient}', [PatientController::class, 'destroy'])->name('admin.patient.destroy');
+    
+    // API routes for patient
+    Route::get('/patient/getTreatments', [PatientController::class, 'getTreatments']);
+    Route::get('/patient/getTreatDataById/{id}', [PatientController::class, 'getTreatDataById']);
+    Route::get('/patient/getSubTreatDataById/{id}', [PatientController::class, 'getSubTreatDataById']);
+    Route::get('/patient/getSubCategory/{id}', [PatientController::class, 'getSubCategory']);
+    Route::get('/patient/getPatientByID/{id}', [PatientController::class, 'getPatientByID']);
+    Route::get('/patient/patientList', [PatientController::class, 'patientList']);
+    
+    // Invoice routes
+    Route::get('/invoice', [InvoiceController::class, 'index'])->name('invoice.index');
+    Route::get('/createInvoice/{id}', [InvoiceController::class, 'create'])->name('invoice.create');
+    Route::get('/ViewInvoice/{id}', [InvoiceController::class, 'view'])->name('invoice.view');
+    Route::post('/createInvoice', [PatientController::class, 'createInvoice'])->name('invoice.store');
 
-    // Add these new user booking routes
-    Route::get('/user/bookings', [BookingController::class, 'userBookings'])->name('user.booking');
+    // Chart routes
+    Route::get('/Chart', [ChartController::class, 'index'])->name('Chart.index');
 
-    //my booking
-    Route::get('/user/bookings/booked', [BookingController::class, 'booked'])->name('user.booking.booked');
-    Route::get('/user/bookings/active', [BookingController::class, 'active'])->name('user.booking.active');
-    Route::get('/user/bookings/past', [BookingController::class, 'past'])->name('user.booking.past');
-    Route::get('/user/bookings/cancelled', [BookingController::class, 'cancelled'])->name('user.booking.cancelled');
-    Route::get('/user/bookings/search', [BookingController::class, 'search'])->name('user.booking.search');
-    Route::delete('/user/bookings/{booking}', [BookingController::class, 'destroy'])->name('user.booking.destroy');
-
-
-    Route::get('/user/bookings/create', [BookingController::class, 'create'])->name('user.booking.create');
-    Route::get('/user/bookings/{booking}', [BookingController::class, 'userShow'])->name('user.booking.show');
-    Route::get('/user/car-rental', [VehicleController::class, 'index'])->name('user.car-rental');
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::post('/admin/check-availability', [AdminController::class, 'checkAvailability'])->name('admin.check-availability');
-
-    // Vehicle management routes
-    Route::get('/admin/vehicle-management', [VehicleController::class, 'index'])->name('admin.vehicle-management');
-    Route::post('/admin/vehicles', [VehicleController::class, 'store'])->name('vehicles.store');
-    Route::get('/admin/vehicles/{vehicle}', [VehicleController::class, 'show'])->name('vehicles.show');
-    Route::patch('/admin/vehicles/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
-    Route::delete('/admin/vehicles/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
-
-    // Customer Management Routes
-    Route::prefix('admin')->group(function () {
-        Route::get('/customer-management', [CustomerController::class, 'index'])->name('admin.customer-management');
-        Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
-        Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
-        Route::patch('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
-        Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
-    });
-
-    // Booking Management Routes
-    Route::prefix('admin')->group(function () {
-        Route::get('/bookings', [BookingController::class, 'index'])->name('admin.booking-management');
-        Route::resource('bookings', BookingController::class)->except(['index']);
-    });
-
-    // Driver Management Routes
-    Route::prefix('admin')->group(function () {
-        Route::get('/driver-management', [DriverController::class, 'index'])->name('admin.driver-management');
-        Route::post('/drivers', [DriverController::class, 'store'])->name('drivers.store');
-        Route::get('/drivers/{driver_id}', [DriverController::class, 'show'])->name('drivers.show');
-        Route::patch('/drivers/{driver_id}', [DriverController::class, 'update'])->name('drivers.update');
-        Route::delete('/drivers/{driver_id}', [DriverController::class, 'destroy'])->name('drivers.destroy');
-    });
-
-
-        //rating
-        Route::post('/rate', [RateController::class, 'store'])->name('rate.store');
-
-    // Report Routes
-    Route::prefix('admin')->group(function () {
-        Route::get('/reports', [ReportController::class, 'index'])->name('admin.reports');
-        Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('admin.reports.export.pdf');
-        Route::get('/reports/export-excel', [ReportController::class, 'exportExcel'])->name('admin.reports.export.excel');
-    });
+    // Appointment routes
+    Route::get('/Appointments', [AppointmentController::class, 'index'])->name('Appointments.index');
 });
-
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/check-availability', [AdminController::class, 'checkAvailability'])->name('admin.check-availability');
-});
-
 
 require __DIR__.'/auth.php';

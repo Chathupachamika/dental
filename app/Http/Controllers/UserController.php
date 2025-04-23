@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -7,18 +6,17 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth'); // Ensure only authenticated users can access
-    }
-
-    public function home()
+    public function dashboard()
     {
         $user = Auth::user();
+
+        // Redirect admins to admin dashboard
         if ($user->isAdmin()) {
-            \Log::info('Redirecting admin from user dashboard', ['email' => $user->email]);
-            return redirect()->route('admin.dashboard'); // Redirect admins away
+            return redirect()->route('admin.dashboard');
         }
-        return view('user.dashboard'); // Load user/dashboard.blade.php for non-admins
+
+        return view('user.user_dashboard');
     }
 }
+
+

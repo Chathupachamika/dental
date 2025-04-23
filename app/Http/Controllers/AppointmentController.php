@@ -4,16 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use Illuminate\Http\Request;
-
 use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index(Request $request)
     {
 
@@ -26,6 +20,6 @@ class AppointmentController extends Controller
         }
 
         $data['patients'] = $invoice->all();
-        return view('Appointments.index', $data);
+        return view('admin.Appointments.index', $data);
     }
 }
