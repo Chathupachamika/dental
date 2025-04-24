@@ -53,7 +53,6 @@
 @section('javascript')
 <script type="text/javascript">
     window.onload = function() {
-
         const urlParams = new URLSearchParams(window.location.search);
         const date = urlParams.get('date');
         if (date) {
