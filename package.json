@@ -16,5 +16,11 @@
         "postcss": "^8.5.3",
         "tailwindcss": "^3.4.17",
         "vite": "^6.2.4"
+    },
+    "dependencies": {
+        "@heroicons/react": "^2.2.0",
+        "@heroicons/vue": "^2.2.0",
+        "font-awesome": "^4.7.0",
+        "fontawesome": "^5.6.3"
     }
 }

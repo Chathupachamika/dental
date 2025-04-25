@@ -1,8 +1,9 @@
 <?php
+
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PatientController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\AppointmentController;
@@ -19,7 +20,7 @@ Route::get('/', function () {
         ]);
         return $user->isAdmin()
             ? redirect()->route('admin.dashboard')
-            : redirect()->route('user.home');
+            : redirect()->route('user.user_dashboard');
     }
     return view('welcome');
 })->name('home');
@@ -30,7 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $user = Auth::user();
         return $user->isAdmin()
             ? redirect()->route('admin.dashboard')
-            : redirect()->route('user.home');
+            : redirect()->route('user.user_dashboard');
     })->name('dashboard');
 
     // Admin dashboard
@@ -38,45 +39,78 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('auth')
         ->name('admin.dashboard');
 
-    // User dashboard
-    Route::get('/user/dashboard', [UserController::class, 'dashboard'])
-        ->middleware('auth')
-        ->name('user.user_dashboard');
+    // User routes
+    Route::prefix('user')->name('user.')->group(function () {
+        // User dashboard
+        Route::get('/dashboard', [UserController::class, 'dashboard'])->name('user_dashboard');
+
+        // Appointment booking
+        Route::get('/book-appointment', [UserController::class, 'bookAppointment'])->name('book.appointment');
+        Route::post('/book-appointment', [UserController::class, 'storeAppointment'])->name('store.appointment');
+
+        // Appointment management
+        Route::get('/appointments', [UserController::class, 'appointments'])->name('appointments');
+        Route::get('/appointment/{id}', [UserController::class, 'appointmentDetails'])->name('appointment.details');
+        Route::post('/appointment/{id}/cancel', [UserController::class, 'cancelAppointment'])->name('appointment.cancel');
+
+        // User profile
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+        Route::post('/profile', [UserController::class, 'updateProfile'])->name('update.profile');
+    });
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Patient routes
-    Route::get('/', [PatientController::class, 'index'])->name('admin.patient.index');
-    Route::get('/patientList', [PatientController::class, 'list'])->name('admin.patient.list');
-    Route::get('/createPatient', [PatientController::class, 'store'])->name('admin.patient.store');
-    Route::post('/createPatient', [PatientController::class, 'createPatient'])->name('admin.patient.create');
-    Route::get('/showPatient/{id}', [PatientController::class, 'show'])->name('admin.patient.show');
-    Route::get('/editPatient/{id}', [PatientController::class, 'edit'])->name('admin.patient.edit');
-    Route::post('/editPatient', [PatientController::class, 'update'])->name('admin.patient.update');
-    Route::delete('/patient/{patient}', [PatientController::class, 'destroy'])->name('admin.patient.destroy');
-    
-    // API routes for patient
+    // Admin routes
+    Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+        // Patient routes
+        Route::prefix('patient')->name('patient.')->group(function () {
+            Route::get('/', [PatientController::class, 'index'])->name('index');
+            Route::get('/list', [PatientController::class, 'list'])->name('list');
+            Route::get('/create', [PatientController::class, 'store'])->name('store');
+            Route::post('/create', [PatientController::class, 'createPatient'])->name('create');
+            Route::get('/show/{id}', [PatientController::class, 'show'])->name('show');
+            Route::get('/edit/{id}', [PatientController::class, 'edit'])->name('edit');
+            Route::post('/edit', [PatientController::class, 'update'])->name('update');
+            Route::delete('/{patient}', [PatientController::class, 'destroy'])->name('destroy');
+        });
+
+        // Invoice routes
+        Route::prefix('invoice')->name('invoice.')->group(function () {
+            Route::get('/', [InvoiceController::class, 'index'])->name('index');
+            Route::get('/create/{id}', [InvoiceController::class, 'create'])->name('create');
+            Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view');
+            Route::post('/create', [PatientController::class, 'createInvoice'])->name('store');
+        });
+
+        // Chart routes
+        Route::prefix('chart')->name('chart.')->group(function () {
+            Route::get('/', [ChartController::class, 'index'])->name('index');
+        });
+
+        // Appointment routes
+        Route::prefix('appointment')->name('appointments.')->group(function () {
+            Route::get('/', [AppointmentController::class, 'index'])->name('index');
+            Route::get('/{id}/confirm', [AppointmentController::class, 'confirm'])->name('confirm');
+            Route::get('/{id}/edit', [AppointmentController::class, 'edit'])->name('edit');
+            Route::post('/{id}', [AppointmentController::class, 'update'])->name('update');
+            Route::get('/{id}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
+            Route::get('/{id}/notify', [AppointmentController::class, 'notify'])->name('notify');
+        });
+    });
+
+    // API routes for patient - accessible to both admin and users
     Route::get('/patient/getTreatments', [PatientController::class, 'getTreatments']);
     Route::get('/patient/getTreatDataById/{id}', [PatientController::class, 'getTreatDataById']);
     Route::get('/patient/getSubTreatDataById/{id}', [PatientController::class, 'getSubTreatDataById']);
     Route::get('/patient/getSubCategory/{id}', [PatientController::class, 'getSubCategory']);
     Route::get('/patient/getPatientByID/{id}', [PatientController::class, 'getPatientByID']);
     Route::get('/patient/patientList', [PatientController::class, 'patientList']);
-    
-    // Invoice routes
-    Route::get('/invoice', [InvoiceController::class, 'index'])->name('invoice.index');
-    Route::get('/createInvoice/{id}', [InvoiceController::class, 'create'])->name('invoice.create');
-    Route::get('/ViewInvoice/{id}', [InvoiceController::class, 'view'])->name('invoice.view');
-    Route::post('/createInvoice', [PatientController::class, 'createInvoice'])->name('invoice.store');
-
-    // Chart routes
-    Route::get('/Chart', [ChartController::class, 'index'])->name('Chart.index');
-
-    // Appointment routes
-    Route::get('/Appointments', [AppointmentController::class, 'index'])->name('Appointments.index');
 });
 
 require __DIR__.'/auth.php';

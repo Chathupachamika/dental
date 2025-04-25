@@ -10,10 +10,9 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->isAdmin()) {
-            return $next($request);
+        if (!Auth::check() || !Auth::user()->isAdmin()) {
+            return redirect()->route('user.user_dashboard');
         }
-        
-        return redirect()->route('home')->with('error', 'Unauthorized access.');
+        return $next($request);
     }
 }
