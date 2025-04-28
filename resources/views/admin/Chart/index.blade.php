@@ -5,6 +5,7 @@
     <div class="card">
         <div class="card-body">
             <h4 class="card-title">Daily Chart </h4>
+
             <h5 id='date-label' class="card-title"> </h5>
             <div class='d-flex w-100 justify-content-end pb-3'>
                 <div class="d-flex">
@@ -53,6 +54,7 @@
 @section('javascript')
 <script type="text/javascript">
     window.onload = function() {
+
         const urlParams = new URLSearchParams(window.location.search);
         const date = urlParams.get('date');
         if (date) {
@@ -70,7 +72,7 @@
         Object.assign(query, {
             'date': $('#date').val()
         });
-        window.location.href = "{{route('Chart.index')}}?" + $.param(query);
+        window.location.href = "{{route('admin.chart.index')}}?" + $.param(query);
     }
 </script>
 @endsection

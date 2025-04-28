@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -14,7 +15,7 @@ class AdminController extends Controller
         // Check if user is admin
         if (!$user->isAdmin()) {
             \Log::info('Non-admin attempted to access admin dashboard', ['email' => $user->email]);
-            return redirect()->route('user.home')->with('error', 'Unauthorized access.');
+            return redirect()->route('user.user_dashboard')->with('error', 'Unauthorized access.');
         }
 
         // Fetch recent activities (if table exists)

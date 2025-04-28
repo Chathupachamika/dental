@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Dental') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -18,43 +18,6 @@
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 
-            <!-- Admin Navigation Header -->
-            <div class="bg-white shadow">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between h-16">
-                        <div class="flex">
-                            <div class="hidden space-x-8 sm:-my-px sm:flex">
-                                <a href="{{ route('admin.patient.index') }}" 
-                                   class="inline-flex items-center px-1 pt-1 border-b-2 
-                                   {{ request()->routeIs('admin.patient.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500' }}
-                                   text-sm font-medium leading-5 focus:outline-none focus:border-indigo-700 transition">
-                                    Patients
-                                </a>
-                                <a href="{{ route('Chart.index') }}"
-                                   class="inline-flex items-center px-1 pt-1 border-b-2
-                                   {{ request()->routeIs('Chart.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500' }}
-                                   text-sm font-medium leading-5 focus:outline-none focus:border-indigo-700 transition">
-                                    Reports
-                                </a>
-                                <a href="{{ route('invoice.index') }}"
-                                   class="inline-flex items-center px-1 pt-1 border-b-2
-                                   {{ request()->routeIs('invoice.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500' }}
-                                   text-sm font-medium leading-5 focus:outline-none focus:border-indigo-700 transition">
-                                    Invoice
-                                </a>
-                                <a href="{{ route('Appointments.index') }}"
-                                   class="inline-flex items-center px-1 pt-1 border-b-2
-                                   {{ request()->routeIs('Appointments.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500' }}
-                                   text-sm font-medium leading-5 focus:outline-none focus:border-indigo-700 transition">
-                                    Appointments
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Page Heading -->
             @if(isset($header))
                 <header class="bg-white shadow">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">

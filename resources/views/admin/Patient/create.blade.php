@@ -1,63 +1,106 @@
-@extends('layouts.app')
-@section('content')
-<div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title">Create Patient</h4>
-            <div class="">
-                <form action="\createPatient" method="POST" class="forms-sample">
-                    @csrf
-                    <div class="form-group row">
-                        <label for="name" class="col-sm-3 col-form-label">Name</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" name='name' id="name" value="{{old('name')}}" placeholder="Name">
-                            @if($errors->any('name'))
-                            <span class="text-danger"> {{$errors->first('name')}}</span>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="name" class="col-sm-3 col-form-label">Address</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="address" value="{{old('address')}}" name="address" placeholder="Address">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="age" class="col-sm-3 col-form-label">Age</label>
-                        <div class="col-sm-9">
-                            <input type="number" class="form-control" id="age"value="{{old('age')}}" name="age" placeholder="Age">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="mobile" class="col-sm-3 col-form-label">Mobile</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="mobile" value="{{old('mobileNumber')}}" name="mobileNumber" placeholder="Mobile">
-                            @if($errors->any('mobile'))
-                            <span class="text-danger"> {{$errors->first('mobile')}}</span>
-                            @endif
-                        </div>
+@extends('admin.admin_logged.app')
 
-                    </div>
-                    <div class="form-group row">
-                        <label for="gender" class="col-sm-3 col-form-label">Gender</label>
-                        <div class="col-sm-9">
-                            <select class="form-control" id="gender" name="gender">
-                                <option>Male</option>
-                                <option>Female</option>
-                                <option>Other</option>
-                            </select>
+@section('content')
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-user-plus me-2"></i> Create Patient
+            </h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.patient.create') }}" method="POST">
+                @csrf
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="name" class="form-label">Patient Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control @if($errors->any('name')) is-invalid @endif" id="name" name="name" value="{{old('name')}}" placeholder="Enter patient name" required>
+                            </div>
+                            @if($errors->any('name'))
+                                <div class="invalid-feedback d-block">{{$errors->first('name')}}</div>
+                            @endif
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label for="nic" class="col-sm-3 col-form-label">Nic</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" value="{{old('nic')}}" id="nic" name="nic" placeholder="Nic">
+
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                <input type="text" class="form-control" id="address" name="address" value="{{old('address')}}" placeholder="Enter address">
+                            </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-gradient-primary mr-2">Submit</button>
-                    <button class="btn btn-light">Cancel</button>
-                </form>
-            </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="age" class="form-label">Age</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-birthday-cake"></i></span>
+                                <input type="number" class="form-control" id="age" name="age" value="{{old('age')}}" placeholder="Enter age">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
+                                <input type="text" class="form-control @if($errors->any('mobileNumber')) is-invalid @endif" id="mobile" name="mobileNumber" value="{{old('mobileNumber')}}" placeholder="Enter mobile number" required>
+                            </div>
+                            @if($errors->any('mobileNumber'))
+                                <div class="invalid-feedback d-block">{{$errors->first('mobileNumber')}}</div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>Male</option>
+                                    <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>Female</option>
+                                    <option value="Other" {{ old('gender') == 'Other' ? 'selected' : '' }}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="nic" class="form-label">NIC</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                <input type="text" class="form-control" id="nic" name="nic" value="{{old('nic')}}" placeholder="Enter NIC number">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group mb-3">
+                            <label for="medicalHistory" class="form-label">Medical History</label>
+                            <textarea class="form-control" id="medicalHistory" name="medicalHistory" rows="3" placeholder="Enter any relevant medical history">{{old('medicalHistory')}}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="button" onclick="history.back()" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Create Patient
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
