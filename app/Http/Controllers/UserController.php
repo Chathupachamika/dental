@@ -78,8 +78,7 @@ class UserController extends Controller
     public function storeAppointment(Request $request)
     {
         $request->validate([
-            'appointment_date' => 'required|date|after_or_equal:today',
-            'treatment' => 'required',
+            'appointment_date' => 'required|date|after_or_equal:today', // Validate the Preferred Date input
             'notes' => 'nullable|string|max:500',
         ]);
 
@@ -97,18 +96,12 @@ class UserController extends Controller
             ]);
         }
 
-        // Create invoice (which serves as appointment)
-        $invoice = Invoice::create([
-            'patient_id' => $patient->id,
-            'visitDate' => $request->appointment_date,
-            'otherNote' => $request->notes,
-            'totalAmount' => 0, // Will be set by admin later
-            'advanceAmount' => 0, // Will be set by admin later
-        ]);
-
-        // Add treatment to invoice
-        $invoice->invoiceTreatment()->create([
-            'treatMent' => $request->treatment,
+        // Save the appointment in the appointments table
+        Appointment::create([
+            'user_id' => $user->id,
+            'appointment_date' => $request->appointment_date, // Set to Preferred Date input value
+            'notes' => $request->notes,
+            'status' => 'pending', // Default status
         ]);
 
         return redirect()->route('user.appointments')
@@ -124,17 +117,11 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        // Get patient record for this user
-        $patient = Patient::where('mobileNumber', $user->mobile_number)->first();
-
-        if ($patient) {
-            $appointments = Invoice::where('patient_id', $patient->id)
-                ->with(['invoiceTreatment'])
-                ->orderBy('visitDate', 'desc')
-                ->paginate(10);
-        } else {
-            $appointments = collect();
-        }
+        // Get appointments for the logged-in user
+        $appointments = Appointment::where('user_id', $user->id)
+            ->with('patient') // Ensure the patient relationship is loaded
+            ->orderBy('appointment_date', 'desc')
+            ->paginate(10);
 
         return view('user.appointments', compact('user', 'appointments'));
     }

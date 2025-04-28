@@ -11,16 +11,14 @@ class Appointment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'patient_id',
-        'visitDate',
-        'totalAmount',
-        'advanceAmount',
-        'otherNote',
+        'user_id',
+        'appointment_date',
+        'notes',
         'status'
     ];
 
     protected $dates = [
-        'visitDate',
+        'visit_date', // Changed from visitDate
         'created_at',
         'updated_at'
     ];
@@ -35,6 +33,14 @@ class Appointment extends Model
     public function invoiceTreatment()
     {
         return $this->hasMany(InvoiceTreatment::class);
+    }
+
+    /**
+     * Define the relationship between Appointment and User.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     // Check if appointment is pending

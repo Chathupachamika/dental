@@ -13,77 +13,47 @@ class AppointmentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Appointment::with(['patient', 'invoiceTreatment'])
-            ->orderBy('visitDate', 'desc');
+        // Retrieve all appointments with related user data
+        $query = Appointment::with('user') // Ensure 'user' relationship is loaded
+            ->orderBy('appointment_date', 'desc'); // Order by appointment_date
 
-        // Filter by date
+        // Apply optional filters if provided
         if ($request->has('date')) {
-            $query->whereDate('visitDate', $request->date);
+            $query->whereDate('appointment_date', $request->date);
         }
 
-        // Filter by type (user-booked or admin-created)
-        if ($request->has('type')) {
-            if ($request->type === 'user') {
-                $query->where('otherNote', 'like', '%Booked by user%');
-            } elseif ($request->type === 'admin') {
-                $query->where(function($q) {
-                    $q->where('otherNote', 'not like', '%Booked by user%')
-                      ->orWhereNull('otherNote');
-                });
-            }
-        }
-
-        // Filter by status
         if ($request->has('status')) {
-            if ($request->status === 'pending') {
-                $query->where('otherNote', 'like', '%Booked by user%')
-                      ->where('totalAmount', 0);
-            } elseif ($request->status === 'confirmed') {
-                $query->where(function($q) {
-                    $q->where('otherNote', 'not like', '%Cancelled%')
-                      ->where(function($sq) {
-                          $sq->where('otherNote', 'not like', '%Booked by user%')
-                             ->orWhere('totalAmount', '>', 0);
-                      });
-                });
-            }
+            $query->where('status', $request->status);
         }
 
-        $patients = $query->paginate(10);
-        return view('admin.Appointments.index', compact('patients'));
+        $appointments = $query->paginate(10); // Paginate the results
+
+        return view('admin.Appointments.index', compact('appointments'));
     }
 
     public function edit($id)
     {
-        $appointment = Appointment::with(['patient', 'invoiceTreatment'])->findOrFail($id);
+        $appointment = Appointment::with('user')->findOrFail($id);
         return view('admin.Appointments.edit', compact('appointment'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'visitDate' => 'required|date',
-            'totalAmount' => 'required|numeric|min:0',
-            'advanceAmount' => 'required|numeric|min:0|lte:totalAmount',
-            'otherNote' => 'nullable|string'
+            'appointment_date' => 'required|date',
+            'appointment_time' => 'required',
+            'status' => 'required|in:pending,confirmed,cancelled',
+            'notes' => 'nullable|string'
         ]);
 
         $appointment = Appointment::findOrFail($id);
 
         $appointment->update([
-            'visitDate' => $request->visitDate,
-            'totalAmount' => $request->totalAmount,
-            'advanceAmount' => $request->advanceAmount,
-            'otherNote' => $request->otherNote
+            'appointment_date' => $request->appointment_date,
+            'appointment_time' => $request->appointment_time,
+            'status' => $request->status,
+            'notes' => $request->notes
         ]);
-
-        if ($appointment->isUserBooked()) {
-            // Log the update for user-booked appointments
-            Log::info('User-booked appointment updated', [
-                'appointment_id' => $id,
-                'admin_id' => Auth::id()
-            ]);
-        }
 
         return redirect()->route('admin.appointments.index')
             ->with('success', 'Appointment updated successfully');
@@ -93,14 +63,14 @@ class AppointmentController extends Controller
     {
         $appointment = Appointment::findOrFail($id);
 
-        if (!$appointment->isPending()) {
+        if ($appointment->status !== 'pending') { // Ensure the status check is correct
             return redirect()->route('admin.appointments.index')
                 ->with('error', 'This appointment is not pending confirmation');
         }
 
         $appointment->update([
             'status' => 'confirmed',
-            'otherNote' => trim($appointment->otherNote . "\nConfirmed by admin on " . now())
+            'notes' => trim(($appointment->notes ?? '') . "\nConfirmed by admin on " . now()->toDateTimeString())
         ]);
 
         return redirect()->route('admin.appointments.index')

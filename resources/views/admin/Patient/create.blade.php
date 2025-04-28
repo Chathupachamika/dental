@@ -9,7 +9,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <form action="\createPatient" method="POST">
+            <form action="{{ route('admin.patient.create') }}" method="POST">
                 @csrf
                 <div class="row">
                     <div class="col-md-6">
@@ -31,7 +31,6 @@
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                                 <input type="text" class="form-control" id="address" name="address" value="{{old('address')}}" placeholder="Enter address">
-                            </div>  value="{{old('address')}}" placeholder="Enter address">
                             </div>
                         </div>
                     </div>
@@ -51,10 +50,10 @@
                             <label for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
-                                <input type="text" class="form-control @if($errors->any('mobile')) is-invalid @endif" id="mobile" name="mobileNumber" value="{{old('mobileNumber')}}" placeholder="Enter mobile number" required>
+                                <input type="text" class="form-control @if($errors->any('mobileNumber')) is-invalid @endif" id="mobile" name="mobileNumber" value="{{old('mobileNumber')}}" placeholder="Enter mobile number" required>
                             </div>
-                            @if($errors->any('mobile'))
-                                <div class="invalid-feedback d-block">{{$errors->first('mobile')}}</div>
+                            @if($errors->any('mobileNumber'))
+                                <div class="invalid-feedback d-block">{{$errors->first('mobileNumber')}}</div>
                             @endif
                         </div>
                     </div>
@@ -80,6 +79,15 @@
                                 <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                                 <input type="text" class="form-control" id="nic" name="nic" value="{{old('nic')}}" placeholder="Enter NIC number">
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group mb-3">
+                            <label for="medicalHistory" class="form-label">Medical History</label>
+                            <textarea class="form-control" id="medicalHistory" name="medicalHistory" rows="3" placeholder="Enter any relevant medical history">{{old('medicalHistory')}}</textarea>
                         </div>
                     </div>
                 </div>

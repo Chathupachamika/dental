@@ -43,8 +43,7 @@
                 <table class="appointments-table">
                     <thead>
                         <tr>
-                            <th>Date & Time</th>
-                            <th>Treatment</th>
+                            <th>Appointment Date</th>
                             <th>Status</th>
                             <th>Notes</th>
                             <th class="text-right">Actions</th>
@@ -52,78 +51,33 @@
                     </thead>
                     <tbody>
                         @foreach($appointments as $appointment)
-                        @php
-                            $today = \Carbon\Carbon::today();
-                            $appointmentDate = \Carbon\Carbon::parse($appointment->visitDate);
-                            $isPast = $appointmentDate->lt($today);
-                            $isCancelled = strpos($appointment->otherNote ?? '', 'Cancelled') !== false;
-                            
-                            if($isCancelled) {
-                                $statusClass = 'cancelled';
-                                $statusText = 'Cancelled';
-                            } elseif($isPast) {
-                                $statusClass = 'completed';
-                                $statusText = 'Completed';
-                            } else {
-                                $statusClass = 'upcoming';
-                                $statusText = 'Upcoming';
-                            }
-                        @endphp
-                        <tr data-status="{{ $statusClass }}">
-                            <td>
-                                <div class="appointment-date">
-                                    <div class="date-calendar">
-                                        <span class="date-month">{{ \Carbon\Carbon::parse($appointment->visitDate)->format('M') }}</span>
-                                        <span class="date-day">{{ \Carbon\Carbon::parse($appointment->visitDate)->format('d') }}</span>
-                                    </div>
-                                    <div class="date-details">
-                                        <span class="date-year">{{ \Carbon\Carbon::parse($appointment->visitDate)->format('Y') }}</span>
-                                        <span class="date-weekday">{{ \Carbon\Carbon::parse($appointment->visitDate)->format('l') }}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                @if(count($appointment->invoiceTreatment) > 0)
-                                    <span class="treatment-badge">{{ $appointment->invoiceTreatment[0]->treatMent }}</span>
-                                @else
-                                    <span class="treatment-badge empty">Not specified</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
-                            </td>
-                            <td>
-                                @if($appointment->otherNote)
-                                    <div class="note-content" title="{{ $appointment->otherNote }}">
-                                        {{ \Illuminate\Support\Str::limit($appointment->otherNote, 50) }}
-                                    </div>
-                                @else
-                                    <span class="no-content">No notes</span>
-                                @endif
-                            </td>
-                            <td class="text-right">
-                                <div class="action-buttons">
+                            @php
+                                $statusClass = $appointment->status; // Use the status field for filtering
+                            @endphp
+                            <tr data-status="{{ $statusClass }}">
+                                <td>{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('d M Y') }}</td>
+                                <td>
+                                    <span class="status-badge {{ $statusClass }}">
+                                        {{ ucfirst($statusClass) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{ $appointment->notes ?? 'No notes' }}
+                                </td>
+                                <td class="text-right">
                                     <a href="{{ route('user.appointment.details', $appointment->id) }}" class="btn-action view">
-                                        <i class="fas fa-eye"></i>
-                                        <span class="action-text">View</span>
+                                        <i class="fas fa-eye"></i> View
                                     </a>
-
-                                    @php
-                                        $canCancel = !$isPast && !$isCancelled;
-                                    @endphp
-
-                                    @if($canCancel)
+                                    @if($appointment->status === 'pending')
                                         <form method="POST" action="{{ route('user.appointment.cancel', $appointment->id) }}" class="d-inline">
                                             @csrf
                                             <button type="submit" class="btn-action cancel" onclick="return confirm('Are you sure you want to cancel this appointment?')">
-                                                <i class="fas fa-times-circle"></i>
-                                                <span class="action-text">Cancel</span>
+                                                <i class="fas fa-times-circle"></i> Cancel
                                             </button>
                                         </form>
                                     @endif
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -630,18 +584,19 @@
         // Filter functionality
         const filterTabs = document.querySelectorAll('.filter-tab');
         const appointmentRows = document.querySelectorAll('.appointments-table tbody tr');
-        
+
         filterTabs.forEach(tab => {
             tab.addEventListener('click', function() {
                 // Update active tab
                 filterTabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
-                
+
                 const filter = this.getAttribute('data-filter');
-                
+
                 // Filter table rows
                 appointmentRows.forEach(row => {
-                    if (filter === 'all' || row.getAttribute('data-status') === filter) {
+                    const status = row.getAttribute('data-status');
+                    if (filter === 'all' || (filter === 'upcoming' && status === 'pending') || status === filter) {
                         row.style.display = '';
                     } else {
                         row.style.display = 'none';
@@ -649,13 +604,13 @@
                 });
             });
         });
-        
+
         // Search functionality
         const searchInput = document.querySelector('.search-input');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
-                
+
                 appointmentRows.forEach(row => {
                     const rowText = row.textContent.toLowerCase();
                     if (rowText.includes(searchTerm)) {

@@ -1,282 +1,377 @@
 @extends('admin.admin_logged.app')
 
 @section('content')
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="card-title">
-                        <i class="fas fa-calendar-alt text-primary me-2"></i> Appointments
-                    </h5>
-                    <h6 id="date-label" class="text-muted"></h6>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-outline-primary active" id="all-btn">All</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary" id="pending-btn">Pending</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary" id="confirmed-btn">Confirmed</button>
-                </div>
-            </div>
+<div class="appointments-container">
+    <div class="appointments-header">
+        <div class="header-content">
+            <h1 class="page-title">Appointments Management</h1>
+            <p class="page-subtitle">View and manage all dental appointments</p>
         </div>
-        <div class="card-body">
-            <div class="d-flex justify-content-between mb-4">
-                <div>
-                    <select class="form-select" id="appointment-type" style="width: 200px;">
-                        <option value="all">All Appointments</option>
-                        <option value="user">User Booked</option>
-                        <option value="admin">Admin Created</option>
-                    </select>
-                </div>
-                <div class="input-group" style="width: 300px;">
-                    <input type="date" class="form-control" name="date" id="date">
-                    <button type="button" onclick="search_place()" class="btn btn-primary">
-                        <i class="fas fa-search me-1"></i> Search
-                    </button>
-                </div>
+    </div>
+
+    <div class="appointments-card">
+        <!-- Filters -->
+        <div class="appointments-filters">
+            <div class="filter-tabs">
+                <a href="{{ route('admin.appointments.index') }}"
+                   class="filter-tab {{ !request('status') ? 'active' : '' }}">
+                    All
+                </a>
+                <a href="{{ route('admin.appointments.index', ['status' => 'pending']) }}"
+                   class="filter-tab {{ request('status') === 'pending' ? 'active' : '' }}">
+                    Pending
+                </a>
+                <a href="{{ route('admin.appointments.index', ['status' => 'confirmed']) }}"
+                   class="filter-tab {{ request('status') === 'confirmed' ? 'active' : '' }}">
+                    Confirmed
+                </a>
+                <a href="{{ route('admin.appointments.index', ['status' => 'cancelled']) }}"
+                   class="filter-tab {{ request('status') === 'cancelled' ? 'active' : '' }}">
+                    Cancelled
+                </a>
             </div>
 
+            <div class="filter-date">
+                <form action="{{ route('admin.appointments.index') }}" method="GET">
+                    <input type="date" name="date" value="{{ request('date') }}"
+                           class="form-control" onchange="this.form.submit()">
+                </form>
+            </div>
+        </div>
+
+        @if($appointments->count() > 0)
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="appointments-table">
                     <thead>
                         <tr>
-                            <th>
-                                <i class="fas fa-user text-primary me-1"></i> Patient Name
-                            </th>
-                            <th>
-                                <i class="fas fa-calendar-day text-primary me-1"></i> Visit Date
-                            </th>
-                            <th>
-                                <i class="fas fa-sticky-note text-primary me-1"></i> Notes
-                            </th>
-                            <th>
-                                <i class="fas fa-info-circle text-primary me-1"></i> Status
-                            </th>
-                            <th>
-                                <i class="fas fa-dollar-sign text-primary me-1"></i> Total Amount
-                            </th>
-                            <th>
-                                <i class="fas fa-money-bill-wave text-primary me-1"></i> Advance Amount
-                            </th>
-                            <th>
-                                <i class="fas fa-tasks text-primary me-1"></i> Actions
-                            </th>
+                            <th>Patient</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Contact</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if(count($patients))
-                            @foreach ($patients as $place)
-                            @php
-                                $isPending = false;
-                                $isUserBooked = false;
-                                $isCancelled = false;
-
-                                // Check if this is a user-booked appointment (will have a note indicating this)
-                                if (strpos($place->otherNote ?? '', 'Booked by user') !== false) {
-                                    $isUserBooked = true;
-                                }
-
-                                // Check if appointment is cancelled
-                                if (strpos($place->otherNote ?? '', 'Cancelled') !== false) {
-                                    $isCancelled = true;
-                                }
-
-                                // Check if appointment is pending confirmation (user-booked with no amount set)
-                                if ($isUserBooked && $place->totalAmount == 0) {
-                                    $isPending = true;
-                                }
-
-                                // Determine appointment status
-                                $status = 'Confirmed';
-                                $statusClass = 'success';
-
-                                if ($isPending) {
-                                    $status = 'Pending';
-                                    $statusClass = 'warning';
-                                } elseif ($isCancelled) {
-                                    $status = 'Cancelled';
-                                    $statusClass = 'danger';
-                                } elseif (Carbon\Carbon::parse($place->visitDate)->isPast()) {
-                                    $status = 'Completed';
-                                    $statusClass = 'info';
-                                }
-                            @endphp
-                            <tr class="appointment-row {{ $isPending ? 'pending' : '' }} {{ $isCancelled ? 'cancelled' : '' }} {{ $isUserBooked ? 'user-booked' : 'admin-created' }}">
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar avatar-sm rounded-circle bg-primary-soft me-3">
-                                            <span>{{ substr($place->patient->name, 0, 1) }}</span>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">{{ $place->patient->name }}</h6>
-                                            <small class="text-muted">ID: #{{ $place->patient->id }}</small>
-                                            @if($isUserBooked)
-                                                <span class="badge bg-primary ms-2">User Booked</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>{{ \Carbon\Carbon::parse($place->visitDate)->format('M d, Y') }}</td>
-                                <td>
-                                    @if($place->otherNote)
-                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ $place->otherNote }}">
-                                            {{ $place->otherNote }}
-                                        </span>
-                                    @else
-                                        <span class="text-muted">No notes</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="badge bg-{{ $statusClass }}">{{ $status }}</span>
-                                </td>
-                                <td>₹{{ number_format($place->totalAmount, 2) }}</td>
-                                <td>₹{{ number_format($place->advanceAmount, 2) }}</td>
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <li><a class="dropdown-item" href="/ViewInvoice/{{$place->id}}"><i class="fas fa-eye me-2"></i> View Details</a></li>
-
-                                            @if($isPending)
-                                                <li><a class="dropdown-item text-success" href="{{ route('appointment.confirm', $place->id) }}"><i class="fas fa-check-circle me-2"></i> Confirm Appointment</a></li>
-                                            @endif
-
-                                            @if(!$isCancelled)
-                                                <li><a class="dropdown-item" href="{{ route('appointment.edit', $place->id) }}"><i class="fas fa-edit me-2"></i> Edit Appointment</a></li>
-                                                <li><a class="dropdown-item text-danger" href="{{ route('appointment.cancel', $place->id) }}" onclick="return confirm('Are you sure you want to cancel this appointment?')"><i class="fas fa-times-circle me-2"></i> Cancel</a></li>
-                                            @endif
-
-                                            @if($isUserBooked && !$isCancelled)
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item" href="{{ route('appointment.notify', $place->id) }}"><i class="fas fa-bell me-2"></i> Send Notification</a></li>
-                                            @endif
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        @else
+                        @foreach($appointments as $appointment)
                             <tr>
-                                <td colspan="7" class="text-center py-4">
-                                    <div class="empty-state">
-                                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                                        <h6>No Appointments Found</h6>
-                                        <p class="text-muted">There are no appointments scheduled for this date.</p>
+                                <td>
+                                    <div class="patient-info">
+                                        <span class="patient-name">{{ $appointment->user->name ?? 'Unknown' }}</span>
+                                        <span class="patient-id">#{{ $appointment->user->id ?? 'N/A' }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="appointment-date">
+                                        <span class="date">{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y') }}</span>
+                                        <span class="time">{{ $appointment->appointment_time ? \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') : 'N/A' }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge {{ strtolower($appointment->status) }}">
+                                        {{ ucfirst($appointment->status) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="contact-info">
+                                        <span class="phone">{{ $appointment->user->mobileNumber ?? 'N/A' }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="notes">
+                                        {{ $appointment->notes ?? 'No notes available' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        @if($appointment->status === 'pending')
+                                            <form action="{{ route('admin.appointments.confirm', $appointment->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn-action confirm" onclick="return confirm('Confirm this appointment?')">
+                                                    <i class="fas fa-check"></i>
+                                                    <span>Confirm</span>
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        @if($appointment->status !== 'cancelled')
+                                            <form action="{{ route('admin.appointments.cancel', $appointment->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn-action cancel" onclick="return confirm('Cancel this appointment?')">
+                                                    <i class="fas fa-times"></i>
+                                                    <span>Cancel</span>
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <a href="{{ route('admin.appointments.edit', $appointment->id) }}" class="btn-action edit">
+                                            <i class="fas fa-edit"></i>
+                                            <span>Edit</span>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
-                        @endif
+                        @endforeach
                     </tbody>
                 </table>
             </div>
 
-            @if(count($patients) > 0)
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div>
-                        <p class="text-muted mb-0">Showing {{ count($patients) }} appointments</p>
-                    </div>
-                    @if(isset($patients) && method_exists($patients, 'links'))
-                        <div>
-                            {{ $patients->links() }}
-                        </div>
-                    @endif
+            <div class="pagination-container">
+                {{ $appointments->links() }}
+            </div>
+        @else
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-calendar-times"></i>
                 </div>
-            @endif
-        </div>
+                <h2>No Appointments Found</h2>
+                <p>There are no appointments matching your current filters.</p>
+            </div>
+        @endif
     </div>
 </div>
-@endsection
 
-@section('javascript')
-<script type="text/javascript">
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const date = urlParams.get('date');
-        if (date) {
-            document.getElementById('date-label').innerHTML = date;
-            document.getElementById('date').value = date;
-        } else {
-            const today = moment().format('YYYY-MM-DD');
-            document.getElementById('date-label').innerHTML = today;
-            document.getElementById('date').value = today;
-        }
+<style>
+/* Updated styles to match book_appointment design */
+:root {
+    --primary: #4361ee;
+    --primary-light: #4895ef;
+    --secondary: #3f37c9;
+    --accent: #4cc9f0;
+    --success: #4CAF50;
+    --warning: #ff9800;
+    --danger: #f44336;
+    --light: #f8f9fa;
+    --dark: #212529;
+    --gray: #6c757d;
+    --gray-light: #e9ecef;
+    --gray-lighter: #f5f5f5;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: all 0.3s ease;
+}
 
-        // Set appointment type filter from URL if present
-        const type = urlParams.get('type');
-        if (type) {
-            document.getElementById('appointment-type').value = type;
-        }
+.appointments-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: var(--gray-lighter);
+    border-radius: var(--radius);
+}
 
-        // Set status filter from URL if present
-        const status = urlParams.get('status');
-        if (status) {
-            if (status === 'pending') {
-                $('#pending-btn').addClass('active').siblings().removeClass('active');
-                filterAppointmentsByStatus('pending');
-            } else if (status === 'confirmed') {
-                $('#confirmed-btn').addClass('active').siblings().removeClass('active');
-                filterAppointmentsByStatus('confirmed');
-            } else {
-                $('#all-btn').addClass('active').siblings().removeClass('active');
-            }
-        }
-    };
+.appointments-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
 
-    var query = <?php echo json_encode((object)Request::only(['date', 'type', 'status'])); ?>;
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+}
 
-    function search_place() {
-        Object.assign(query, {
-            'date': $('#date').val(),
-            'type': $('#appointment-type').val()
-        });
-        window.location.href = "{{route('admin.appointments.index')}}?" + $.param(query);
-    }
+.page-subtitle {
+    color: var(--gray);
+    font-size: 1rem;
+}
 
-    // Filter appointments by type (user-booked or admin-created)
-    $('#appointment-type').on('change', function() {
-        Object.assign(query, {
-            'type': $(this).val()
-        });
-        window.location.href = "{{route('admin.appointments.index')}}?" + $.param(query);
-    });
+.appointments-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: var(--transition);
+}
 
-    // Filter appointments by status
-    $('#all-btn').on('click', function() {
-        $(this).addClass('active').siblings().removeClass('active');
-        Object.assign(query, {
-            'status': 'all'
-        });
-        window.location.href = "{{route('admin.appointments.index')}}?" + $.param(query);
-    });
+.appointments-card:hover {
+    box-shadow: var(--shadow-hover);
+}
 
-    $('#pending-btn').on('click', function() {
-        $(this).addClass('active').siblings().removeClass('active');
-        Object.assign(query, {
-            'status': 'pending'
-        });
-        window.location.href = "{{route('admin.appointments.index')}}?" + $.param(query);
-    });
+.appointments-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--gray-light);
+    border-bottom: 1px solid var(--gray);
+}
 
-    $('#confirmed-btn').on('click', function() {
-        $(this).addClass('active').siblings().removeClass('active');
-        Object.assign(query, {
-            'status': 'confirmed'
-        });
-        window.location.href = "{{route('admin.appointments.index')}}?" + $.param(query);
-    });
+.filter-tabs {
+    display: flex;
+    gap: 1rem;
+}
 
-    // Client-side filtering function
-    function filterAppointmentsByStatus(status) {
-        if (status === 'pending') {
-            $('.appointment-row').hide();
-            $('.pending').show();
-        } else if (status === 'confirmed') {
-            $('.appointment-row').hide();
-            $('.appointment-row:not(.pending):not(.cancelled)').show();
-        } else {
-            $('.appointment-row').show();
-        }
-    }
-</script>
+.filter-tab {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    color: var(--gray);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.filter-tab:hover {
+    background: var(--gray-lighter);
+    color: var(--primary);
+}
+
+.filter-tab.active {
+    background: var(--primary);
+    color: white;
+}
+
+.filter-date input {
+    padding: 0.5rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    transition: border-color 0.3s;
+}
+
+.filter-date input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.appointments-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+}
+
+.appointments-table th {
+    padding: 1rem;
+    text-align: left;
+    background: var(--gray-light);
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.appointments-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-light);
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+.appointments-table tr:hover {
+    background: var(--gray-lighter);
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-badge.pending {
+    background: rgba(255, 193, 7, 0.2);
+    color: var(--warning);
+}
+
+.status-badge.confirmed {
+    background: rgba(76, 175, 80, 0.2);
+    color: var(--success);
+}
+
+.status-badge.cancelled {
+    background: rgba(244, 67, 54, 0.2);
+    color: var(--danger);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-action.confirm {
+    background: rgba(76, 175, 80, 0.2);
+    color: var(--success);
+}
+
+.btn-action.confirm:hover {
+    background: rgba(76, 175, 80, 0.3);
+}
+
+.btn-action.cancel {
+    background: rgba(244, 67, 54, 0.2);
+    color: var(--danger);
+}
+
+.btn-action.cancel:hover {
+    background: rgba(244, 67, 54, 0.3);
+}
+
+.btn-action.edit {
+    background: var(--gray-light);
+    color: var(--gray);
+}
+
+.btn-action.edit:hover {
+    background: var(--gray-lighter);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: var(--gray-lighter);
+    border-radius: var(--radius);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: var(--gray);
+    margin-bottom: 1rem;
+}
+
+.pagination-container {
+    padding: 1rem;
+    border-top: 1px solid var(--gray-light);
+    text-align: center;
+}
+
+.pagination-container .pagination {
+    display: inline-flex;
+    gap: 0.5rem;
+}
+
+.pagination-container .pagination a {
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--gray-light);
+    color: var(--dark);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.pagination-container .pagination a:hover {
+    background: var(--gray-lighter);
+    color: var(--primary);
+}
+
+.pagination-container .pagination .active {
+    background: var(--primary);
+    color: white;
+}
+</style>
+
 @endsection

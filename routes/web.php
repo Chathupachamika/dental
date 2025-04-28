@@ -85,7 +85,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [InvoiceController::class, 'index'])->name('index');
             Route::get('/create/{id}', [InvoiceController::class, 'create'])->name('create');
             Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view');
-            Route::post('/create', [PatientController::class, 'createInvoice'])->name('store');
+            Route::post('/create', [InvoiceController::class, 'store'])->name('store');
         });
 
         // Chart routes
@@ -96,10 +96,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Appointment routes
         Route::prefix('appointment')->name('appointments.')->group(function () {
             Route::get('/', [AppointmentController::class, 'index'])->name('index');
-            Route::get('/{id}/confirm', [AppointmentController::class, 'confirm'])->name('confirm');
+            Route::post('/{id}/confirm', [AppointmentController::class, 'confirm'])->name('confirm');
             Route::get('/{id}/edit', [AppointmentController::class, 'edit'])->name('edit');
-            Route::post('/{id}', [AppointmentController::class, 'update'])->name('update');
-            Route::get('/{id}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
+            Route::put('/{id}', [AppointmentController::class, 'update'])->name('update');
+            Route::post('/{id}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
             Route::get('/{id}/notify', [AppointmentController::class, 'notify'])->name('notify');
         });
     });
@@ -112,5 +112,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/patient/getPatientByID/{id}', [PatientController::class, 'getPatientByID']);
     Route::get('/patient/patientList', [PatientController::class, 'patientList']);
 });
+
 
 require __DIR__.'/auth.php';

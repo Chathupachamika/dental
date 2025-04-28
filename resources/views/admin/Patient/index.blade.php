@@ -10,13 +10,16 @@
             <p class="text-muted mb-0">Search and create invoices for patients</p>
         </div>
         <div class="card-body">
-            <div class="d-flex justify-content-end mb-4">
+            <div class="d-flex justify-content-between mb-4">
                 <div class="input-group" style="width: 300px;">
                     <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search by name or mobile">
                     <button type="button" onclick="search_place()" class="btn btn-primary">
                         <i class="fas fa-search me-1"></i> Search
                     </button>
                 </div>
+                <a href="{{ route('admin.patient.store') }}" class="btn btn-success">
+                    <i class="fas fa-user-plus me-1"></i> Add New Patient
+                </a>
             </div>
 
             <div class="table-responsive">
@@ -56,7 +59,7 @@
                                 <td>{{ $place->address }}</td>
                                 <td>{{ $place->mobileNumber }}</td>
                                 <td class="text-end">
-                                    <a href="/createInvoice/{{$place->id}}" class="btn btn-sm btn-primary">
+                                    <a href="{{ route('admin.invoice.create', $place->id) }}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-file-invoice-dollar me-1"></i> Create Invoice
                                     </a>
                                 </td>
@@ -109,5 +112,12 @@
         });
         window.location.href = "{{route('admin.patient.index')}}?" + $.param(query);
     }
+
+    // Enable pressing Enter to search
+    $('#keyword').keypress(function(e) {
+        if(e.which == 13) {
+            search_place();
+        }
+    });
 </script>
 @endsection

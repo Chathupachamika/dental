@@ -57,10 +57,10 @@
                             <label for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
-                                <input type="text" class="form-control @if($errors->any('mobile')) is-invalid @endif" id="mobile" name="mobileNumber" value="{{$patient->mobileNumber}}" placeholder="Enter mobile number" required>
+                                <input type="text" class="form-control @if($errors->any('mobileNumber')) is-invalid @endif" id="mobile" name="mobileNumber" value="{{$patient->mobileNumber}}" placeholder="Enter mobile number" required>
                             </div>
-                            @if($errors->any('mobile'))
-                                <div class="invalid-feedback d-block">{{$errors->first('mobile')}}</div>
+                            @if($errors->any('mobileNumber'))
+                                <div class="invalid-feedback d-block">{{$errors->first('mobileNumber')}}</div>
                             @endif
                         </div>
                     </div>
@@ -86,6 +86,15 @@
                                 <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                                 <input type="text" class="form-control" id="nic" name="nic" value="{{$patient->nic}}" placeholder="Enter NIC number">
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group mb-3">
+                            <label for="medicalHistory" class="form-label">Medical History</label>
+                            <textarea class="form-control" id="medicalHistory" name="medicalHistory" rows="3" placeholder="Enter any relevant medical history">{{$patient->medicalHistory ?? ''}}</textarea>
                         </div>
                     </div>
                 </div>
