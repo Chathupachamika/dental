@@ -1,157 +1,117 @@
 @extends('admin.admin_logged.app')
 
 @section('content')
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="card-title">
-                        <i class="fas fa-users text-primary me-2"></i> Patient List
-                    </h5>
-                    <p class="text-muted mb-0">Manage and view all patient records</p>
-                </div>
-                <a href="{{ route('admin.patient.store') }}" class="btn btn-primary">
-                    <i class="fas fa-user-plus me-1"></i> Add Patient
-                </a>
+<div class="container mx-auto px-4 py-6">
+    <div class="bg-white shadow-xl rounded-xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white px-6 py-4 rounded-t-xl flex flex-col sm:flex-row sm:justify-between sm:items-center">
+            <div>
+                <h2 class="text-xl font-semibold flex items-center">
+                    <i class="fas fa-users mr-2"></i> Patient List
+                </h2>
+                <p class="text-sm text-blue-100">Manage and view all patient records</p>
             </div>
+            <a href="{{ route('admin.patient.store') }}" class="mt-4 sm:mt-0 bg-green-600 text-white px-5 py-2 rounded-lg shadow hover:bg-green-700 flex items-center">
+                <i class="fas fa-user-plus mr-2"></i> Add Patient
+            </a>
         </div>
-        <div class="card-body">
-            <div class="d-flex justify-content-between mb-4">
-                <div class="d-flex">
-                    <div class="input-group me-2" style="width: 300px;">
-                        <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search by name or mobile">
-                        <button type="button" onclick="search_place()" class="btn btn-primary">
-                            <i class="fas fa-search me-1"></i> Search
-                        </button>
-                    </div>
-                    <select class="form-select" id="filter" style="width: 150px;">
-                        <option value="all">All Patients</option>
-                        <option value="recent">Recent Patients</option>
-                        <option value="pending">Pending Balance</option>
-                    </select>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-outline-secondary" onclick="exportPatients()">
-                        <i class="fas fa-file-export me-1"></i> Export
-                    </button>
-                </div>
+
+        <!-- Search & Filter -->
+        <div class="p-6">
+            <div class="flex flex-col sm:flex-row items-stretch gap-3 mb-6">
+                <input type="text" name="keyword" id="keyword" placeholder="Search by name or mobile"
+                       class="w-full px-4 py-2 border rounded-lg shadow focus:outline-none focus:ring focus:border-blue-400">
+                <button type="button" onclick="search_place()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow flex items-center justify-center">
+                    <i class="fas fa-search mr-2"></i> Search
+                </button>
+                <select id="filter" class="w-full sm:w-48 px-3 py-2 border rounded-lg shadow focus:outline-none focus:ring focus:border-blue-400">
+                    <option value="all">All Patients</option>
+                    <option value="recent">Recent Patients</option>
+                    <option value="pending">Pending Balance</option>
+                </select>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+            <!-- Patient Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left">
+                    <thead class="bg-gray-100 rounded-lg">
                         <tr>
-                            <th>
-                                Name
-                                @if(Request::query('sortByName') && Request::query('sortByName')=='asc')
-                                <a href="javascript:sortByName('desc')" class="text-muted"><i class="fas fa-sort-down ms-1"></i></a>
-                                @elseif(Request::query('sortByName') && Request::query('sortByName')=='desc')
-                                <a href="javascript:sortByName('asc')" class="text-muted"><i class="fas fa-sort-up ms-1"></i></a>
-                                @else
-                                <a href="javascript:sortByName('asc')" class="text-muted"><i class="fas fa-sort ms-1"></i></a>
-                                @endif
-                            </th>
-                            <th>Address</th>
-                            <th>Contact No</th>
-                            <th>Last Visit</th>
-                            <th>Balance</th>
-                            <th class="text-end">Actions</th>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Address</th>
+                            <th class="px-4 py-2">Contact No</th>
+                            <th class="px-4 py-2">Last Visit</th>
+                            <th class="px-4 py-2">Balance</th>
+                            <th class="px-4 py-2 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if(count($patients))
-                            @foreach ($patients as $place)
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar avatar-sm rounded-circle bg-primary-soft me-3">
-                                            <span>{{ substr($place->name, 0, 1) }}</span>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">{{ $place->name }}</h6>
-                                            <small class="text-muted">ID: #{{ $place->id }}</small>
-                                        </div>
+                        @forelse ($patients as $place)
+                        <tr class="border-t hover:bg-gray-50">
+                            <td class="px-4 py-3">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded-full mr-3">
+                                        <span class="font-semibold">{{ substr($place->name, 0, 1) }}</span>
                                     </div>
-                                </td>
-                                <td>{{ $place->address }}</td>
-                                <td>{{ $place->mobileNumber }}</td>
-                                <td>
-                                    @if(isset($place->lastVisit))
-                                        {{ \Carbon\Carbon::parse($place->lastVisit)->format('M d, Y') }}
-                                    @else
-                                        <span class="text-muted">No visits</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if(isset($place->balance) && $place->balance > 0)
-                                        <span class="text-danger">₹{{ number_format($place->balance, 2) }}</span>
-                                    @else
-                                        <span class="text-success">₹0.00</span>
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    <a href="{{ route('admin.patient.show', $place->id) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye me-1"></i> View
-                                    </a>
-                                    <a href="{{ route('admin.patient.edit', $place->id) }}" class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-edit me-1"></i> Edit
-                                    </a>
-                                    <a href="javascript:delete_place('{{route('admin.patient.destroy',$place->id)}}')" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-trash-alt me-1"></i> Delete
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforeach
-                        @else
-                            <tr>
-                                <td colspan="6" class="text-center py-4">
-                                    <div class="empty-state">
-                                        <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
-                                        <h6>No Patients Found</h6>
-                                        <p class="text-muted">No patients match your search criteria.</p>
+                                    <div>
+                                        <div class="font-medium">{{ $place->name }}</div>
+                                        <div class="text-gray-500 text-xs">ID: #{{ $place->id }}</div>
                                     </div>
-                                </td>
-                            </tr>
-                        @endif
+                                </div>
+                            </td>
+                            <td class="px-4 py-3">{{ $place->address }}</td>
+                            <td class="px-4 py-3">{{ $place->mobileNumber }}</td>
+                            <td class="px-4 py-3">
+                                {{ $place->lastVisit ? \Carbon\Carbon::parse($place->lastVisit)->format('M d, Y') : '—' }}
+                            </td>
+                            <td class="px-4 py-3">
+                                @if($place->balance > 0)
+                                    <span class="text-red-500 font-semibold">Rs {{ number_format($place->balance, 2) }}</span>
+                                @else
+                                    <span class="text-green-500 font-semibold">Rs 0.00</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <a href="{{ route('admin.patient.show', $place->id) }}"
+                                   class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm shadow inline-flex items-center">
+                                    <i class="fas fa-eye mr-1"></i> View
+                                </a>
+                                <a href="{{ route('admin.patient.edit', $place->id) }}"
+                                   class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-sm shadow inline-flex items-center">
+                                    <i class="fas fa-edit mr-1"></i> Edit
+                                </a>
+                                <button onclick="delete_place('{{ route('admin.patient.destroy', $place->id) }}')"
+                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm shadow inline-flex items-center">
+                                    <i class="fas fa-trash-alt mr-1"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="px-4 py-6 text-center text-gray-500">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-user-slash fa-3x text-gray-400 mb-2"></i>
+                                    <h6 class="font-semibold">No Patients Found</h6>
+                                    <p class="text-sm">No patients match your search criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
 
             @if(count($patients))
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div>
-                        <p class="text-muted mb-0">Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} patients</p>
-                    </div>
-                    <div>
-                        {{ $patients->links() }}
-                    </div>
+            <!-- Pagination Info & Links -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mt-6 text-sm text-gray-600">
+                <div class="mb-2 sm:mb-0">
+                    Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} patients
                 </div>
+                <div>
+                    {{ $patients->links() }}
+                </div>
+            </div>
             @endif
-        </div>
-    </div>
-</div>
-
-<form id="place_delete_form" method="post" action="" class="d-none">
-    @csrf
-    @method('DELETE')
-</form>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete this patient? This action cannot be undone and will delete all associated invoices and records.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Patient</button>
-            </div>
         </div>
     </div>
 </div>
@@ -160,53 +120,30 @@
 @section('javascript')
 <script type="text/javascript">
     var query = <?php echo json_encode((object)Request::only(['keyword', 'sortByName', 'filter'])); ?>;
-    var deleteUrl = '';
 
     function search_place() {
         Object.assign(query, {
-            'keyword': $('#keyword').val(),
-            'filter': $('#filter').val()
+            'keyword': document.getElementById('keyword').value,
+            'filter': document.getElementById('filter').value
         });
-        window.location.href = "{{route('admin.patient.list')}}?" + $.param(query);
-    }
-
-    function sortByName(value) {
-        Object.assign(query, {
-            'sortByName': value
-        });
-        window.location.href = "{{route('admin.patient.list')}}?" + $.param(query);
+        window.location.href = "{{route('admin.patient.list')}}?" + new URLSearchParams(query).toString();
     }
 
     function delete_place(url) {
         deleteUrl = url;
-        $('#deleteConfirmModal').modal('show');
+        $('#deleteConfirmModal').removeClass('hidden');
     }
 
     $('#confirmDeleteBtn').click(function() {
         $('#place_delete_form').attr('action', deleteUrl);
         $('#place_delete_form').submit();
-        $('#deleteConfirmModal').modal('hide');
+        $('#deleteConfirmModal').addClass('hidden');
     });
 
-    $('#filter').on('change', function() {
-        search_place();
-    });
-
-    // Enable pressing Enter to search
-    $('#keyword').keypress(function(e) {
-        if(e.which == 13) {
+    // Enable Enter key for search
+    document.getElementById('keyword').addEventListener('keypress', function (e) {
+        if (e.which === 13 || e.keyCode === 13) {
             search_place();
-        }
-    });
-
-    function exportPatients() {
-        window.location.href = "{{route('admin.patient.export')}}?" + $.param(query);
-    }
-
-    // Set filter from URL if present
-    $(document).ready(function() {
-        if (query.filter) {
-            $('#filter').val(query.filter);
         }
     });
 </script>

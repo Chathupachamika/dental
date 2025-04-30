@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TreatmentSubCategoriesOne extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'name',
         'treatment_id',
+        'name',
         'description',
         'showDropDown'
     ];
+
+    public function treatment()
+    {
+        return $this->belongsTo(Treatment::class);
+    }
 }

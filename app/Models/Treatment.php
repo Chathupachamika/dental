@@ -14,4 +14,9 @@ class Treatment extends Model
         'description',
         'showDropDown',
     ];
+
+    public function subCategories()
+    {
+        return $this->hasMany(TreatmentSubCategoriesOne::class);
+    }
 }

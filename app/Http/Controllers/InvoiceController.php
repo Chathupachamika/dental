@@ -27,6 +27,7 @@ class InvoiceController extends Controller
 
         return view('admin.invoice.index', compact('invoices'));
     }
+
     public function create($id)
     {
         try {
@@ -40,6 +41,7 @@ class InvoiceController extends Controller
                 ->with('error', 'Patient not found.');
         }
     }
+
     public function view(int $id)
     {
         try {
@@ -57,39 +59,76 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         try {
-            // Start transaction
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
-            // Create invoice
-            $invoice = new Invoice();
-            $invoice->patient_id = $request->patient_id;
-            $invoice->totalAmount = $request->totalAmount;
-            $invoice->advanceAmount = $request->advanceAmount;
-            $invoice->visitDate = $request->visitDate;
-            $invoice->otherNote = $request->otherNote;
-            $invoice->save();
+            // Create invoice record
+            $invoice = Invoice::create([
+                'patient_id' => $request->patient_id,
+                'totalAmount' => $request->totalAmount,
+                'advanceAmount' => $request->advanceAmount,
+                'visitDate' => $request->visitDate,
+                'otherNote' => $request->otherNote
+            ]);
 
             // Create invoice treatments
-            if ($request->treatments) {
-                foreach ($request->treatments as $key => $treatment) {
-                    if ($treatment) {
-                        $invoiceTreatment = new InvoiceTreatment();
-                        $invoiceTreatment->invoice_id = $invoice->id;
-                        $invoiceTreatment->treatMent = $treatment;
-                        $invoiceTreatment->subType = $request->sub_types[$key] ?? null;
-                        $invoiceTreatment->position = $request->positions[$key] ?? null;
-                        $invoiceTreatment->save();
-                    }
+            foreach ($request->treatments as $treatment) {
+                // Get or create the treatment record
+                $treatmentModel = Treatment::firstOrCreate(
+                    ['name' => $treatment['treatment']],
+                    [
+                        'description' => 'Added from invoice creation',
+                        'showDropDown' => false
+                    ]
+                );
+
+                // Handle subtype (save to treatment_sub_categories_ones)
+                $subtype_id = null;
+                if (!empty($treatment['subtype'])) {
+                    $subtype = TreatmentSubCategoriesOne::firstOrCreate(
+                        [
+                            'name' => $treatment['subtype'],
+                            'treatment_id' => $treatmentModel->id
+                        ],
+                        [
+                            'description' => 'Added from invoice creation',
+                            'showDropDown' => false
+                        ]
+                    );
+                    $subtype_id = $subtype->id;
                 }
+
+                // Handle position (save to treatment_sub_categories_twos)
+                $position_id = null;
+                if (!empty($treatment['position'])) {
+                    $position = TreatmentSubCategoriesTwo::firstOrCreate(
+                        ['name' => $treatment['position']],
+                        ['description' => 'Added from invoice creation']
+                    );
+                    $position_id = $position->id;
+                }
+
+                // Create the invoice treatment with the related IDs
+                InvoiceTreatment::create([
+                    'invoice_id' => $invoice->id,
+                    'treatMent' => $treatment['treatment'],
+                    'subtype_id' => $subtype_id,
+                    'position_id' => $position_id
+                ]);
             }
 
-            \DB::commit();
+            DB::commit();
 
-            return redirect()->route('admin.invoice.view', $invoice->id)
-                ->with('success', 'Invoice created successfully.');
+            return response()->json([
+                'success' => true,
+                'data' => $invoice->load('patient', 'invoiceTreatment')
+            ]);
+
         } catch (\Exception $e) {
-            \DB::rollback();
-            return back()->with('error', 'Error creating invoice: ' . $e->getMessage());
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 }

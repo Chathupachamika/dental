@@ -1,77 +1,84 @@
 @extends('admin.admin_logged.app')
 
 @section('content')
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h5 class="card-title">
-                <i class="fas fa-search text-primary me-2"></i> Patient Search
-            </h5>
-            <p class="text-muted mb-0">Search and create invoices for patients</p>
+<div class="container mx-auto px-4 py-6">
+
+    <!-- Add Patient Button -->
+    <div class="flex justify-end mb-6">
+        <a href="{{ route('admin.patient.store') }}"
+           class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow flex items-center">
+            <i class="fas fa-user-plus mr-2"></i> Add New Patient
+        </a>
+    </div>
+
+    <!-- Card Wrapper -->
+    <div class="bg-white shadow rounded-xl">
+
+        <!-- Card Header -->
+        <div class="bg-blue-600 text-white px-6 py-4 rounded-t-xl flex flex-col sm:flex-row sm:justify-between sm:items-center">
+            <div>
+                <h5 class="text-lg font-semibold"><i class="fas fa-search mr-2"></i> Patient Search</h5>
+                <p class="text-sm text-blue-100">Search and create invoices for patients</p>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="d-flex justify-content-between mb-4">
-                <div class="input-group" style="width: 300px;">
-                    <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search by name or mobile">
-                    <button type="button" onclick="search_place()" class="btn btn-primary">
-                        <i class="fas fa-search me-1"></i> Search
+
+        <!-- Card Body -->
+        <div class="p-6">
+            <!-- Search Input + Button -->
+            <div class="mb-6">
+                <div class="flex flex-col sm:flex-row items-stretch gap-3">
+                    <input type="text" name="keyword" id="keyword" placeholder="Search by name or mobile"
+                           class="w-full px-4 py-2 border rounded-lg shadow focus:outline-none focus:ring focus:border-blue-400">
+                    <button type="button" onclick="search_place()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow flex items-center justify-center">
+                        <i class="fas fa-search mr-2"></i> Search
                     </button>
                 </div>
-                <a href="{{ route('admin.patient.store') }}" class="btn btn-success">
-                    <i class="fas fa-user-plus me-1"></i> Add New Patient
-                </a>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+            <!-- Patient Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left">
+                    <thead class="bg-gray-100 rounded-lg">
                         <tr>
-                            <th>
-                                Name
-                                @if(Request::query('sortByName') && Request::query('sortByName')=='asc')
-                                <a href="javascript:sortByName('desc')" class="text-muted"><i class="fas fa-sort-down ms-1"></i></a>
-                                @elseif(Request::query('sortByName') && Request::query('sortByName')=='desc')
-                                <a href="javascript:sortByName('asc')" class="text-muted"><i class="fas fa-sort-up ms-1"></i></a>
-                                @else
-                                <a href="javascript:sortByName('asc')" class="text-muted"><i class="fas fa-sort ms-1"></i></a>
-                                @endif
-                            </th>
-                            <th>Address</th>
-                            <th>Contact No</th>
-                            <th class="text-end">Actions</th>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Address</th>
+                            <th class="px-4 py-2">Contact No</th>
+                            <th class="px-4 py-2 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if(count($patients))
                             @foreach ($patients as $place)
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar avatar-sm rounded-circle bg-primary-soft me-3">
-                                            <span>{{ substr($place->name, 0, 1) }}</span>
+                            <tr class="border-t hover:bg-gray-50">
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded-full mr-3">
+                                            <span class="font-semibold">{{ substr($place->name, 0, 1) }}</span>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">{{ $place->name }}</h6>
-                                            <small class="text-muted">ID: #{{ $place->id }}</small>
+                                            <div class="font-medium">{{ $place->name }}</div>
+                                            <div class="text-gray-500 text-xs">ID: #{{ $place->id }}</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ $place->address }}</td>
-                                <td>{{ $place->mobileNumber }}</td>
-                                <td class="text-end">
-                                    <a href="{{ route('admin.invoice.create', $place->id) }}" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-file-invoice-dollar me-1"></i> Create Invoice
+                                <td class="px-4 py-3">{{ $place->address }}</td>
+                                <td class="px-4 py-3">{{ $place->mobileNumber }}</td>
+                                <td class="px-4 py-3 text-right">
+                                    <a href="{{ route('admin.invoice.create', $place->id) }}"
+                                       class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm shadow inline-flex items-center">
+                                        <i class="fas fa-file-invoice-dollar mr-1"></i> Create Invoice
                                     </a>
                                 </td>
                             </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="4" class="text-center py-4">
-                                    <div class="empty-state">
-                                        <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
-                                        <h6>No Patients Found</h6>
-                                        <p class="text-muted">No patients match your search criteria.</p>
+                                <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                                    <div class="flex flex-col items-center">
+                                        <i class="fas fa-user-slash fa-3x text-gray-400 mb-2"></i>
+                                        <h6 class="font-semibold">No Patients Found</h6>
+                                        <p class="text-sm">No patients match your search criteria.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -81,14 +88,15 @@
             </div>
 
             @if(count($patients))
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div>
-                        <p class="text-muted mb-0">Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} patients</p>
-                    </div>
-                    <div>
-                        {{ $patients->links() }}
-                    </div>
+            <!-- Pagination Info & Links -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mt-6 text-sm text-gray-600">
+                <div class="mb-2 sm:mb-0">
+                    Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} patients
                 </div>
+                <div>
+                    {{ $patients->links() }}
+                </div>
+            </div>
             @endif
         </div>
     </div>
@@ -101,21 +109,21 @@
 
     function search_place() {
         Object.assign(query, {
-            'keyword': $('#keyword').val()
+            'keyword': document.getElementById('keyword').value
         });
-        window.location.href = "{{route('admin.patient.index')}}?" + $.param(query);
+        window.location.href = "{{route('admin.patient.index')}}?" + new URLSearchParams(query).toString();
     }
 
     function sortByName(value) {
         Object.assign(query, {
             'sortByName': value
         });
-        window.location.href = "{{route('admin.patient.index')}}?" + $.param(query);
+        window.location.href = "{{route('admin.patient.index')}}?" + new URLSearchParams(query).toString();
     }
 
-    // Enable pressing Enter to search
-    $('#keyword').keypress(function(e) {
-        if(e.which == 13) {
+    // Enable Enter key for search
+    document.getElementById('keyword').addEventListener('keypress', function (e) {
+        if (e.which === 13 || e.keyCode === 13) {
             search_place();
         }
     });

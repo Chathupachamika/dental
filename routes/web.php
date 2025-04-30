@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -83,7 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Invoice routes
         Route::prefix('invoice')->name('invoice.')->group(function () {
             Route::get('/', [InvoiceController::class, 'index'])->name('index');
-            Route::get('/create/{id}', [InvoiceController::class, 'create'])->name('create');
+            Route::get('/create/{id?}', [InvoiceController::class, 'create'])->name('create');
             Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view');
             Route::post('/create', [InvoiceController::class, 'store'])->name('store');
         });
@@ -102,6 +103,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/{id}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
             Route::get('/{id}/notify', [AppointmentController::class, 'notify'])->name('notify');
         });
+
+        // Reports route
+        Route::get('/reports', [ChartController::class, 'index'])->name('reports.index');
+
+        Route::get('/patients/export', [PatientController::class, 'export'])->name('patient.export');
     });
 
     // API routes for patient - accessible to both admin and users

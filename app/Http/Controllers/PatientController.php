@@ -10,6 +10,7 @@ use App\Models\TreatmentSubCategoriesTwo;
 use App\Models\Treatment;
 use App\Models\TreatmentSubCategoriesOne;
 use App\Models\InvoiceTreatment;
+use Illuminate\Support\Facades\Response;
 
 class PatientController extends Controller
 {
@@ -244,5 +245,39 @@ class PatientController extends Controller
 
         $data['patients'] = $place_query->orderBy('id', 'DESC')->paginate(5);
         return view('admin.patient.list', $data);
+    }
+
+    public function export()
+    {
+        $patients = Patient::all();
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="patients.csv"',
+        ];
+
+        $callback = function() use ($patients) {
+            $file = fopen('php://output', 'w');
+
+            // Add CSV headers
+            fputcsv($file, ['ID', 'Name', 'Mobile Number', 'Address', 'Age', 'Gender', 'NIC']);
+
+            // Add patient data
+            foreach ($patients as $patient) {
+                fputcsv($file, [
+                    $patient->id,
+                    $patient->name,
+                    $patient->mobileNumber,
+                    $patient->address,
+                    $patient->age,
+                    $patient->gender,
+                    $patient->nic
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
     }
 }
