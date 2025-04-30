@@ -15,7 +15,7 @@ class AdminController extends Controller
         // Check if user is admin
         if (!$user->isAdmin()) {
             \Log::info('Non-admin attempted to access admin dashboard', ['email' => $user->email]);
-            return redirect()->route('user.user_dashboard')->with('error', 'Unauthorized access.');
+            return redirect()->route('user.dashboard')->with('error', 'Unauthorized access.');
         }
 
         // Fetch recent activities (if table exists)

@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Invoice;
 use Carbon\Carbon;
 
+// This controller can be removed as we're using UserController instead
 class UserDashboardController extends Controller
 {
+    // Move this functionality to UserController if needed
     public function index()
     {
         $user = auth()->user();

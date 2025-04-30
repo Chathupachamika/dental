@@ -1017,9 +1017,9 @@
             justify-content: center;
             width: 40px;
             height: 40px;
-            border-radius: var(--radius-full);
+            border-radius: var (--radius-full);
             background-color: var(--gray-100);
-            color: var(--gray-700);
+            color: var (--gray-700);
             cursor: pointer;
             transition: all 0.2s ease;
             margin-right: 1rem;
@@ -1153,7 +1153,7 @@
         }
 
         .notification-item:hover {
-            background-color: var(--gray-50);
+            background-color: var (--gray-50);
         }
 
         .notification-item:last-child {
@@ -1174,7 +1174,7 @@
 
         .notification-icon.warning {
             background-color: var(--warning-light);
-            color: var(--warning);
+            color: var (--warning);
         }
 
         .notification-content {
@@ -1267,12 +1267,174 @@
         .notification-empty p {
             font-size: 0.875rem;
         }
+
+        /* Update sidebar transition styles */
+        .sidebar {
+            width: 280px;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar.collapsed .sidebar-menu-item {
+            padding: 0.875rem;
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .sidebar-menu-item i {
+            margin-right: 0;
+        }
+
+        .sidebar.collapsed .sidebar-menu-item span,
+        .sidebar.collapsed .sidebar-group-header,
+        .sidebar.collapsed .sidebar-brand span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-brand img {
+            width: 40px;
+        }
+
+        /* Update main content transition */
+        .main-content {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+
+        /* Update navbar toggler transition */
+        .navbar-toggler {
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-toggler.rotated {
+            transform: rotate(180deg);
+        }
     </style>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        // Load the Visualization API and the controls package.
+        google.charts.load('current', {'packages':['corechart', 'controls']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(drawDashboard);
+
+        function drawDashboard() {
+            // Fetch patient age data from the API
+            fetch('/admin/chart/patient-ages')
+                .then(response => response.json())
+                .then(patientData => {
+                    // Create data table with patient data
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Patient');
+                    data.addColumn('number', 'Age');
+                    data.addRows(patientData);
+
+                    // Create a dashboard
+                    var dashboard = new google.visualization.Dashboard(
+                        document.getElementById('dashboard_div'));
+
+                    // Create a range slider for age filtering
+                    var ageRangeSlider = new google.visualization.ControlWrapper({
+                        'controlType': 'NumberRangeFilter',
+                        'containerId': 'filter_div',
+                        'options': {
+                            'filterColumnLabel': 'Age',
+                            'minValue': 0,
+                            'maxValue': 100
+                        }
+                    });
+
+                    // Create a column chart
+                    var ageChart = new google.visualization.ChartWrapper({
+                        'chartType': 'ColumnChart',
+                        'containerId': 'chart_div',
+                        'options': {
+                            'width': '100%',
+                            'height': 400,
+                            'pieSliceText': 'value',
+                            'legend': 'right',
+                            'title': 'Patient Age Distribution',
+                            'hAxis': {
+                                'title': 'Patients'
+                            },
+                            'vAxis': {
+                                'title': 'Age'
+                            }
+                        }
+                    });
+
+                    // Bind range slider to chart
+                    dashboard.bind(ageRangeSlider, ageChart);
+
+                    // Draw the dashboard
+                    dashboard.draw(data);
+                })
+                .catch(error => {
+                    console.error('Error loading patient age data:', error);
+                    document.getElementById('chart_div').innerHTML =
+                        '<div class="text-center text-gray-500 py-4">Failed to load patient age data</div>';
+                });
+        }
+    </script>
+    <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawTreatmentDistributionChart);
+
+    function drawTreatmentDistributionChart() {
+        fetch('/admin/chart/treatments')
+            .then(response => response.json())
+            .then(treatmentData => {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Treatment');
+                data.addColumn('number', 'Count');
+
+                treatmentData.forEach(item => {
+                    data.addRow([item.treatment, item.count]);
+                });
+
+                var options = {
+                    title: 'Treatment Distribution',
+                    pieHole: 0.4,
+                    sliceVisibilityThreshold: .05,
+                    colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'],
+                    chartArea: {
+                        width: '100%',
+                        height: '80%'
+                    },
+                    legend: {
+                        position: 'bottom',
+                        alignment: 'center'
+                    }
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('treatmentDistributionChart'));
+                chart.draw(data, options);
+
+                window.addEventListener('resize', function() {
+                    chart.draw(data, options);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading treatment data:', error);
+                document.getElementById('treatmentDistributionChart').innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        Failed to load treatment data
+                    </div>
+                `;
+            });
+    }
+</script>
 </head>
 <body>
     <!-- Global Loader -->
@@ -1450,58 +1612,37 @@
                 }, 500);
             });
 
-            // Sidebar Toggle
+            // Sidebar Toggle - Update this section
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
 
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.style.transition = 'all 0.3s ease-in-out';
-                mainContent.style.transition = 'margin-left 0.3s ease-in-out';
-
+            function toggleSidebar() {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('expanded');
 
-                // Remove transition after animation completes
-                setTimeout(() => {
-                    sidebar.style.transition = '';
-                    mainContent.style.transition = '';
-                }, 300);
-            });
-
-            // Remove the old show/hide mobile behavior
-            if (sidebarCollapseBtn) {
-                sidebarCollapseBtn.parentElement.removeChild(sidebarCollapseBtn);
+                // Store the state in localStorage
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
             }
 
-            // Hover effect for collapsed sidebar
-            if (sidebar) {
-                const menuItems = sidebar.querySelectorAll('.sidebar-menu-item');
+            // Initialize sidebar state from localStorage
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+            }
 
-                menuItems.forEach(item => {
-                    item.addEventListener('mouseenter', function() {
-                        if (sidebar.classList.contains('collapsed')) {
-                            const tooltip = document.createElement('div');
-                            tooltip.className = 'sidebar-tooltip';
-                            tooltip.textContent = this.querySelector('span').textContent;
+            sidebarToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleSidebar();
 
-                            const rect = this.getBoundingClientRect();
-                            tooltip.style.top = `${rect.top + rect.height/2}px`;
-                            tooltip.style.left = `${rect.right + 10}px`;
-                            tooltip.style.transform = 'translateY(-50%)';
+                // Add rotate animation to toggle button
+                this.style.transform = this.style.transform === 'rotate(180deg)' ? 'rotate(0)' : 'rotate(180deg)';
+            });
 
-                            document.body.appendChild(tooltip);
-                        }
-                    });
-
-                    item.addEventListener('mouseleave', function() {
-                        const tooltip = document.querySelector('.sidebar-tooltip');
-                        if (tooltip) {
-                            tooltip.remove();
-                        }
-                    });
-                });
+            // Remove the old sidebarCollapseBtn code
+            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+            if (sidebarCollapseBtn) {
+                sidebarCollapseBtn.remove();
             }
 
             // Notification Bell Toggle
@@ -1512,13 +1653,7 @@
                     this.classList.toggle('show');
 
                     if (this.classList.contains('show')) {
-                        // Add bell ring animation
-                        this.classList.add('animate-bell');
-                        setTimeout(() => {
-                            this.classList.remove('animate-bell');
-                        }, 1000);
-
-                        // Load notifications via AJAX
+                        // Remove bell ring animation on manual click
                         loadPendingAppointments();
                     }
                 });
@@ -1821,23 +1956,149 @@
                         badge = document.createElement('span');
                         badge.className = 'notification-badge';
                         notificationBell.appendChild(badge);
+
+                        // Only animate when new notifications arrive
+                        notificationBell.classList.add('animate-bell');
+                        setTimeout(() => {
+                            notificationBell.classList.remove('animate-bell');
+                        }, 1000);
                     }
-
                     badge.textContent = data.count;
-
-                    // Add animation to draw attention
-                    notificationBell.classList.add('animate-bell');
-                    setTimeout(() => {
-                        notificationBell.classList.remove('animate-bell');
-                    }, 1000);
                 }
             })
             .catch(error => {
                 console.error('Error fetching pending appointments count:', error);
             });
         });
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the controls package.
+      google.charts.load('current', {'packages':['corechart', 'controls']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawDashboard);
+
+      // Callback that creates and populates a data table,
+      // instantiates a dashboard, a range slider and a pie chart,
+      // passes in the data and draws it.
+      function drawDashboard() {
+
+        // Create our data table.
+        var data = google.visualization.arrayToDataTable([
+          ['Name', 'Donuts eaten'],
+          ['Michael' , 5],
+          ['Elisa', 7],
+          ['Robert', 3],
+          ['John', 2],
+          ['Jessica', 6],
+          ['Aaron', 1],
+          ['Margareth', 8]
+        ]);
+
+        // Create a dashboard.
+        var dashboard = new google.visualization.Dashboard(
+            document.getElementById('dashboard_div'));
+
+        // Create a range slider, passing some options
+        var donutRangeSlider = new google.visualization.ControlWrapper({
+          'controlType': 'NumberRangeFilter',
+          'containerId': 'filter_div',
+          'options': {
+            'filterColumnLabel': 'Donuts eaten'
+          }
+        });
+
+        // Create a pie chart, passing some options
+        var pieChart = new google.visualization.ChartWrapper({
+          'chartType': 'PieChart',
+          'containerId': 'chart_div',
+          'options': {
+            'width': 300,
+            'height': 300,
+            'pieSliceText': 'value',
+            'legend': 'right'
+          }
+        });
+
+        // Establish dependencies, declaring that 'filter' drives 'pieChart',
+        // so that the pie chart will only display entries that are let through
+        // given the chosen slider range.
+        dashboard.bind(donutRangeSlider, pieChart);
+
+        // Draw the dashboard.
+        dashboard.draw(data);
+      }
+    </script>
     </script>
 
-    @yield('javascript')
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawAppointmentsPieChart);
+
+        function drawAppointmentsPieChart() {
+            fetch('/admin/appointment?status=all&format=json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(apiData => {
+                    // Process the data
+                    var data = google.visualization.arrayToDataTable([
+                        ['Status', 'Count'],
+                        ['Confirmed', parseInt(apiData.confirmed) || 0],
+                        ['Pending', parseInt(apiData.pending) || 0],
+                        ['Cancelled', parseInt(apiData.cancelled) || 0]
+                    ]);
+
+                    var options = {
+                        pieHole: 0.4,
+                        colors: ['#10b981', '#f59e0b', '#ef4444'],
+                        chartArea: {
+                            width: '100%',
+                            height: '80%'
+                        },
+                        legend: {
+                            position: 'bottom',
+                            alignment: 'center'
+                        },
+                        pieSliceText: 'value',
+                        fontSize: 12,
+                        fontName: 'Poppins',
+                        tooltip: {
+                            showColorCode: true
+                        },
+                        animation: {
+                            startup: true,
+                            duration: 1000,
+                            easing: 'out'
+                        }
+                    };
+
+                    var chart = new google.visualization.PieChart(document.getElementById('appointmentsPieChart'));
+                    chart.draw(data, options);
+
+                    // Redraw on window resize
+                    window.addEventListener('resize', function() {
+                        chart.draw(data, options);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading appointment data:', error);
+                    document.getElementById('appointmentsPieChart').innerHTML = `
+                        <div class="flex flex-col items-center justify-center p-4 text-gray-500">
+                            <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+                            <p>Failed to load appointment data</p>
+                            <button onclick="drawAppointmentsPieChart()" class="mt-2 text-sm text-blue-500 hover:text-blue-700">
+                                <i class="fas fa-redo mr-1"></i> Try again
+                            </button>
+                        </div>
+                    `;
+                });
+        }
+    </script>
 </body>
 </html>

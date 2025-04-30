@@ -1,3 +1,7 @@
+@import 'https://cdn.jsdelivr.net/npm/@mdi/font@6.5.95/css/materialdesignicons.min.css';
+@import 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
