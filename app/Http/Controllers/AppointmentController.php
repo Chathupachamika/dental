@@ -22,8 +22,25 @@ class AppointmentController extends Controller
             $query->whereDate('appointment_date', $request->date);
         }
 
+        // Modified status filter to handle pending specifically
         if ($request->has('status')) {
             $query->where('status', $request->status);
+
+            // If requesting pending count via AJAX
+            if ($request->status === 'pending' && $request->has('count')) {
+                return response()->json([
+                    'count' => $query->count()
+                ]);
+            }
+
+            // If requesting pending appointments for notification panel
+            if ($request->status === 'pending' && $request->format === 'json') {
+                $appointments = $query->get();
+                return response()->json([
+                    'success' => true,
+                    'appointments' => $appointments
+                ]);
+            }
         }
 
         $appointments = $query->paginate(10); // Paginate the results

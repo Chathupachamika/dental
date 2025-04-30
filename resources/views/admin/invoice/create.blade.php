@@ -8,21 +8,14 @@
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Create New Invoice</h1>
-                    <p class="text-gray-600 mt-2">Patient ID: <span class="font-semibold text-indigo-600">#{{ $patient->id }}</span></p>
-                </div>
-                <div class="flex items-center space-x-4 bg-white p-2 rounded-lg shadow-sm">
-                    <span class="text-sm font-medium text-gray-600">Draft</span>
-                    <div class="w-16 h-6 bg-indigo-100 rounded-full p-1 cursor-pointer transition-all duration-300 hover:bg-indigo-200">
-                        <div class="w-4 h-4 bg-indigo-600 rounded-full shadow-md transform translate-x-0"></div>
-                    </div>
-                    <span class="text-sm font-medium text-gray-600">Final</span>
+                    <p class="text-gray-600 mt-2">Patient ID: <span class="font-semibold text-blue-600">#{{ $patient->id }}</span></p>
                 </div>
             </div>
         </div>
 
         <!-- Enhanced Main Content -->
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div class="bg-gradient-to-r from-indigo-600 to-blue-500 p-8 relative overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-500 p-8 relative overflow-hidden">
                 <div class="absolute inset-0 bg-pattern opacity-10"></div>
                 <h5 class="text-3xl font-bold text-white flex items-center relative z-10">
                     <i class="fas fa-file-invoice-dollar mr-4 text-white/80"></i>
@@ -97,7 +90,7 @@
                     <!-- Treatment Selection -->
                     <div class="bg-white rounded-xl p-6 mb-8 border border-gray-200 shadow-sm">
                         <h6 class="text-lg font-semibold text-gray-700 mb-4">Treatment Selection</h6>
-                        <div class="flex items-end space-x-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <div class="flex flex-col md:flex-row md:items-end space-y-4 md:space-y-0 md:space-x-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                             <div class="flex-1 group">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Treatment Type</label>
                                 <select id="treatmentSelect" class="w-full rounded-lg border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 transition-all">
@@ -113,13 +106,13 @@
                                     <option value="">Select Subtype</option>
                                 </select>
                             </div>
-                            <div class="w-24 group">
+                            <div class="w-full md:w-24 group">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Position</label>
                                 <select id="positionSelect" class="w-full rounded-lg border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 transition-all hidden">
                                     <option value="">Position</option>
                                 </select>
                             </div>
-                            <button type="button" id="addTreatmentBtn" class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center">
+                            <button type="button" id="addTreatmentBtn" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
                                 <i class="fas fa-plus mr-2"></i>Add Treatment
                             </button>
                         </div>
@@ -134,30 +127,42 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div class="group transition-all duration-300">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Other Note</label>
-                                <textarea name="otherNote" class="pl-3 w-full rounded-lg border-gray-200 bg-white shadow-sm"></textarea>
+                                <textarea name="otherNote" class="pl-3 w-full rounded-lg border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500"></textarea>
                             </div>
                             <div class="group transition-all duration-300">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Next Visit Date</label>
-                                <input type="date" name="visitDate" class="pl-3 w-full rounded-lg border-gray-200 bg-white shadow-sm">
+                                <div class="relative">
+                                    <i class="fas fa-calendar-alt absolute left-3 top-3 text-gray-400"></i>
+                                    <input type="date" name="visitDate" class="pl-10 w-full rounded-lg border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500">
+                                </div>
                             </div>
                             <div class="group transition-all duration-300">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Total</label>
-                                <input type="number" name="totalAmount" id="totalAmount" class="pl-3 w-full rounded-lg border-gray-200 bg-gray-100 shadow-sm" value="0.00" readonly>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-3 text-gray-500">$</span>
+                                    <input type="number" name="totalAmount" id="totalAmount" class="pl-8 w-full rounded-lg border-gray-200 bg-gray-100 shadow-sm" value="0.00" readonly>
+                                </div>
                             </div>
                             <div class="group transition-all duration-300">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Advance</label>
-                                <input type="number" name="advanceAmount" id="advanceAmount" class="pl-3 w-full rounded-lg border-gray-200 bg-white shadow-sm" value="0">
+                                <div class="relative">
+                                    <span class="absolute left-3 top-3 text-gray-500">$</span>
+                                    <input type="number" name="advanceAmount" id="advanceAmount" class="pl-8 w-full rounded-lg border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500" value="0">
+                                </div>
                             </div>
                             <div class="group transition-all duration-300">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Balance</label>
-                                <input type="number" id="balanceAmount" class="pl-3 w-full rounded-lg border-gray-200 bg-gray-100 shadow-sm" value="0" readonly>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-3 text-gray-500">$</span>
+                                    <input type="number" id="balanceAmount" class="pl-8 w-full rounded-lg border-gray-200 bg-gray-100 shadow-sm" value="0" readonly>
+                                </div>
                             </div>
                             <div class="col-span-2">
                                 <div class="flex justify-end space-x-4">
-                                    <button type="button" class="px-6 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 transition-all">
+                                    <button type="button" class="px-6 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 transition-all flex items-center">
                                         <i class="fas fa-times mr-2"></i>Cancel
                                     </button>
-                                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-3 rounded-lg hover:shadow-lg transition-all duration-300">
+                                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center">
                                         <i class="fas fa-save mr-2"></i>Save Invoice
                                     </button>
                                 </div>
@@ -232,7 +237,7 @@
                 <button type="button" id="cancelEditBtn" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
                     Cancel
                 </button>
-                <button type="button" id="saveEditBtn" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                <button type="button" id="saveEditBtn" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
                     Save Changes
                 </button>
             </div>
@@ -283,14 +288,17 @@
                 </div>
                 <div class="form-group">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Price</label>
-                    <input type="number" id="consultationPrice" class="w-full rounded-lg border-gray-200 bg-white shadow-sm" value="50">
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-500">$</span>
+                        <input type="number" id="consultationPrice" class="pl-8 w-full rounded-lg border-gray-200 bg-white shadow-sm" value="50">
+                    </div>
                 </div>
             </div>
             <div class="mt-6 flex space-x-3">
                 <button type="button" id="cancelConsultationEditBtn" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
                     Cancel
                 </button>
-                <button type="button" id="saveConsultationEditBtn" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                <button type="button" id="saveConsultationEditBtn" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
                     Save Changes
                 </button>
             </div>
@@ -298,11 +306,12 @@
     </div>
 </div>
 
+<!-- Fixed Loader with proper styling -->
 <div id="loader" class="fixed inset-0 bg-white/80 z-50 flex items-center justify-center backdrop-blur-sm" style="display: none;">
     <div class="relative">
-        <div class="h-24 w-24 rounded-full border-t-4 border-b-4 border-primary animate-spin"></div>
+        <div class="h-24 w-24 rounded-full border-t-4 border-b-4 border-blue-600 animate-spin"></div>
         <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-primary font-medium">Loading...</span>
+            <span class="text-blue-600 font-medium">Loading...</span>
         </div>
     </div>
 </div>
@@ -310,12 +319,16 @@
 <style>
 /* Modern color scheme */
 :root {
-    --primary: #4f46e5;
-    --primary-dark: #4338ca;
-    --secondary: #3b82f6;
+    --blue-primary: #3b82f6;
+    --blue-dark: #2563eb;
+    --blue-light: #60a5fa;
     --success: #10b981;
     --danger: #ef4444;
     --warning: #f59e0b;
+    --surface: #ffffff;
+    --background: #f8fafc;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
 }
 
 /* Enhanced animations */
@@ -331,8 +344,8 @@
 }
 
 @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 0 rgba(79, 70, 229, 0); }
-    50% { box-shadow: 0 0 20px rgba(79, 70, 229, 0.2); }
+    0%, 100% { box-shadow: 0 0 0 rgba(59, 130, 246, 0); }
+    50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
 }
 
 /* Card and container styles */
@@ -361,13 +374,8 @@ input, select, textarea {
 
 input:focus, select:focus, textarea:focus {
     transform: scale(1.01);
-    box-shadow213,219,0.8);
-}
-
-input:focus, select:focus, textarea:focus {
-    transform: scale(1.01);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: var(--blue-primary);
 }
 
 /* Button styles */
@@ -399,182 +407,98 @@ button:hover:after {
 .treatment-card {
     animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     background: linear-gradient(to right bottom, #ffffff, #fafafa);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(59, 130, 246, 0.05);
+    border-radius: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .treatment-card:hover {
     transform: translateY(-2px) scale(1.01);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    border-color: rgba(79, 70, 229, 0.3);
+    border-color: rgba(59, 130, 246, 0.3);
 }
 
-/* Progress steps animation */
-.step-active {
-    animation: pulseGlow 2s infinite;
-}
-
-/* Modern form layout */
-.form-group {
-    position: relative;
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    position: absolute;
-    top: -0.75rem;
-    left: 0.75rem;
-    padding: 0 0.5rem;
-    background: white;
-    font-size: 0.875rem;
-    color: var(--primary);
+/* Button icon styles */
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    background: #f3f4f6;
+    color: #6b7280;
     transition: all 0.2s;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+.btn-icon:hover {
+    background: #e5e7eb;
+    color: #374151;
 }
 
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
+.view-btn:hover {
+    background: #dbeafe;
+    color: #2563eb;
 }
 
-::-webkit-scrollbar-thumb {
-    background: #c7d2fe;
-    border-radius: 4px;
+.edit-btn:hover {
+    background: #d1fae5;
+    color: #059669;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #818cf8;
+.delete-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
 }
 
-/* Loading state animations */
-@keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
+/* Status tags */
+.status-tag {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
 }
 
-.loading {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite linear;
+.status-active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
 }
 
-/* Responsive improvements */
-@media (max-width: 768px) {
-    .container {
-        padding: 1rem;
-    }
-
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    .treatment-card {
-        margin-bottom: 1rem;
-    }
+.status-pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
 }
 
-/* Modern Design System */
-:root {
-    --primary: #4f46e5;
-    --primary-light: #6366f1;
-    --primary-dark: #4338ca;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    --background: #f8fafc;
-    --surface: #ffffff;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-}
-
-/* Modern Animations */
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-/* Enhanced Card Design */
-.treatment-card {
-    background: linear-gradient(145deg, var(--surface), #f8fafc);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.05),
-        0 4px 6px rgba(79, 70, 229, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.treatment-card:hover {
-    transform: translateY(-2px);
-    box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.05),
-        0 10px 15px rgba(79, 70, 229, 0.1);
-}
-
-/* Modern Button Styles */
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+/* Modern Tooltips */
+[data-tooltip] {
     position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
 }
 
-.btn-primary::before {
-    content: '';
+[data-tooltip]:after {
+    content: attr(data-tooltip);
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.2),
-        transparent
-    );
-    transition: 0.5s;
-}
-
-.btn-primary:hover::before {
-    left: 100%;
-}
-
-/* Modern Form Controls */
-.form-control {
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-2px);
+    background: #1f2937;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
     transition: all 0.2s ease;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: linear-gradient(180deg, #ffffff, #fafafa);
+    z-index: 10;
 }
 
-.form-control:focus {
-    transform: translateY(-1px);
-    box-shadow:
-        0 0 0 3px rgba(79, 70, 229, 0.1),
-        0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* Loader Animation */
-@keyframes loader-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loader {
-    animation: loader-spin 1s linear infinite;
-}
-
-/* Glass Morphism Effects */
-.glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+[data-tooltip]:hover:after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-8px);
 }
 
 /* Modern Scrollbar */
@@ -589,61 +513,46 @@ button:hover:after {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, var(--primary-light), var(--primary));
+    background: linear-gradient(45deg, #60a5fa, #3b82f6);
     border-radius: 4px;
     border: 2px solid #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-dark);
+    background: #2563eb;
 }
 
-/* Treatment Status Tags */
-.status-tag {
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
+/* Loader Animation */
+@keyframes loader-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-.status-active {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success);
+.animate-spin {
+    animation: loader-spin 1s linear infinite;
 }
 
-.status-pending {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-}
-
-/* Modern Tooltips */
-[data-tooltip] {
-    position: relative;
-}
-
-[data-tooltip]:after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-2px);
-    background: var(--text-primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-size: 0.75rem;
-    white-space: nowrap;
+/* Modal animations */
+.modal-enter {
     opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
+    transform: scale(0.95);
 }
 
-[data-tooltip]:hover:after {
+.modal-enter-active {
     opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(-8px);
+    transform: scale(1);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.modal-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.modal-exit-active {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 300ms, transform 300ms;
 }
 </style>
 
@@ -717,7 +626,8 @@ button:hover:after {
                 treatment,
                 subtype,
                 position,
-                price: treatmentData[treatment].price
+                price: treatmentData[treatment].price,
+                status: 'pending'
             });
             renderTreatmentCards();
             resetForm();
@@ -739,19 +649,19 @@ button:hover:after {
                                     </span>
                                 </div>
                                 <p class="text-sm text-gray-600 mt-1">
-                                    ${t.subtype ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">${t.subtype}</span>` : ''}
+                                    ${t.subtype ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">${t.subtype}</span>` : ''}
                                     ${t.position ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ml-2">Position ${t.position}</span>` : ''}
                                 </p>
-                                <p class="text-lg font-medium text-primary mt-2">$${t.price.toFixed(2)}</p>
+                                <p class="text-lg font-medium text-blue-600 mt-2">$${t.price.toFixed(2)}</p>
                             </div>
                             <div class="flex space-x-2">
-                                <button class="btn-icon view-btn" data-tooltip="View Details">
+                                <button type="button" class="btn-icon view-btn" data-tooltip="View Details">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button class="btn-icon edit-btn" data-tooltip="Edit Treatment">
+                                <button type="button" class="btn-icon edit-btn" data-tooltip="Edit Treatment">
                                     <i class="fas fa-pencil-alt"></i>
                                 </button>
-                                <button class="btn-icon delete-btn" data-tooltip="Delete">
+                                <button type="button" class="btn-icon delete-btn" data-tooltip="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -774,7 +684,7 @@ button:hover:after {
                     </div>
                     <div class="flex items-center justify-between border-t pt-3">
                         <span class="text-sm font-medium text-gray-500">Price</span>
-                        <span class="text-sm font-semibold text-indigo-600">$${t.price.toFixed(2)}</span>
+                        <span class="text-sm font-semibold text-blue-600">$${t.price.toFixed(2)}</span>
                     </div>
                     ${t.notes ? `
                         <div class="border-t pt-3">
@@ -847,7 +757,8 @@ button:hover:after {
                 treatment: $('#editTreatmentSelect').val(),
                 subtype: $('#editSubtypeSelect').val(),
                 position: $('#editPositionSelect').val(),
-                price: treatmentData[$('#editTreatmentSelect').val()].price
+                price: treatmentData[$('#editTreatmentSelect').val()].price,
+                status: treatments[editIndex].status || 'pending'
             };
             renderTreatmentCards();
             $('#editModal').addClass('hidden');
@@ -862,6 +773,7 @@ button:hover:after {
                 treatment: 'Consultation',
                 notes: $('#consultationNotes').val(),
                 price: parseFloat($('#consultationPrice').val()) || 50,
+                status: treatments[editIndex].status || 'pending'
             };
             renderTreatmentCards();
             $('#consultationEditModal').addClass('hidden');
@@ -876,9 +788,28 @@ button:hover:after {
         // Delete treatment
         $(document).on('click', '.delete-btn', function () {
             const index = $(this).closest('div[data-index]').data('index');
-            treatments.splice(index, 1);
-            renderTreatmentCards();
-            updateTotal();
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This treatment will be removed from the invoice",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    treatments.splice(index, 1);
+                    renderTreatmentCards();
+                    updateTotal();
+
+                    Swal.fire(
+                        'Deleted!',
+                        'The treatment has been removed.',
+                        'success'
+                    )
+                }
+            });
         });
 
         // Update total and balance
@@ -902,6 +833,16 @@ button:hover:after {
         // Form submission
         $('#invoiceForm').submit(function (e) {
             e.preventDefault();
+
+            if (treatments.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No Treatments Added',
+                    text: 'Please add at least one treatment to create an invoice',
+                });
+                return;
+            }
+
             showLoader();
 
             // Ensure we're sending the complete treatment data
@@ -918,8 +859,6 @@ button:hover:after {
                     price: t.price
                 }))
             };
-
-            console.log('Submitting form data:', formData);
 
             $.ajax({
                 url: "{{ route('admin.invoice.store') }}",
@@ -945,11 +884,11 @@ button:hover:after {
     });
 
     function showLoader() {
-        $('#loader').removeClass('hidden');
+        $('#loader').fadeIn(300);
     }
 
     function hideLoader() {
-        $('#loader').addClass('hidden');
+        $('#loader').fadeOut(300);
     }
 
     function showSuccess(message) {
@@ -970,12 +909,12 @@ button:hover:after {
             icon: 'error',
             title: 'Oops...',
             text: message,
-            confirmButtonColor: 'var(--primary)',
+            confirmButtonColor: '#3b82f6',
             customClass: {
                 popup: 'animated fadeInDown faster'
             }
         });
     }
-    </script>
+</script>
 
 @endsection
