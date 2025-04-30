@@ -154,9 +154,81 @@
                         </h3>
                     </div>
                     <div class="p-5">
-                        <div id="treatmentsChart" style="height: 250px;"></div>
+                        <div id="treatmentChart" style="height: 250px;"></div>
                     </div>
                 </div>
+
+                <script type="text/javascript">
+                    google.charts.load('current', {'packages':['corechart']});
+                    google.charts.setOnLoadCallback(drawTreatmentChart);
+
+                    function drawTreatmentChart() {
+                        fetch('/admin/treatment-stats')
+                            .then(response => response.json())
+                            .then(treatmentData => {
+                                var data = new google.visualization.DataTable();
+                                data.addColumn('string', 'Treatment');
+                                data.addColumn('number', 'Count');
+
+                                treatmentData.forEach(item => {
+                                    data.addRow([item.treatment, item.count]);
+                                });
+
+                                var options = {
+                                    titleTextStyle: {
+                                        color: '#1e293b',
+                                        fontSize: 16,
+                                        fontName: 'Poppins'
+                                    },
+                                    pieHole: 0.4,
+                                    sliceVisibilityThreshold: 0.05,
+                                    colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#6366f1'],
+                                    chartArea: {
+                                        width: '100%',
+                                        height: '80%'
+                                    },
+                                    legend: {
+                                        position: 'bottom',
+                                        alignment: 'center',
+                                        textStyle: {
+                                            color: '#475569',
+                                            fontName: 'Poppins',
+                                            fontSize: 12
+                                        }
+                                    },
+                                    pieSliceText: 'percentage',
+                                    pieSliceTextStyle: {
+                                        color: 'white',
+                                        fontName: 'Poppins'
+                                    },
+                                    tooltip: {
+                                        showColorCode: true,
+                                        text: 'percentage'
+                                    }
+                                };
+
+                                var chart = new google.visualization.PieChart(document.getElementById('treatmentChart'));
+                                chart.draw(data, options);
+
+                                // Redraw chart on window resize
+                                window.addEventListener('resize', function() {
+                                    chart.draw(data, options);
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error loading treatment data:', error);
+                                document.getElementById('treatmentChart').innerHTML = `
+                                    <div class="text-center text-gray-500 py-4">
+                                        <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+                                        <p>Failed to load treatment data</p>
+                                        <button onclick="drawTreatmentChart()" class="mt-2 text-sm text-blue-500 hover:text-blue-700">
+                                            <i class="fas fa-redo mr-1"></i> Try again
+                                        </button>
+                                    </div>
+                                `;
+                            });
+                    }
+                </script>
             </div>
 
             <!-- Recent Invoices -->
@@ -171,66 +243,90 @@
                         <i class="fas fa-chevron-right ml-1 text-xs"></i>
                     </a>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-gray-50">
-                                <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Invoice #</th>
-                                <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Patient</th>
-                                <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Date</th>
-                                <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Amount</th>
-                                <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @if(isset($recentInvoices) && count($recentInvoices) > 0)
-                                @foreach($recentInvoices as $invoice)
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-5 py-4 text-sm text-gray-900">
-                                        <a href="{{ route('admin.invoice.view', $invoice->id) }}" class="font-medium text-blue-600 hover:text-blue-800">#{{ $invoice->id }}</a>
-                                    </td>
-                                    <td class="px-5 py-4 text-sm">
-                                        <div class="flex items-center">
-                                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center mr-3">
-                                                <span class="font-medium">{{ substr($invoice->patient->name ?? 'U', 0, 1) }}</span>
-                                            </div>
-                                            <span class="text-gray-700">{{ $invoice->patient->name ?? 'Unknown' }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-5 py-4 text-sm text-gray-500">
-                                        {{ \Carbon\Carbon::parse($invoice->created_at ?? now())->format('d M, Y') }}
-                                    </td>
-                                    <td class="px-5 py-4 text-sm">
-                                        <span class="font-medium text-gray-900">₹{{ number_format($invoice->totalAmount ?? 0) }}</span>
-                                    </td>
-                                    <td class="px-5 py-4 text-sm">
-                                        @php
-                                            $isPaid = isset($invoice->totalAmount) && isset($invoice->advanceAmount) && $invoice->totalAmount <= $invoice->advanceAmount;
-                                        @endphp
-                                        @if($isPaid)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                <i class="fas fa-check-circle mr-1"></i> Paid
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                <i class="fas fa-clock mr-1"></i> Pending
-                                            </span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                            @else
-                                <tr>
-                                    <td colspan="5" class="px-5 py-8 text-center text-gray-500">
-                                        <i class="fas fa-file-invoice text-gray-300 text-4xl mb-3"></i>
-                                        <p>No recent invoices found</p>
-                                    </td>
-                                </tr>
-                            @endif
-                        </tbody>
-                    </table>
+                <div class="overflow-x-auto" id="recentInvoicesTable">
+                    <div class="p-4 text-center text-gray-500">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Loading invoices...
+                    </div>
                 </div>
             </div>
+
+            <script>
+            function loadRecentInvoices() {
+                fetch('/admin/recent-invoices')
+                    .then(response => response.json())
+                    .then(invoices => {
+                        const tableContent = `
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-gray-50">
+                                        <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Invoice #</th>
+                                        <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Patient</th>
+                                        <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Date</th>
+                                        <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Amount</th>
+                                        <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    ${invoices.length > 0 ? invoices.map(invoice => `
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-5 py-4 text-sm text-gray-900">
+                                                <a href="/admin/invoice/view/${invoice.id}" class="font-medium text-blue-600 hover:text-blue-800">#${invoice.id}</a>
+                                            </td>
+                                            <td class="px-5 py-4 text-sm">
+                                                <div class="flex items-center">
+                                                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center mr-3">
+                                                        <span class="font-medium">${invoice.patient ? invoice.patient.name.charAt(0) : 'U'}</span>
+                                                    </div>
+                                                    <span class="text-gray-700">${invoice.patient ? invoice.patient.name : 'Unknown'}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-5 py-4 text-sm text-gray-500">
+                                                ${moment(invoice.created_at).format('D MMM, YYYY')}
+                                            </td>
+                                            <td class="px-5 py-4 text-sm">
+                                                <span class="font-medium text-gray-900">₹${invoice.totalAmount ? invoice.totalAmount.toLocaleString() : '0'}</span>
+                                            </td>
+                                            <td class="px-5 py-4 text-sm">
+                                                ${invoice.totalAmount <= invoice.advanceAmount ?
+                                                    `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <i class="fas fa-check-circle mr-1"></i> Paid
+                                                    </span>` :
+                                                    `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        <i class="fas fa-clock mr-1"></i> Pending
+                                                    </span>`
+                                                }
+                                            </td>
+                                        </tr>
+                                    `).join('') : `
+                                        <tr>
+                                            <td colspan="5" class="px-5 py-8 text-center text-gray-500">
+                                                <i class="fas fa-file-invoice text-gray-300 text-4xl mb-3 block"></i>
+                                                <p>No recent invoices found</p>
+                                            </td>
+                                        </tr>
+                                    `}
+                                </tbody>
+                            </table>
+                        `;
+                        document.getElementById('recentInvoicesTable').innerHTML = tableContent;
+                    })
+                    .catch(error => {
+                        console.error('Error loading recent invoices:', error);
+                        document.getElementById('recentInvoicesTable').innerHTML = `
+                            <div class="p-4 text-center text-gray-500">
+                                <i class="fas fa-exclamation-circle text-red-500 text-xl mb-2 block"></i>
+                                <p>Failed to load recent invoices</p>
+                                <button onclick="loadRecentInvoices()" class="mt-2 text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-redo mr-1"></i> Try again
+                                </button>
+                            </div>
+                        `;
+                    });
+            }
+
+            // Load invoices when the document is ready
+            document.addEventListener('DOMContentLoaded', loadRecentInvoices);
+            </script>
         </div>
 
         <!-- Right Column -->

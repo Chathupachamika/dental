@@ -112,6 +112,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Add this new route
         Route::get('/chart/patient-ages', [PatientController::class, 'getPatientAges'])->name('chart.patient-ages');
+
+        // Add these new API routes
+        Route::get('/recent-invoices', [InvoiceController::class, 'getRecentInvoices'])->name('recent.invoices');
+        Route::get('/treatment-stats', [PatientController::class, 'getTreatmentStats'])->name('treatment.stats');
+        Route::get('/appointment-stats', [AppointmentController::class, 'getStats'])->name('appointment.stats');
     });
 
     // API routes for patient - accessible to both admin and users

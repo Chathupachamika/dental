@@ -290,4 +290,24 @@ class PatientController extends Controller
 
         return response()->json($data);
     }
+
+    public function getTreatmentStats()
+    {
+        try {
+            $treatments = InvoiceTreatment::select('treatMent')
+                ->selectRaw('COUNT(*) as count')
+                ->groupBy('treatMent')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'treatment' => $item->treatMent,
+                        'count' => $item->count
+                    ];
+                });
+
+            return response()->json($treatments);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

@@ -1267,6 +1267,54 @@
         .notification-empty p {
             font-size: 0.875rem;
         }
+
+        /* Update sidebar transition styles */
+        .sidebar {
+            width: 280px;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar.collapsed .sidebar-menu-item {
+            padding: 0.875rem;
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .sidebar-menu-item i {
+            margin-right: 0;
+        }
+
+        .sidebar.collapsed .sidebar-menu-item span,
+        .sidebar.collapsed .sidebar-group-header,
+        .sidebar.collapsed .sidebar-brand span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-brand img {
+            width: 40px;
+        }
+
+        /* Update main content transition */
+        .main-content {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+
+        /* Update navbar toggler transition */
+        .navbar-toggler {
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-toggler.rotated {
+            transform: rotate(180deg);
+        }
     </style>
 
     <!-- Scripts -->
@@ -1339,6 +1387,54 @@
                 });
         }
     </script>
+    <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawTreatmentDistributionChart);
+
+    function drawTreatmentDistributionChart() {
+        fetch('/admin/chart/treatments')
+            .then(response => response.json())
+            .then(treatmentData => {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Treatment');
+                data.addColumn('number', 'Count');
+
+                treatmentData.forEach(item => {
+                    data.addRow([item.treatment, item.count]);
+                });
+
+                var options = {
+                    title: 'Treatment Distribution',
+                    pieHole: 0.4,
+                    sliceVisibilityThreshold: .05,
+                    colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'],
+                    chartArea: {
+                        width: '100%',
+                        height: '80%'
+                    },
+                    legend: {
+                        position: 'bottom',
+                        alignment: 'center'
+                    }
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('treatmentDistributionChart'));
+                chart.draw(data, options);
+
+                window.addEventListener('resize', function() {
+                    chart.draw(data, options);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading treatment data:', error);
+                document.getElementById('treatmentDistributionChart').innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        Failed to load treatment data
+                    </div>
+                `;
+            });
+    }
+</script>
 </head>
 <body>
     <!-- Global Loader -->
@@ -1504,7 +1600,6 @@
     <script src="{{ asset('assets/vendors/chart.js/Chart.min.js')}}"></script>
 
     <script>
-
         document.addEventListener('DOMContentLoaded', function() {
             // Show loader on page load
             const globalLoader = document.getElementById('global-loader');
@@ -1517,58 +1612,37 @@
                 }, 500);
             });
 
-            // Sidebar Toggle
+            // Sidebar Toggle - Update this section
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
 
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.style.transition = 'all 0.3s ease-in-out';
-                mainContent.style.transition = 'margin-left 0.3s ease-in-out';
-
+            function toggleSidebar() {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('expanded');
 
-                // Remove transition after animation completes
-                setTimeout(() => {
-                    sidebar.style.transition = '';
-                    mainContent.style.transition = '';
-                }, 300);
-            });
-
-            // Remove the old show/hide mobile behavior
-            if (sidebarCollapseBtn) {
-                sidebarCollapseBtn.parentElement.removeChild(sidebarCollapseBtn);
+                // Store the state in localStorage
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
             }
 
-            // Hover effect for collapsed sidebar
-            if (sidebar) {
-                const menuItems = sidebar.querySelectorAll('.sidebar-menu-item');
+            // Initialize sidebar state from localStorage
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+            }
 
-                menuItems.forEach(item => {
-                    item.addEventListener('mouseenter', function() {
-                        if (sidebar.classList.contains('collapsed')) {
-                            const tooltip = document.createElement('div');
-                            tooltip.className = 'sidebar-tooltip';
-                            tooltip.textContent = this.querySelector('span').textContent;
+            sidebarToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleSidebar();
 
-                            const rect = this.getBoundingClientRect();
-                            tooltip.style.top = `${rect.top + rect.height/2}px`;
-                            tooltip.style.left = `${rect.right + 10}px`;
-                            tooltip.style.transform = 'translateY(-50%)';
+                // Add rotate animation to toggle button
+                this.style.transform = this.style.transform === 'rotate(180deg)' ? 'rotate(0)' : 'rotate(180deg)';
+            });
 
-                            document.body.appendChild(tooltip);
-                        }
-                    });
-
-                    item.addEventListener('mouseleave', function() {
-                        const tooltip = document.querySelector('.sidebar-tooltip');
-                        if (tooltip) {
-                            tooltip.remove();
-                        }
-                    });
-                });
+            // Remove the old sidebarCollapseBtn code
+            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+            if (sidebarCollapseBtn) {
+                sidebarCollapseBtn.remove();
             }
 
             // Notification Bell Toggle
@@ -1896,7 +1970,6 @@
                 console.error('Error fetching pending appointments count:', error);
             });
         });
-
 
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">

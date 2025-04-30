@@ -209,4 +209,28 @@ class InvoiceController extends Controller
 
         return $pdf->download('invoice-' . $invoice->id . '.pdf');
     }
+
+    public function getRecentInvoices()
+    {
+        try {
+            $invoices = Invoice::with(['patient', 'invoiceTreatment'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get()
+                ->map(function($invoice) {
+                    return [
+                        'id' => $invoice->id,
+                        'patient' => $invoice->patient,
+                        'totalAmount' => $invoice->totalAmount,
+                        'advanceAmount' => $invoice->advanceAmount,
+                        'created_at' => $invoice->created_at,
+                        'status' => $invoice->totalAmount <= $invoice->advanceAmount ? 'paid' : 'pending'
+                    ];
+                });
+
+            return response()->json($invoices);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
