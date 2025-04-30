@@ -31,7 +31,7 @@
                 <h3 class="card-title">Upcoming Appointments</h3>
             </div>
             <div class="card-body">
-                @if(count($upcomingAppointments) > 0)
+                @if(!is_null($upcomingAppointments) && count($upcomingAppointments) > 0)
                     <div class="appointments-table">
                         <table>
                             <thead>
@@ -142,7 +142,7 @@
             <h3 class="card-title">Recent Treatment History</h3>
         </div>
         <div class="card-body">
-            @if(count($pastAppointments) > 0)
+            @if(!is_null($pastAppointments) && count($pastAppointments) > 0)
                 <div class="history-table">
                     <table>
                         <thead>
