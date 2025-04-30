@@ -122,6 +122,12 @@
             50% { transform: translateY(-6px); }
         }
 
+        @keyframes bellRing {
+            0%, 100% { transform: rotate(0); }
+            10%, 30%, 50%, 70%, 90% { transform: rotate(10deg); }
+            20%, 40%, 60%, 80% { transform: rotate(-10deg); }
+        }
+
         .animate-fadeIn {
             animation: fadeIn 0.5s ease-out forwards;
         }
@@ -136,6 +142,10 @@
 
         .animate-float {
             animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-bell {
+            animation: bellRing 1s ease-in-out;
         }
 
         /* Sidebar Styles */
@@ -998,6 +1008,265 @@
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(100%); opacity: 0; }
         }
+
+        /* Notification Bell Styles */
+        .notification-bell {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            background-color: var(--gray-100);
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 1rem;
+        }
+
+        .notification-bell:hover {
+            background-color: var(--primary-50);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .notification-bell.active {
+            background-color: var(--primary-50);
+            color: var(--primary);
+        }
+
+        .notification-bell i {
+            font-size: 1.25rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-full);
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: -100px;
+            width: 350px;
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            z-index: 1000;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95);
+            transform-origin: top right;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .notification-bell.show .notification-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(to right, var(--primary-50), var(--white));
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification-title i {
+            color: var(--primary);
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .notification-action {
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+        }
+
+        .notification-action:hover {
+            background-color: var(--gray-100);
+            color: var(--primary);
+        }
+
+        .notification-body {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .notification-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .notification-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .notification-body::-webkit-scrollbar-thumb {
+            background-color: var(--gray-300);
+            border-radius: var(--radius-full);
+        }
+
+        .notification-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: var(--gray-50);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            background-color: var(--primary-50);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.warning {
+            background-color: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-message {
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message strong {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .notification-actions-item {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .notification-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .notification-btn-confirm {
+            background-color: var(--primary-50);
+            color: var(--primary);
+        }
+
+        .notification-btn-confirm:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .notification-btn-cancel {
+            background-color: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .notification-btn-cancel:hover {
+            background-color: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .notification-footer {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--gray-50);
+            text-align: center;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .notification-footer a {
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .notification-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .notification-empty {
+            padding: 2rem;
+            text-align: center;
+            color: var(--gray-500);
+        }
+
+        .notification-empty i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--gray-300);
+        }
+
+        .notification-empty p {
+            font-size: 0.875rem;
+        }
     </style>
 
     <!-- Scripts -->
@@ -1080,6 +1349,48 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="navbar-profile">
+                    <!-- Notification Bell -->
+                    <div class="notification-bell" id="notificationBell">
+                        <i class="fas fa-bell"></i>
+                        @if(isset($pendingAppointmentsCount) && $pendingAppointmentsCount > 0)
+                            <span class="notification-badge">{{ $pendingAppointmentsCount }}</span>
+                        @endif
+
+                        <!-- Notification Dropdown -->
+                        <div class="notification-dropdown">
+                            <div class="notification-header">
+                                <div class="notification-title">
+                                    <i class="fas fa-bell"></i>
+                                    <span>Notifications</span>
+                                    @if(isset($pendingAppointmentsCount) && $pendingAppointmentsCount > 0)
+                                        <span class="badge bg-danger text-white">{{ $pendingAppointmentsCount }}</span>
+                                    @endif
+                                </div>
+                                <div class="notification-actions">
+                                    <button class="notification-action" id="markAllRead" title="Mark all as read">
+                                        <i class="fas fa-check-double"></i>
+                                    </button>
+                                    <button class="notification-action" id="refreshNotifications" title="Refresh">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-body" id="notificationBody">
+                                <!-- Notifications will be loaded here via AJAX -->
+                                <div class="notification-loading">
+                                    <div class="d-flex justify-content-center p-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notification-footer">
+                                <a href="{{ route('admin.appointments.index', ['status' => 'pending']) }}">View All Pending Appointments</a>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="navbar-profile-img">
                         <img src="{{ asset('images/user.jpg') }}" alt="User">
                     </div>
@@ -1146,24 +1457,22 @@
             const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
 
             sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
+                sidebar.style.transition = 'all 0.3s ease-in-out';
+                mainContent.style.transition = 'margin-left 0.3s ease-in-out';
+
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+
+                // Remove transition after animation completes
+                setTimeout(() => {
+                    sidebar.style.transition = '';
+                    mainContent.style.transition = '';
+                }, 300);
             });
 
+            // Remove the old show/hide mobile behavior
             if (sidebarCollapseBtn) {
-                sidebarCollapseBtn.addEventListener('click', function() {
-                    sidebar.classList.toggle('collapsed');
-                    mainContent.classList.toggle('expanded');
-
-                    // Change icon direction
-                    const icon = this.querySelector('i');
-                    if (sidebar.classList.contains('collapsed')) {
-                        icon.classList.remove('fa-chevron-left');
-                        icon.classList.add('fa-chevron-right');
-                    } else {
-                        icon.classList.remove('fa-chevron-right');
-                        icon.classList.add('fa-chevron-left');
-                    }
-                });
+                sidebarCollapseBtn.parentElement.removeChild(sidebarCollapseBtn);
             }
 
             // Hover effect for collapsed sidebar
@@ -1192,6 +1501,213 @@
                             tooltip.remove();
                         }
                     });
+                });
+            }
+
+            // Notification Bell Toggle
+            const notificationBell = document.getElementById('notificationBell');
+            if (notificationBell) {
+                notificationBell.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.classList.toggle('show');
+
+                    if (this.classList.contains('show')) {
+                        // Add bell ring animation
+                        this.classList.add('animate-bell');
+                        setTimeout(() => {
+                            this.classList.remove('animate-bell');
+                        }, 1000);
+
+                        // Load notifications via AJAX
+                        loadPendingAppointments();
+                    }
+                });
+
+                // Close notification dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!notificationBell.contains(e.target)) {
+                        notificationBell.classList.remove('show');
+                    }
+                });
+
+                // Prevent closing when clicking inside dropdown
+                const notificationDropdown = notificationBell.querySelector('.notification-dropdown');
+                if (notificationDropdown) {
+                    notificationDropdown.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+
+                // Refresh notifications
+                const refreshBtn = document.getElementById('refreshNotifications');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', function() {
+                        loadPendingAppointments();
+                        this.classList.add('animate-spin');
+                        setTimeout(() => {
+                            this.classList.remove('animate-spin');
+                        }, 1000);
+                    });
+                }
+
+                // Mark all as read
+                const markAllReadBtn = document.getElementById('markAllRead');
+                if (markAllReadBtn) {
+                    markAllReadBtn.addEventListener('click', function() {
+                        // You can implement AJAX call to mark all as read
+                        showToast('Success', 'All notifications marked as read', 'success');
+                    });
+                }
+            }
+
+            // Function to load pending appointments via AJAX
+            function loadPendingAppointments() {
+                const notificationBody = document.getElementById('notificationBody');
+
+                // Show loading state
+                notificationBody.innerHTML = `
+                    <div class="d-flex justify-content-center p-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                `;
+
+                // Fetch pending appointments
+                fetch('/admin/appointment?status=pending&format=json', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.appointments && data.appointments.length > 0) {
+                        let html = '';
+
+                        data.appointments.forEach(appointment => {
+                            const date = new Date(appointment.appointment_date);
+                            const formattedDate = date.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                            });
+
+                            const time = appointment.appointment_time ?
+                                new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : 'N/A';
+
+                            html += `
+                                <div class="notification-item">
+                                    <div class="notification-icon warning">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-message">
+                                            <strong>${appointment.user ? appointment.user.name : 'Unknown Patient'}</strong> has requested an appointment on <strong>${formattedDate}</strong></strong>
+                                        </div>
+                                        <div class="notification-time">
+                                            ${moment(appointment.created_at).fromNow()}
+                                        </div>
+                                        <div class="notification-actions-item">
+                                            <form action="/admin/appointment/${appointment.id}/confirm" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="notification-btn notification-btn-confirm">
+                                                    <i class="fas fa-check"></i> Confirm
+                                                </button>
+                                            </form>
+                                            <form action="/admin/appointment/${appointment.id}/cancel" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="notification-btn notification-btn-cancel">
+                                                    <i class="fas fa-times"></i> Cancel
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        notificationBody.innerHTML = html;
+
+                        // Add event listeners to the confirm and cancel buttons
+                        const confirmButtons = notificationBody.querySelectorAll('.notification-btn-confirm');
+                        const cancelButtons = notificationBody.querySelectorAll('.notification-btn-cancel');
+
+                        confirmButtons.forEach(button => {
+                            button.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const form = this.closest('form');
+
+                                fetch(form.action, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        showToast('Success', 'Appointment confirmed successfully', 'success');
+                                        loadPendingAppointments();
+                                    } else {
+                                        showToast('Error', 'Failed to confirm appointment', 'error');
+                                    }
+                                })
+                                .catch(error => {
+                                    showToast('Error', 'An error occurred', 'error');
+                                });
+                            });
+                        });
+
+                        cancelButtons.forEach(button => {
+                            button.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const form = this.closest('form');
+
+                                fetch(form.action, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        showToast('Success', 'Appointment cancelled successfully', 'success');
+                                        loadPendingAppointments();
+                                    } else {
+                                        showToast('Error', 'Failed to cancel appointment', 'error');
+                                    }
+                                })
+                                .catch(error => {
+                                    showToast('Error', 'An error occurred', 'error');
+                                });
+                            });
+                        });
+
+                    } else {
+                        notificationBody.innerHTML = `
+                            <div class="notification-empty">
+                                <i class="fas fa-check-circle"></i>
+                                <h4>All caught up!</h4>
+                                <p>No pending appointments to confirm.</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    notificationBody.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h4>Oops!</h4>
+                            <p>Failed to load notifications. Please try again.</p>
+                        </div>
+                    `;
                 });
             }
 
@@ -1286,6 +1802,39 @@
             setTimeout(() => {
                 showToast('Welcome Back!', 'Your dashboard is ready', 'success');
             }, 1000);
+
+            // Load pending appointments count via AJAX
+            fetch('/admin/appointment?status=pending&count=true', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.count && data.count > 0) {
+                    const notificationBell = document.getElementById('notificationBell');
+
+                    // Create or update badge
+                    let badge = notificationBell.querySelector('.notification-badge');
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'notification-badge';
+                        notificationBell.appendChild(badge);
+                    }
+
+                    badge.textContent = data.count;
+
+                    // Add animation to draw attention
+                    notificationBell.classList.add('animate-bell');
+                    setTimeout(() => {
+                        notificationBell.classList.remove('animate-bell');
+                    }, 1000);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching pending appointments count:', error);
+            });
         });
     </script>
 

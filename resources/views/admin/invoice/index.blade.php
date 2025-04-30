@@ -241,6 +241,9 @@
 </div>
 
 @section('javascript')
+<!-- Add SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script type="text/javascript">
     var query = <?php echo json_encode((object)Request::only(['keyword', 'filter'])); ?>;
 
@@ -282,10 +285,20 @@
     }
 
     function openEditModal(invoiceId) {
-        // Show modal with loading state
+        // Show loading state with SweetAlert2
+        Swal.fire({
+            title: 'Loading...',
+            text: 'Fetching invoice details',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Show modal
         const modal = document.getElementById('editInvoiceModal');
         const modalContent = document.getElementById('modalContent');
-
         modal.classList.remove('hidden');
 
         // Fetch invoice data
@@ -297,6 +310,7 @@
         })
         .then(response => response.json())
         .then(data => {
+            Swal.close();
             // Populate form fields
             document.getElementById('editInvoiceId').value = data.id;
             document.getElementById('editTotalAmount').value = data.totalAmount;
@@ -347,7 +361,12 @@
         .catch(error => {
             console.error('Error fetching invoice data:', error);
             closeEditModal();
-            alert('Failed to load invoice data. Please try again.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to load invoice data. Please try again.',
+                confirmButtonColor: '#3085d6'
+            });
         });
     }
 
@@ -372,50 +391,68 @@
         e.preventDefault();
         const invoiceId = document.getElementById('editInvoiceId').value;
 
-        // Create form data
-        const formData = new FormData(this);
+        // Show confirmation dialog
+        Swal.fire({
+            title: 'Update Invoice',
+            text: 'Are you sure you want to update this invoice?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
+                submitBtn.disabled = true;
 
-        // Show loading state
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
-        submitBtn.disabled = true;
-
-        // Send AJAX request
-        fetch(`/admin/invoice/update/${invoiceId}`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'X-HTTP-Method-Override': 'PUT'
+                // Send AJAX request
+                fetch(`/admin/invoice/update/${invoiceId}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-HTTP-Method-Override': 'PUT'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Invoice updated successfully',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            closeEditModal();
+                            window.location.reload();
+                        });
+                    } else {
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error updating invoice: ' + data.message,
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while updating the invoice. Please try again.',
+                        confirmButtonColor: '#3085d6'
+                    });
+                });
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Show success message
-                const successMessage = document.createElement('div');
-                successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center';
-                successMessage.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Invoice updated successfully!';
-                document.body.appendChild(successMessage);
-
-                // Close modal and refresh page after delay
-                setTimeout(() => {
-                    closeEditModal();
-                    window.location.reload();
-                }, 1500);
-            } else {
-                // Reset button and show error
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
-                alert('Error updating invoice: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            submitBtn.innerHTML = originalBtnText;
-            submitBtn.disabled = false;
-            alert('An error occurred while updating the invoice. Please try again.');
         });
     });
 
