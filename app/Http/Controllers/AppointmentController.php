@@ -13,6 +13,19 @@ class AppointmentController extends Controller
 {
     public function index(Request $request)
     {
+        $query = Appointment::with('user');
+
+        // If requesting all statuses for chart
+        if ($request->status === 'all' && $request->format === 'json') {
+            $counts = [
+                'confirmed' => Appointment::where('status', 'confirmed')->count(),
+                'pending' => Appointment::where('status', 'pending')->count(),
+                'cancelled' => Appointment::where('status', 'cancelled')->count()
+            ];
+
+            return response()->json($counts);
+        }
+
         // Retrieve all appointments with related user data
         $query = Appointment::with('user') // Ensure 'user' relationship is loaded
             ->orderBy('appointment_date', 'desc'); // Order by appointment_date

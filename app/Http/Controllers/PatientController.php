@@ -280,4 +280,14 @@ class PatientController extends Controller
 
         return Response::stream($callback, 200, $headers);
     }
+
+    public function getPatientAges()
+    {
+        $patients = Patient::whereNotNull('age')->get(['name', 'age']);
+        $data = $patients->map(function($patient) {
+            return [$patient->name, (int)$patient->age];
+        });
+
+        return response()->json($data);
+    }
 }

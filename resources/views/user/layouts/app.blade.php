@@ -41,7 +41,7 @@
             --gray-700: #374151;
             --gray-800: #1f2937;
             --gray-900: #111827;
-            
+
             /* Animation variables */
             --transition-fast: 0.2s;
             --transition-normal: 0.3s;
@@ -101,9 +101,9 @@
             left: 10%;
             width: 80%;
             height: 1px;
-            background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0) 0%, 
-                rgba(255, 255, 255, 0.3) 50%, 
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
                 rgba(255, 255, 255, 0) 100%);
         }
 
@@ -141,8 +141,8 @@
             left: 0;
             width: 0;
             height: 100%;
-            background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0.1) 0%, 
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.1) 0%,
                 rgba(255, 255, 255, 0) 100%);
             transition: width var(--transition-normal);
             z-index: -1;
@@ -161,8 +161,8 @@
         }
 
         .sidebar-menu-item.active {
-            background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0.2) 0%, 
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.2) 0%,
                 rgba(255, 255, 255, 0.05) 100%);
             font-weight: 500;
         }
@@ -190,8 +190,8 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0.8) 0%, 
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.8) 0%,
                 rgba(255, 255, 255, 0) 100%);
             border-radius: 2px;
         }
@@ -650,12 +650,12 @@
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <a href="{{ route('user.user_dashboard') }}">
+                <a href="{{ route('user.dashboard') }}">
                     <img src="{{ asset('assets/images/logo.jpeg') }}" alt="Logo">
                 </a>
             </div>
             <div class="sidebar-menu">
-                <a href="{{ route('user.user_dashboard') }}" class="sidebar-menu-item {{ request()->routeIs('user.user_dashboard') ? 'active' : '' }}">
+                <a href="{{ route('user.dashboard') }}" class="sidebar-menu-item {{ request()->routeIs('user.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
@@ -774,12 +774,12 @@
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebarToggle');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
-            
+
             // Function to toggle sidebar
             function toggleSidebar() {
                 sidebar.classList.toggle('show');
                 sidebarOverlay.classList.toggle('show');
-                
+
                 // Prevent body scrolling when sidebar is open on mobile
                 if (sidebar.classList.contains('show')) {
                     document.body.style.overflow = 'hidden';
@@ -787,11 +787,11 @@
                     document.body.style.overflow = '';
                 }
             }
-            
+
             // Event listeners
             sidebarToggle.addEventListener('click', toggleSidebar);
             sidebarOverlay.addEventListener('click', toggleSidebar);
-            
+
             // Close sidebar on window resize if screen becomes larger
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 992 && sidebar.classList.contains('show')) {
@@ -800,13 +800,13 @@
                     document.body.style.overflow = '';
                 }
             });
-            
+
             // Add animation to menu items
             const menuItems = document.querySelectorAll('.sidebar-menu-item');
             menuItems.forEach((item, index) => {
                 item.style.opacity = '0';
                 item.style.transform = 'translateX(-10px)';
-                
+
                 setTimeout(() => {
                     item.style.transition = 'all 0.3s ease';
                     item.style.opacity = '1';

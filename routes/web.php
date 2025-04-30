@@ -15,35 +15,28 @@ Route::get('/', function () {
     if (Auth::check()) {
         $user = Auth::user();
         if ($user->role === 'admin') {
-            return view('admin.admin_dashboard');
+            return redirect()->route('admin.dashboard');
         } else {
-            return view('user.user_dashboard');
+            return redirect()->route('user.dashboard');
         }
     }
     return view('welcome');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Common dashboard route that redirects based on role
     Route::get('/dashboard', function () {
         $user = Auth::user();
         if ($user->role === 'admin') {
-            return view('admin.admin_dashboard');
+            return redirect()->route('admin.dashboard');
         } else {
-            return view('user.user_dashboard');
+            return redirect()->route('user.dashboard');
         }
     })->name('dashboard');
 
-    Route::get('/dashboard', [App\Http\Controllers\UserDashboardController::class, 'index'])->name('user.dashboard');
-
-    // Admin dashboard
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
-        ->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
-        ->name('admin.dashboard');
-
     // User routes
     Route::prefix('user')->name('user.')->group(function () {
-        // User dashboard
-        Route::get('/dashboard', [UserController::class, 'dashboard'])->name('user_dashboard');
+        Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
         // Appointment booking
         Route::get('/book-appointment', [UserController::class, 'bookAppointment'])->name('book.appointment');
@@ -68,7 +61,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->name('admin.')
         ->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
         ->group(function () {
-        // Dashboard
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
         // Patient routes
@@ -117,6 +109,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/chart/treatments', [App\Http\Controllers\Admin\ChartController::class, 'treatments'])->name('chart.treatments');
         Route::get('/chart/appointments', [App\Http\Controllers\Admin\ChartController::class, 'appointments'])->name('chart.appointments');
+
+        // Add this new route
+        Route::get('/chart/patient-ages', [PatientController::class, 'getPatientAges'])->name('chart.patient-ages');
     });
 
     // API routes for patient - accessible to both admin and users

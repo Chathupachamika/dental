@@ -21,36 +21,24 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
+        // Get patient record for this user
+        $patient = Patient::where('mobileNumber', $user->mobile_number)->first();
+
         // Get upcoming appointments for this user
-        $upcomingAppointments = Invoice::where('patient_id', function($query) use ($user) {
-            $query->select('id')
-                ->from('patients')
-                ->where('mobileNumber', $user->mobile_number)
-                ->first();
-        })
-        ->where('visitDate', '>=', Carbon::today())
-        ->with(['patient', 'invoiceTreatment'])
-        ->orderBy('visitDate', 'asc')
-        ->take(5)
-        ->get();
+        $upcomingAppointments = Invoice::where('patient_id', $patient ? $patient->id : null)
+            ->where('visitDate', '>=', Carbon::today())
+            ->with(['patient', 'invoiceTreatment'])
+            ->orderBy('visitDate', 'asc')
+            ->get();
 
         // Get past appointments for this user
-        $pastAppointments = Invoice::where('patient_id', function($query) use ($user) {
-            $query->select('id')
-                ->from('patients')
-                ->where('mobileNumber', $user->mobile_number)
-                ->first();
-        })
-        ->where('visitDate', '<', Carbon::today())
-        ->with(['patient', 'invoiceTreatment'])
-        ->orderBy('visitDate', 'desc')
-        ->take(5)
-        ->get();
+        $pastAppointments = Invoice::where('patient_id', $patient ? $patient->id : null)
+            ->where('visitDate', '<', Carbon::today())
+            ->with(['patient', 'invoiceTreatment'])
+            ->orderBy('visitDate', 'desc')
+            ->get();
 
-        // Get available treatments for appointment booking
-        $treatments = Treatment::all();
-
-        return view('user.user_dashboard', compact('user', 'upcomingAppointments', 'pastAppointments', 'treatments'));
+        return view('user.user_dashboard', compact('user', 'upcomingAppointments', 'pastAppointments'));
     }
 
     /**

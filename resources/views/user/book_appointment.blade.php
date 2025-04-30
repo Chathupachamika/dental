@@ -55,7 +55,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="{{ route('user.user_dashboard') }}" class="btn-secondary">
+                    <a href="{{ route('user.dashboard') }}" class="btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Dashboard
                     </a>
                     <button type="submit" class="btn-primary">
