@@ -14,30 +14,30 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     if (Auth::check()) {
         $user = Auth::user();
-        \Log::info('Root route accessed', [
-            'email' => $user->email,
-            'role' => $user->role ?? 'none',
-            'is_admin' => $user->isAdmin(),
-        ]);
-        return $user->isAdmin()
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('user.user_dashboard');
+        if ($user->role === 'admin') {
+            return view('admin.admin_dashboard');
+        } else {
+            return view('user.user_dashboard');
+        }
     }
     return view('welcome');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Redirect /dashboard based on role
     Route::get('/dashboard', function () {
         $user = Auth::user();
-        return $user->isAdmin()
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('user.user_dashboard');
+        if ($user->role === 'admin') {
+            return view('admin.admin_dashboard');
+        } else {
+            return view('user.user_dashboard');
+        }
     })->name('dashboard');
+
+    Route::get('/dashboard', [App\Http\Controllers\UserDashboardController::class, 'index'])->name('user.dashboard');
 
     // Admin dashboard
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
-        ->middleware('auth')
+        ->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
         ->name('admin.dashboard');
 
     // User routes
@@ -64,8 +64,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Admin routes
-    Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    // Admin routes - update the middleware definition
+    Route::prefix('admin')->name('admin.')
+        ->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
+        ->group(function () {
         // Dashboard
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
@@ -88,6 +90,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view');
             Route::post('/create', [InvoiceController::class, 'store'])->name('store');
             Route::get('/{invoice}/download', [InvoiceController::class, 'download'])->name('download');
+            Route::put('/update/{id}', [InvoiceController::class, 'update'])->name('update');
         });
 
         // Chart routes
@@ -109,6 +112,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/reports', [ChartController::class, 'index'])->name('reports.index');
 
         Route::get('/patients/export', [PatientController::class, 'export'])->name('patient.export');
+
+        Route::get('/chart/revenue', [App\Http\Controllers\Admin\ChartController::class, 'revenue'])->name('chart.revenue');
+
+        Route::get('/chart/treatments', [App\Http\Controllers\Admin\ChartController::class, 'treatments'])->name('chart.treatments');
+        Route::get('/chart/appointments', [App\Http\Controllers\Admin\ChartController::class, 'appointments'])->name('chart.appointments');
     });
 
     // API routes for patient - accessible to both admin and users

@@ -21,7 +21,20 @@ class InvoiceController extends Controller
             ->with('invoiceTreatment');
 
         if ($request->keyword) {
-            $invoices->where('id', $request->keyword);
+            $invoices->where(function($query) use ($request) {
+                $query->where('id', $request->keyword)
+                      ->orWhereHas('patient', function($q) use ($request) {
+                          $q->where('name', 'like', '%' . $request->keyword . '%');
+                      });
+            });
+        }
+
+        if ($request->filter && $request->filter !== 'all') {
+            if ($request->filter === 'paid') {
+                $invoices->whereRaw('totalAmount = advanceAmount');
+            } elseif ($request->filter === 'pending') {
+                $invoices->whereRaw('totalAmount > advanceAmount');
+            }
         }
 
         $invoices = $invoices->orderBy('id', 'DESC')->paginate(5);
@@ -46,12 +59,20 @@ class InvoiceController extends Controller
     public function view(int $id)
     {
         try {
-            $invoice = Invoice::with('patient')
-                            ->with('invoiceTreatment')
+            $invoice = Invoice::with(['patient', 'invoiceTreatment.subCategoryOne', 'invoiceTreatment.subCategoryTwo'])
                             ->findOrFail($id);
+
+            // Check if it's an AJAX request
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json($invoice);
+            }
 
             return view('admin.invoice.show', ['invoice' => $invoice]);
         } catch (\Exception $e) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['error' => 'Invoice not found'], 404);
+            }
+
             return redirect()->route('admin.invoice.index')
                 ->with('error', 'Invoice not found.');
         }
@@ -121,6 +142,52 @@ class InvoiceController extends Controller
 
             return response()->json([
                 'success' => true,
+                'data' => $invoice->load('patient', 'invoiceTreatment')
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $invoice = Invoice::findOrFail($id);
+
+            DB::beginTransaction();
+
+            $invoice->update([
+                'totalAmount' => $request->totalAmount,
+                'advanceAmount' => $request->advanceAmount,
+                'visitDate' => $request->visitDate,
+                'otherNote' => $request->otherNote
+            ]);
+
+            if ($request->has('treatments')) {
+                // Delete existing treatments
+                $invoice->invoiceTreatment()->delete();
+
+                // Create new treatments
+                foreach ($request->treatments as $treatment) {
+                    InvoiceTreatment::create([
+                        'invoice_id' => $invoice->id,
+                        'treatMent' => $treatment['treatment'],
+                        'subtype_id' => $treatment['subtype_id'] ?? null,
+                        'position_id' => $treatment['position_id'] ?? null
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice updated successfully',
                 'data' => $invoice->load('patient', 'invoiceTreatment')
             ]);
 

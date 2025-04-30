@@ -61,18 +61,22 @@
                             <td class="px-4 py-3">Rs {{ number_format($invoice->totalAmount - $invoice->advanceAmount, 2) }}</td>
                             <td class="px-4 py-3">
                                 @if($invoice->totalAmount == $invoice->advanceAmount)
-                                    <span class="text-green-500 font-semibold">Paid</span>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">Paid</span>
                                 @elseif($invoice->advanceAmount > 0)
-                                    <span class="text-yellow-500 font-semibold">Partial</span>
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">Partial</span>
                                 @else
-                                    <span class="text-red-500 font-semibold">Unpaid</span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">Unpaid</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-right">
+                            <td class="px-4 py-3 text-right space-x-2">
                                 <a href="{{ route('admin.invoice.view', $invoice->id) }}"
                                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm shadow inline-flex items-center">
                                     <i class="fas fa-eye mr-1"></i> View
                                 </a>
+                                <button onclick="openEditModal({{ $invoice->id }})"
+                                        class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm shadow inline-flex items-center">
+                                    <i class="fas fa-pencil-alt mr-1"></i> Edit
+                                </button>
                             </td>
                         </tr>
                         @empty
@@ -105,6 +109,137 @@
     </div>
 </div>
 
+<!-- Improved Edit Invoice Modal -->
+<div id="editInvoiceModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 transition-opacity duration-300 ease-in-out">
+    <div class="relative top-20 mx-auto p-0 max-w-2xl shadow-2xl rounded-lg bg-white transform transition-all duration-300 ease-in-out scale-95 opacity-0" id="modalContent">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fas fa-edit text-2xl mr-3"></i>
+                <div>
+                    <h3 class="text-xl font-bold">Edit Invoice</h3>
+                    <p class="text-blue-100 text-sm">Update invoice details</p>
+                </div>
+            </div>
+            <button onclick="closeEditModal()" class="text-white hover:text-gray-200 focus:outline-none">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+            <form id="editInvoiceForm" class="space-y-5">
+                @csrf
+                <input type="hidden" id="editInvoiceId">
+
+                <!-- Patient Info (Read-only) -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-5">
+                    <div class="flex items-center mb-3">
+                        <div id="patientAvatar" class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3">
+                            <span class="font-semibold text-lg" id="patientInitial"></span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-lg" id="patientName"></h4>
+                            <p class="text-gray-500 text-sm" id="patientId"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total Amount</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500">Rs</span>
+                                </div>
+                                <input type="number" id="editTotalAmount" name="totalAmount" step="0.01"
+                                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Advance Amount</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500">Rs</span>
+                                </div>
+                                <input type="number" id="editAdvanceAmount" name="advanceAmount" step="0.01"
+                                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Next Visit Date</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-calendar-alt text-gray-500"></i>
+                                </div>
+                                <input type="date" id="editVisitDate" name="visitDate"
+                                    class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Balance Due</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500">Rs</span>
+                                </div>
+                                <input type="text" id="balanceDue" readonly
+                                    class="pl-10 block w-full rounded-md bg-gray-50 border-gray-300 text-gray-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Treatment Section -->
+                <div class="mt-6">
+                    <h4 class="font-medium text-gray-700 mb-3 flex items-center">
+                        <i class="fas fa-clipboard-list mr-2 text-blue-500"></i> Treatment Details
+                    </h4>
+                    <div id="treatmentsList" class="space-y-3 mb-4">
+                        <!-- Treatment items will be added here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-sticky-note mr-2 text-blue-500"></i> Notes
+                    </label>
+                    <textarea id="editOtherNote" name="otherNote" rows="3"
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Add any additional notes here..."></textarea>
+                </div>
+
+                <!-- Status Indicator -->
+                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+                    <div class="flex items-center">
+                        <span class="text-sm font-medium text-gray-700 mr-2">Payment Status:</span>
+                        <span id="paymentStatus" class="px-3 py-1 rounded-full text-xs font-semibold"></span>
+                    </div>
+
+                    <div class="flex space-x-3">
+                        <button type="button" onclick="closeEditModal()"
+                                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 flex items-center">
+                            <i class="fas fa-times mr-2"></i> Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center">
+                            <i class="fas fa-save mr-2"></i> Update Invoice
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section('javascript')
 <script type="text/javascript">
     var query = <?php echo json_encode((object)Request::only(['keyword', 'filter'])); ?>;
@@ -121,6 +256,180 @@
     document.getElementById('keyword').addEventListener('keypress', function (e) {
         if (e.which === 13 || e.keyCode === 13) {
             search_invoice();
+        }
+    });
+
+    // Calculate balance due when total or advance amount changes
+    function calculateBalance() {
+        const total = parseFloat(document.getElementById('editTotalAmount').value) || 0;
+        const advance = parseFloat(document.getElementById('editAdvanceAmount').value) || 0;
+        const balance = total - advance;
+
+        document.getElementById('balanceDue').value = balance.toFixed(2);
+
+        // Update payment status
+        const statusElement = document.getElementById('paymentStatus');
+        if (balance <= 0) {
+            statusElement.textContent = 'PAID';
+            statusElement.className = 'px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold';
+        } else if (advance > 0) {
+            statusElement.textContent = 'PARTIAL';
+            statusElement.className = 'px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold';
+        } else {
+            statusElement.textContent = 'UNPAID';
+            statusElement.className = 'px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold';
+        }
+    }
+
+    function openEditModal(invoiceId) {
+        // Show modal with loading state
+        const modal = document.getElementById('editInvoiceModal');
+        const modalContent = document.getElementById('modalContent');
+
+        modal.classList.remove('hidden');
+
+        // Fetch invoice data
+        fetch(`/admin/invoice/view/${invoiceId}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Populate form fields
+            document.getElementById('editInvoiceId').value = data.id;
+            document.getElementById('editTotalAmount').value = data.totalAmount;
+            document.getElementById('editAdvanceAmount').value = data.advanceAmount;
+            document.getElementById('editVisitDate').value = data.visitDate;
+            document.getElementById('editOtherNote').value = data.otherNote;
+
+            // Set patient info
+            document.getElementById('patientName').textContent = data.patient.name;
+            document.getElementById('patientId').textContent = `ID: #${data.patient.id}`;
+            document.getElementById('patientInitial').textContent = data.patient.name.charAt(0);
+
+            // Calculate balance
+            calculateBalance();
+
+            // Populate treatments
+            const treatmentsList = document.getElementById('treatmentsList');
+            treatmentsList.innerHTML = '';
+
+            if (data.invoiceTreatment && data.invoiceTreatment.length > 0) {
+                data.invoiceTreatment.forEach((treatment, index) => {
+                    const treatmentItem = document.createElement('div');
+                    treatmentItem.className = 'p-3 bg-gray-50 rounded-lg';
+                    treatmentItem.innerHTML = `
+                        <input type="hidden" name="treatments[${index}][treatment]" value="${treatment.treatMent}">
+                        <input type="hidden" name="treatments[${index}][subtype_id]" value="${treatment.subtype_id || ''}">
+                        <input type="hidden" name="treatments[${index}][position_id]" value="${treatment.position_id || ''}">
+                        <div class="flex justify-between">
+                            <div class="font-medium">${treatment.treatMent}</div>
+                        </div>
+                        <div class="text-sm text-gray-500 mt-1">
+                            ${treatment.subCategoryOne ? treatment.subCategoryOne.name : '—'} /
+                            ${treatment.subCategoryTwo ? treatment.subCategoryTwo.name : '—'}
+                        </div>
+                    `;
+                    treatmentsList.appendChild(treatmentItem);
+                });
+            } else {
+                treatmentsList.innerHTML = '<p class="text-gray-500 italic">No treatments found</p>';
+            }
+
+            // Animate modal in
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        })
+        .catch(error => {
+            console.error('Error fetching invoice data:', error);
+            closeEditModal();
+            alert('Failed to load invoice data. Please try again.');
+        });
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('editInvoiceModal');
+        const modalContent = document.getElementById('modalContent');
+
+        // Animate modal out
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    // Add event listeners for amount calculations
+    document.getElementById('editTotalAmount').addEventListener('input', calculateBalance);
+    document.getElementById('editAdvanceAmount').addEventListener('input', calculateBalance);
+
+    document.getElementById('editInvoiceForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const invoiceId = document.getElementById('editInvoiceId').value;
+
+        // Create form data
+        const formData = new FormData(this);
+
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
+        submitBtn.disabled = true;
+
+        // Send AJAX request
+        fetch(`/admin/invoice/update/${invoiceId}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-HTTP-Method-Override': 'PUT'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                const successMessage = document.createElement('div');
+                successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center';
+                successMessage.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Invoice updated successfully!';
+                document.body.appendChild(successMessage);
+
+                // Close modal and refresh page after delay
+                setTimeout(() => {
+                    closeEditModal();
+                    window.location.reload();
+                }, 1500);
+            } else {
+                // Reset button and show error
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+                alert('Error updating invoice: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+            alert('An error occurred while updating the invoice. Please try again.');
+        });
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('editInvoiceModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !document.getElementById('editInvoiceModal').classList.contains('hidden')) {
+            closeEditModal();
         }
     });
 </script>

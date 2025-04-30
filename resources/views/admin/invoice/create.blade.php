@@ -18,31 +18,6 @@
                     <span class="text-sm font-medium text-gray-600">Final</span>
                 </div>
             </div>
-
-            <!-- Improved Progress Steps -->
-            <div class="flex justify-between items-center">
-                <div class="flex items-center w-full">
-                    @foreach(['Patient Info', 'Treatments', 'Payment Details', 'Review'] as $index => $step)
-                        <div class="flex items-center {{ $index > 0 ? 'flex-1' : '' }}">
-                            <div class="flex flex-col items-center">
-                                <div class="flex items-center justify-center w-12 h-12 rounded-full
-                                    {{ $index === 0 ? 'bg-indigo-600 ring-4 ring-indigo-100' : 'bg-gray-200' }}
-                                    transition-all duration-300">
-                                    <span class="text-lg {{ $index === 0 ? 'text-white' : 'text-gray-500' }}">
-                                        {{ $index + 1 }}
-                                    </span>
-                                </div>
-                                <span class="text-sm font-medium mt-2 {{ $index === 0 ? 'text-indigo-600' : 'text-gray-500' }}">
-                                    {{ $step }}
-                                </span>
-                            </div>
-                            @if($index < 3)
-                                <div class="flex-1 h-0.5 mx-4 {{ $index === 0 ? 'bg-indigo-600' : 'bg-gray-200' }}"></div>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            </div>
         </div>
 
         <!-- Enhanced Main Content -->
