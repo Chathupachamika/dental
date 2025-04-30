@@ -87,6 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/create/{id?}', [InvoiceController::class, 'create'])->name('create');
             Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view');
             Route::post('/create', [InvoiceController::class, 'store'])->name('store');
+            Route::get('/{invoice}/download', [InvoiceController::class, 'download'])->name('download');
         });
 
         // Chart routes
