@@ -138,4 +138,29 @@ class AppointmentController extends Controller
         return redirect()->route('admin.appointments.index')
             ->with('success', 'Notification sent successfully');
     }
+
+    public function getStats()
+    {
+        try {
+            $stats = [
+                'total' => Appointment::count(),
+                'confirmed' => Appointment::where('status', 'confirmed')->count(),
+                'pending' => Appointment::where('status', 'pending')->count(),
+                'cancelled' => Appointment::where('status', 'cancelled')->count(),
+                'today' => Appointment::whereDate('appointment_date', Carbon::today())->count(),
+                'thisWeek' => Appointment::whereBetween('appointment_date', [
+                    Carbon::now()->startOfWeek(),
+                    Carbon::now()->endOfWeek()
+                ])->count(),
+                'thisMonth' => Appointment::whereBetween('appointment_date', [
+                    Carbon::now()->startOfMonth(),
+                    Carbon::now()->endOfMonth()
+                ])->count()
+            ];
+
+            return response()->json($stats);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

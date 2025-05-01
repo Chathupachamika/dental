@@ -88,6 +88,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Chart routes
         Route::prefix('chart')->name('chart.')->group(function () {
             Route::get('/', [ChartController::class, 'index'])->name('index');
+            Route::get('/data', [ChartController::class, 'getData'])->name('data');
+            Route::get('/revenue', [ChartController::class, 'revenue'])->name('revenue');
+            Route::get('/treatments', [ChartController::class, 'treatments'])->name('treatments');
+            Route::get('/appointments', [ChartController::class, 'appointments'])->name('appointments');
         });
 
         // Appointment routes
@@ -104,11 +108,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/reports', [ChartController::class, 'index'])->name('reports.index');
 
         Route::get('/patients/export', [PatientController::class, 'export'])->name('patient.export');
-
-        Route::get('/chart/revenue', [App\Http\Controllers\Admin\ChartController::class, 'revenue'])->name('chart.revenue');
-
-        Route::get('/chart/treatments', [App\Http\Controllers\Admin\ChartController::class, 'treatments'])->name('chart.treatments');
-        Route::get('/chart/appointments', [App\Http\Controllers\Admin\ChartController::class, 'appointments'])->name('chart.appointments');
 
         // Add this new route
         Route::get('/chart/patient-ages', [PatientController::class, 'getPatientAges'])->name('chart.patient-ages');
@@ -127,6 +126,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/patient/getPatientByID/{id}', [PatientController::class, 'getPatientByID']);
     Route::get('/patient/patientList', [PatientController::class, 'patientList']);
 });
-
 
 require __DIR__.'/auth.php';
