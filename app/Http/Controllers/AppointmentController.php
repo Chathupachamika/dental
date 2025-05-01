@@ -180,6 +180,23 @@ class AppointmentController extends Controller
         ]);
     }
 
+    public function getConfirmedAppointments(Request $request)
+{
+    $user = Auth::user();
+
+    $appointments = Appointment::where('user_id', $user->id)
+        ->where('status', 'confirmed')
+        ->orderBy('appointment_date', 'desc')
+        ->orderBy('appointment_time', 'asc')
+        ->with('user')
+        ->get();
+
+    return response()->json([
+        'success' => true,
+        'appointments' => $appointments
+    ]);
+}
+
     /**
      * Store a new appointment
      */
