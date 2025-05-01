@@ -252,4 +252,55 @@ class AppointmentController extends Controller
             'appointment' => $appointment
         ]);
     }
+
+    public function getAllAppointments(Request $request)
+    {
+        $user = Auth::user();
+        return Appointment::where('user_id', $user->id)
+            ->orderBy('appointment_date', 'desc')
+            ->paginate(10);
+    }
+
+    public function getUpcomingAppointments(Request $request)
+    {
+        $user = Auth::user();
+        return Appointment::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->where('appointment_date', '>=', now())
+            ->orderBy('appointment_date', 'asc')
+            ->paginate(10);
+    }
+
+    public function getCompletedAppointments(Request $request)
+    {
+        $user = Auth::user();
+        return Appointment::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->orderBy('appointment_date', 'desc')
+            ->paginate(10);
+    }
+
+    public function getCancelledAppointments(Request $request)
+    {
+        $user = Auth::user();
+        return Appointment::where('user_id', $user->id)
+            ->where('status', 'cancelled')
+            ->orderBy('appointment_date', 'desc')
+            ->paginate(10);
+    }
+
+    public function searchAppointments(Request $request)
+    {
+        $user = Auth::user();
+        $search = $request->get('query');
+
+        return Appointment::where('user_id', $user->id)
+            ->where(function($query) use ($search) {
+                $query->where('notes', 'like', "%{$search}%")
+                      ->orWhere('appointment_date', 'like', "%{$search}%")
+                      ->orWhere('status', 'like', "%{$search}%");
+            })
+            ->orderBy('appointment_date', 'desc')
+            ->paginate(10);
+    }
 }

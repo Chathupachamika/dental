@@ -50,6 +50,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Add this new route
         Route::get('/appointments/confirmed', [AppointmentController::class, 'getConfirmedAppointments'])->name('appointments.confirmed');
 
+        // Appointment API routes
+        Route::get('/api/appointments/all', [AppointmentController::class, 'getAllAppointments'])->name('api.appointments.all');
+        Route::get('/api/appointments/upcoming', [AppointmentController::class, 'getUpcomingAppointments'])->name('api.appointments.upcoming');
+        Route::get('/api/appointments/completed', [AppointmentController::class, 'getCompletedAppointments'])->name('api.appointments.completed');
+        Route::get('/api/appointments/cancelled', [AppointmentController::class, 'getCancelledAppointments'])->name('api.appointments.cancelled');
+        Route::get('/api/appointments/search', [AppointmentController::class, 'searchAppointments'])->name('api.appointments.search');
+
         // User profile
         Route::get('/profile', [UserController::class, 'profile'])->name('profile');
         Route::post('/profile', [UserController::class, 'updateProfile'])->name('update.profile');
@@ -62,8 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Help & Support
         Route::get('/help', [App\Http\Controllers\User\HelpController::class, 'index'])->name('help');
-        Route::post('/support/contact', [App\Http\Controllers\User\SupportController::class, 'contact'])->name('support.contact');
-    });
+     });
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
