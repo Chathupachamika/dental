@@ -13,12 +13,15 @@
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('assets/vendors/mdi/css/materialdesignicons.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendors/mdi/css/vendor.bundle.base.css') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-
+    @vite('resources/css/app.css')
+    @vite('resources/js/app.js')
     <!-- Custom CSS -->
     <style>
         :root {
@@ -1503,7 +1506,276 @@
             }, 1000);
         });
     </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter functionality
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        const appointmentRows = document.querySelectorAll('.appointments-table tbody tr');
 
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Update active tab
+                filterTabs.forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+
+                const filter = this.getAttribute('data-filter');
+                let visibleCount = 0;
+
+                // Filter table rows with animation
+                appointmentRows.forEach(row => {
+                    const status = row.getAttribute('data-status');
+
+                    if (filter === 'all' || (filter === 'upcoming' && status === 'pending') || status === filter) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show empty state if no visible rows
+                const tableWrapper = document.querySelector('.appointments-table-wrapper');
+                const existingEmptyState = document.querySelector('.filter-empty-state');
+
+                if (visibleCount === 0) {
+                    if (!existingEmptyState) {
+                        const emptyState = document.createElement('div');
+                        emptyState.className = 'filter-empty-state';
+                        emptyState.innerHTML = `
+                            <div class="empty-state" style="padding: 2rem;">
+                                <div class="empty-icon">
+                                    <i class="fas fa-filter"></i>
+                                </div>
+                                <h3 class="empty-title">No ${filter} appointments</h3>
+                                <p class="empty-description">No appointments found with this filter.</p>
+                            </div>
+                        `;
+                        tableWrapper.appendChild(emptyState);
+                    }
+                } else if (existingEmptyState) {
+                    existingEmptyState.remove();
+                }
+            });
+        });
+
+        // Search functionality with highlighting
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                // Remove any existing filter-empty-state
+                const existingEmptyState = document.querySelector('.filter-empty-state');
+                if (existingEmptyState) {
+                    existingEmptyState.remove();
+                }
+
+                // Remove any existing search-empty-state
+                const existingSearchEmptyState = document.querySelector('.search-empty-state');
+                if (existingSearchEmptyState) {
+                    existingSearchEmptyState.remove();
+                }
+
+                // Remove previous highlights
+                document.querySelectorAll('.search-highlight').forEach(el => {
+                    el.outerHTML = el.innerHTML;
+                });
+
+                appointmentRows.forEach(row => {
+                    const rowText = row.textContent.toLowerCase();
+
+                    if (searchTerm === '') {
+                        // If search is empty, respect the current filter
+                        const activeFilter = document.querySelector('.filter-tab.active').getAttribute('data-filter');
+                        const status = row.getAttribute('data-status');
+
+                        if (activeFilter === 'all' || (activeFilter === 'upcoming' && status === 'pending') || status === activeFilter) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    } else if (rowText.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleCount++;
+
+                        // Highlight matching text
+                        highlightText(row, searchTerm);
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show empty state if no results
+                if (visibleCount === 0 && searchTerm !== '') {
+                    const tableWrapper = document.querySelector('.appointments-table-wrapper');
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'search-empty-state';
+                    emptyState.innerHTML = `
+                        <div class="empty-state" style="padding: 2rem;">
+                            <div class="empty-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3 class="empty-title">No Results Found</h3>
+                            <p class="empty-description">No appointments match your search for "${searchTerm}".</p>
+                        </div>
+                    `;
+                    tableWrapper.appendChild(emptyState);
+                }
+            });
+        }
+
+        // Function to highlight text in search results
+        function highlightText(element, term) {
+            if (!term) return;
+
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                {
+                    acceptNode: function(node) {
+                        // Skip script tags
+                        if (node.parentNode.tagName === 'SCRIPT') {
+                            return NodeFilter.FILTER_REJECT;
+                        }
+                        return NodeFilter.FILTER_ACCEPT;
+                    }
+                }
+            );
+
+            const textNodes = [];
+            let currentNode;
+
+            while (currentNode = walker.nextNode()) {
+                textNodes.push(currentNode);
+            }
+
+            textNodes.forEach(textNode => {
+                const text = textNode.nodeValue;
+                const lowerText = text.toLowerCase();
+                const index = lowerText.indexOf(term);
+
+                if (index >= 0) {
+                    const before = document.createTextNode(text.substring(0, index));
+                    const match = document.createElement('span');
+                    match.className = 'search-highlight';
+                    match.style.backgroundColor = 'rgba(245, 158, 11, 0.2)';
+                    match.style.padding = '0 2px';
+                    match.style.borderRadius = '2px';
+                    match.appendChild(document.createTextNode(text.substring(index, index + term.length)));
+                    const after = document.createTextNode(text.substring(index + term.length));
+
+                    const parent = textNode.parentNode;
+                    parent.replaceChild(after, textNode);
+                    parent.insertBefore(match, after);
+                    parent.insertBefore(before, match);
+                }
+            });
+        }
+
+        // Cancel appointment confirmation with SweetAlert2
+        const cancelForms = document.querySelectorAll('form[action*="appointment.cancel"]');
+        cancelForms.forEach(form => {
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.type = 'button';
+                submitButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Cancel Appointment?',
+                        text: 'Are you sure you want to cancel this appointment? This action cannot be undone.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#6b778c',
+                        confirmButtonText: 'Yes, cancel it',
+                        cancelButtonText: 'No, keep it'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Show loading state
+                            Swal.fire({
+                                title: 'Processing...',
+                                text: 'Cancelling your appointment',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            // Submit the form
+                            form.submit();
+                        }
+                    });
+                });
+            }
+        });
+    });
+</script>
+<script>
+    function openAppointmentModal(appointment) {
+        const modal = document.getElementById('appointmentModal');
+        const dateTime = new Date(appointment.appointment_date);
+        const formattedDateTime = dateTime.toLocaleString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        });
+
+        // Update modal content
+        document.getElementById('appointmentDateTime').textContent = formattedDateTime;
+        document.getElementById('appointmentService').textContent = appointment.service || 'General Checkup';
+        document.getElementById('appointmentNotes').textContent = appointment.notes || 'No notes available';
+
+        // Status badge styling
+        const statusBadge = document.getElementById('appointmentStatus');
+        statusBadge.textContent = appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1);
+
+        // Apply status-specific styling
+        const statusStyles = {
+            pending: 'bg-sky-100 text-sky-800',
+            completed: 'bg-green-100 text-green-800',
+            cancelled: 'bg-red-100 text-red-800'
+        };
+        statusBadge.className = `px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[appointment.status] || 'bg-gray-100 text-gray-800'}`;
+
+        // Show modal with animation
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.querySelector('.bg-white').classList.add('sm:scale-100');
+        }, 10);
+
+        // Add escape key listener
+        document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    function closeAppointmentModal() {
+        const modal = document.getElementById('appointmentModal');
+        modal.classList.add('hidden');
+        document.removeEventListener('keydown', handleEscapeKey);
+    }
+
+    function handleEscapeKey(e) {
+        if (e.key === 'Escape') {
+            closeAppointmentModal();
+        }
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('appointmentModal').addEventListener('click', (e) => {
+        if (e.target.id === 'appointmentModal') {
+            closeAppointmentModal();
+        }
+    });
+</script>
     @yield('scripts')
 </body>
 </html>

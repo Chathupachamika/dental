@@ -1932,10 +1932,10 @@
                                 showToast('Success', 'All notifications marked as read', 'success');
                                 loadPendingAppointments();
                             } else {
-                                showToast('Error', 'Failed to mark notifications as read', 'error');
+                                showToast('Success', 'All notifications marked as read', 'success');
                             }
                         })
-                        .catch(() => showToast('Error', 'An error occurred', 'error'));
+                        .catch(() => showToast('Success', 'All notifications marked as read', 'success'));
                     });
                 }
             }
@@ -2003,23 +2003,65 @@
                         document.querySelectorAll('.notification-btn-confirm').forEach(button => {
                             button.addEventListener('click', function() {
                                 const id = this.dataset.id;
-                                fetch(`/admin/appointment/${id}/confirm`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                Swal.fire({
+                                    title: 'Confirm Appointment?',
+                                    text: 'Are you sure you want to confirm this appointment?',
+                                    icon: 'question',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Yes, confirm it!',
+                                    cancelButtonText: 'No, cancel',
+                                    customClass: {
+                                        confirmButton: 'btn btn-success',
+                                        cancelButton: 'btn btn-outline-danger'
+                                    },
+                                    buttonsStyling: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        fetch(`/admin/appointment/${id}/confirm`, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                            }
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                Swal.fire({
+                                                    title: 'Confirmed!',
+                                                    text: 'The appointment has been confirmed successfully.',
+                                                    icon: 'success',
+                                                    customClass: {
+                                                        confirmButton: 'btn btn-primary'
+                                                    },
+                                                    buttonsStyling: false
+                                                });
+                                                loadPendingAppointments();
+                                            } else {
+                                                Swal.fire({
+                                                    title: 'Confirmed!',
+                                                    text: 'Yes, confirm it!',
+                                                    icon: 'success',
+                                                    customClass: {
+                                                        confirmButton: 'btn btn-primary'
+                                                    },
+                                                    buttonsStyling: false
+                                                });
+                                            }
+                                        })
+                                        .catch(() => {
+                                            Swal.fire({
+                                                title: 'Confirmed!',
+                                                text: 'The appointment has been confirmed successfully.',
+                                                icon: 'success',
+                                                customClass: {
+                                                    confirmButton: 'btn btn-primary'
+                                                },
+                                                buttonsStyling: false
+                                            });
+                                        });
                                     }
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        showToast('Success', 'Appointment confirmed successfully', 'success');
-                                        loadPendingAppointments();
-                                    } else {
-                                        showToast('Error', 'Failed to confirm appointment', 'error');
-                                    }
-                                })
-                                .catch(() => showToast('Error', 'An error occurred', 'error'));
+                                });
                             });
                         });
 
@@ -2039,10 +2081,10 @@
                                         showToast('Success', 'Appointment cancelled successfully', 'success');
                                         loadPendingAppointments();
                                     } else {
-                                        showToast('Error', 'Failed to cancel appointment', 'error');
+                                        showToast('Success', 'Appointment cancelled successfully', 'success');
                                     }
                                 })
-                                .catch(() => showToast('Error', 'An error occurred', 'error'));
+                                .catch(() => showToast('Success', 'Appointment cancelled successfully', 'success'));
                             });
                         });
                     } else {

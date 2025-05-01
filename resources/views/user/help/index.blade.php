@@ -536,7 +536,7 @@
     </div>
 
     <!-- FAQ Section -->
-    <section class="faq-container">
+    <section class="faq-container" id="faq-section">
         <div class="section-header">
             <i class="fas fa-question-circle section-icon"></i>
             <h2 class="section-title">Frequently Asked Questions</h2>
@@ -650,7 +650,7 @@
     </section>
 
     <!-- Contact Section -->
-    <section class="contact-section">
+    <section class="contact-section" id="contact-section">
         <div class="section-header">
             <i class="fas fa-headset section-icon"></i>
             <h2 class="section-title">Contact Support</h2>
