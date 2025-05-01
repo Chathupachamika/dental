@@ -87,14 +87,24 @@
                 </table>
             </div>
 
-            @if(count($patients))
-            <!-- Pagination Info & Links -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mt-6 text-sm text-gray-600">
-                <div class="mb-2 sm:mb-0">
-                    Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} patients
-                </div>
-                <div>
-                    {{ $patients->links() }}
+            @if(count($patients) > 10)
+            <!-- Enhanced Pagination Section -->
+            <div class="mt-6 border-t border-gray-200 pt-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 text-sm text-gray-700">
+                    <!-- Pagination Info -->
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-bar text-blue-500 mr-2"></i>
+                        <span>Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} patients</span>
+                    </div>
+
+                    <!-- Pagination Links -->
+                    <div class="flex items-center justify-center space-x-1">
+                        {{ $patients->onEachSide(1)->links()->with([
+                            'class' => 'relative inline-flex items-center px-4 py-2 text-sm font-medium leading-5 text-gray-700 bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 active:bg-gray-100 active:text-gray-700',
+                            'active' => 'z-10 bg-blue-600 text-white border-blue-600 hover:bg-blue-700',
+                            'disabled' => 'opacity-50 cursor-not-allowed'
+                        ]) }}
+                    </div>
                 </div>
             </div>
             @endif

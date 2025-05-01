@@ -8,50 +8,42 @@ use PDF;
 
 class AnalyticsController extends Controller
 {
-    public function exportPdf(Request $request)
+    public function exportPDF()
     {
-        // Get all the required data
-        $stats = [
-            'appointments' => $this->getAppointmentStats(),
-            'invoices' => $this->getRecentInvoices(),
-            'patients' => $this->getPatientStats(),
-            'revenue' => $this->getRevenueStats()
-        ];
+        try {
+            // Get your data here
+            $data = [
+                'appointments' => $this->getAppointmentsData(),
+                'revenue' => $this->getRevenueData(),
+                'treatments' => $this->getTreatmentsData(),
+                // Add more data as needed
+            ];
 
-        // Generate PDF
-        $pdf = PDF::loadView('admin.charts.export-pdf', $stats);
+            // Generate PDF using your preferred library (e.g., DomPDF)
+            $pdf = PDF::loadView('admin.reports.analytics_pdf', $data);
 
-        // Return the PDF for download
-        return $pdf->download('dental-analytics-' . now()->format('Y-m-d') . '.pdf');
+            // Return the PDF for download
+            return $pdf->download('dental-analytics-' . now()->format('Y-m-d') . '.pdf');
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to generate PDF'], 500);
+        }
     }
 
-    private function getAppointmentStats()
+    private function getAppointmentsData()
     {
-        // Get appointment statistics from your existing logic
-        return \App\Models\Appointment::select('status', \DB::raw('count(*) as total'))
-            ->groupBy('status')
-            ->get();
+        // Implement your appointments data retrieval logic
+        return [];
     }
 
-    private function getRecentInvoices()
+    private function getRevenueData()
     {
-        // Get recent invoices from your existing logic
-        return \App\Models\Invoice::with('patient')
-            ->latest()
-            ->take(10)
-            ->get();
+        // Implement your revenue data retrieval logic
+        return [];
     }
 
-    private function getPatientStats()
+    private function getTreatmentsData()
     {
-        // Get patient statistics
-        return \App\Models\Patient::count();
-    }
-
-    private function getRevenueStats()
-    {
-        // Get revenue statistics
-        return \App\Models\Invoice::selectRaw('SUM(totalAmount) as total, SUM(advanceAmount) as advance')
-            ->first();
+        // Implement your treatments data retrieval logic
+        return [];
     }
 }

@@ -85,14 +85,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Patient routes
         Route::prefix('patient')->name('patient.')->group(function () {
             Route::get('/', [PatientController::class, 'index'])->name('index');
-            Route::get('/list', [PatientController::class, 'index'])->name('list');
-            Route::get('/patientList', [PatientController::class, 'patientList'])->name('patientList'); // Add this line
+            Route::get('/list', [PatientController::class, 'list'])->name('list');
+            Route::get('/patientList', [PatientController::class, 'patientList'])->name('patientList');
             Route::get('/create', [PatientController::class, 'store'])->name('store');
             Route::post('/create', [PatientController::class, 'createPatient'])->name('create');
             Route::get('/show/{id}', [PatientController::class, 'show'])->name('show');
             Route::get('/edit/{id}', [PatientController::class, 'edit'])->name('edit');
             Route::post('/edit', [PatientController::class, 'update'])->name('update');
             Route::delete('/{patient}', [PatientController::class, 'destroy'])->name('destroy');
+            Route::get('/{patient}/download', [PatientController::class, 'downloadPDF'])->name('download'); // Add this line
         });
 
         // Invoice routes
@@ -152,6 +153,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('admin.revenue.monthly');
         Route::get('/payments/pending', [App\Http\Controllers\Admin\DashboardController::class, 'getPendingPayments'])
             ->name('admin.payments.pending');
+
+        // Add the PDF export route
+        Route::post('/admin/export/analytics-pdf', [App\Http\Controllers\Admin\AnalyticsController::class, 'exportPDF'])
+            ->name('admin.export.analytics.pdf');
+
+        // Add the patient PDF download route
+        Route::get('/admin/patient/{patient}/download', [App\Http\Controllers\Admin\PatientController::class, 'downloadPDF'])->name('admin.patient.download');
     });
 
     // API routes for patient - accessible to both admin and users

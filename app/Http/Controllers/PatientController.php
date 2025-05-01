@@ -11,6 +11,7 @@ use App\Models\Treatment;
 use App\Models\TreatmentSubCategoriesOne;
 use App\Models\InvoiceTreatment;
 use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PatientController extends Controller
 {
@@ -37,12 +38,24 @@ class PatientController extends Controller
 
     public function list(Request $request)
     {
-
         $place_query = Patient::whereNotNull('name');
 
         if ($request->keyword) {
-            $place_query->where('name', 'LIKE', '%' . $request->keyword . '%')
-                ->orWhere('mobileNumber', 'LIKE', '%' . $request->keyword . '%');
+            $place_query->where(function($q) use ($request) {
+                $q->where('name', 'LIKE', '%' . $request->keyword . '%')
+                  ->orWhere('mobileNumber', 'LIKE', '%' . $request->keyword . '%');
+            });
+        }
+
+        if ($request->filter) {
+            switch ($request->filter) {
+                case 'recent':
+                    $place_query->orderBy('created_at', 'desc');
+                    break;
+                case 'pending':
+                    $place_query->where('balance', '>', 0);
+                    break;
+            }
         }
 
         if ($request->sortByName && in_array($request->sortByName, ['asc', 'desc'])) {
@@ -50,7 +63,7 @@ class PatientController extends Controller
         }
 
         $data['patients'] = $place_query->orderBy('id', 'DESC')->paginate(5);
-        return view('admin.patient.list', $data);
+        return view('admin.Patient.list', $data);
     }
 
     public function getSubCategory($id)
@@ -322,5 +335,12 @@ class PatientController extends Controller
             'total' => $count,
             'percentageChange' => round($percentageChange, 1)
         ]);
+    }
+
+    public function downloadPDF(Patient $patient)
+    {
+        $patient->load(['invoice.invoiceTreatment']);
+        $pdf = PDF::loadView('admin.Patient.pdf', ['patient' => $patient]);
+        return $pdf->download('patient-'.$patient->id.'.pdf');
     }
 }
