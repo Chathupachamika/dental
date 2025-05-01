@@ -84,7 +84,7 @@
                         </div>
                         <div>
                             <p class="text-sm text-blue-100">Monthly Revenue</p>
-                            <h3 class="text-2xl font-bold text-white">₹{{ number_format($monthlyRevenue ?? 285000) }}</h3>
+                            <h3 class="text-2xl font-bold text-white">Rs.{{ number_format($monthlyRevenue ?? 285000) }}</h3>
                         </div>
                     </div>
                     <div class="mt-2 text-xs text-blue-100">
@@ -99,7 +99,7 @@
                         </div>
                         <div>
                             <p class="text-sm text-blue-100">Pending Payments</p>
-                            <h3 class="text-2xl font-bold text-white">₹{{ number_format($pendingPayments ?? 42500) }}</h3>
+                            <h3 class="text-2xl font-bold text-white">Rs.{{ number_format($pendingPayments ?? 42500) }}</h3>
                         </div>
                     </div>
                     <div class="mt-2 text-xs text-blue-100">

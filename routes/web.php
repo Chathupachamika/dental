@@ -66,7 +66,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Patient routes
         Route::prefix('patient')->name('patient.')->group(function () {
             Route::get('/', [PatientController::class, 'index'])->name('index');
-            Route::get('/list', [PatientController::class, 'list'])->name('list');
+            Route::get('/list', [PatientController::class, 'index'])->name('list');
+            Route::get('/patientList', [PatientController::class, 'patientList'])->name('patientList'); // Add this line
             Route::get('/create', [PatientController::class, 'store'])->name('store');
             Route::post('/create', [PatientController::class, 'createPatient'])->name('create');
             Route::get('/show/{id}', [PatientController::class, 'show'])->name('show');
@@ -102,10 +103,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/{id}', [AppointmentController::class, 'update'])->name('update');
             Route::post('/{id}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
             Route::get('/{id}/notify', [AppointmentController::class, 'notify'])->name('notify');
+            Route::get('/today', [AppointmentController::class, 'getTodayAppointments'])->name('today');
+            Route::get('/{id}', [AppointmentController::class, 'show'])->name('show');
+            Route::post('/store', [AppointmentController::class, 'store'])->name('store');
         });
 
         // Reports route
-        Route::get('/reports', [ChartController::class, 'index'])->name('reports.index');
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
         Route::get('/patients/export', [PatientController::class, 'export'])->name('patient.export');
 
@@ -125,6 +129,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/patient/getSubCategory/{id}', [PatientController::class, 'getSubCategory']);
     Route::get('/patient/getPatientByID/{id}', [PatientController::class, 'getPatientByID']);
     Route::get('/patient/patientList', [PatientController::class, 'patientList']);
+
+    // Add the PDF export route
+    Route::post('/admin/analytics/export-pdf', [App\Http\Controllers\Admin\AnalyticsController::class, 'exportPdf'])->name('admin.export.analytics.pdf');
 });
 
 require __DIR__.'/auth.php';

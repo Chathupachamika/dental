@@ -412,7 +412,7 @@
             right: 0;
             top: calc(100% + 0.5rem);
             background: var(--white);
-            border-radius: var(--radius-lg);
+            border-radius: var (--radius-lg);
             box-shadow: var(--shadow-lg);
             padding: 0.5rem;
             min-width: 180px;
@@ -478,7 +478,7 @@
         .card-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: var(--gray-800);
+            color: var (--gray-800);
             margin: 0;
             display: flex;
             align-items: center;
@@ -654,7 +654,7 @@
             width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid var(--gray-300);
-            border-radius: var(--radius-lg);
+            border-radius: var (--radius-lg);
             font-size: 1rem;
             transition: all 0.2s;
             background-color: var(--white);
@@ -727,7 +727,7 @@
         }
 
         .bg-success {
-            background-color: var(--success);
+            background-color: var (--success);
         }
 
         .bg-warning {
@@ -958,7 +958,7 @@
 
         .toast-success .toast-icon {
             background-color: var(--success-light);
-            color: var(--success);
+            color: var (--success);
         }
 
         .toast-warning .toast-icon {
@@ -1073,12 +1073,15 @@
             transform: scale(0.95);
             transform-origin: top right;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: none;
         }
 
         .notification-bell.show .notification-dropdown {
             opacity: 1;
             visibility: visible;
             transform: scale(1);
+            backdrop-filter: none;
+            background-color: var(--white);
         }
 
         .notification-header {
@@ -1152,6 +1155,7 @@
 
         .notification-item:hover {
             background-color: var(--gray-50);
+            opacity: 1;
         }
 
         .notification-item:last-child {
@@ -1268,6 +1272,230 @@
     </style>
 
     <!-- Scripts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    // Load the Google Charts library
+    google.charts.load('current', {
+        'packages': ['corechart', 'calendar', 'bar']
+    });
+
+    // Set callback when the Google Charts library is loaded
+    google.charts.setOnLoadCallback(initCharts);
+
+    // Initialize all charts
+    function initCharts() {
+        loadMainChart('monthly');
+        loadTreatmentChart();
+        loadAppointmentStatusChart();
+        loadRevenueChart();
+        loadCalendarChart();
+
+        // Set up event listeners for period selector buttons
+        document.querySelectorAll('.period-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.period-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // Add active class to clicked button
+                this.classList.add('active');
+
+                // Load chart with selected period
+                loadMainChart(this.dataset.period);
+            });
+        });
+    }
+
+    // Load the main overview chart
+    function loadMainChart(period) {
+        fetch(`{{ route('admin.chart.data') }}?period=${period}`)
+            .then(response => response.json())
+            .then(data => {
+                const chartData = google.visualization.arrayToDataTable(data);
+
+                const options = {
+                    title: '',
+                    hAxis: {title: period === 'daily' ? 'Day' : (period === 'monthly' ? 'Month' : 'Year')},
+                    vAxis: {title: 'Amount', minValue: 0},
+                    seriesType: 'bars',
+                    series: {
+                        0: {color: '#4e73df'},
+                        1: {color: '#1cc88a'},
+                        2: {type: 'line', color: '#f6c23e', targetAxisIndex: 1}
+                    },
+                    vAxes: {
+                        0: {title: 'Amount ($)', format: '$#,###'},
+                        1: {title: 'Appointments', format: '#,###'}
+                    },
+                    legend: {position: 'bottom'},
+                    chartArea: {width: '85%', height: '70%'},
+                    animation: {
+                        startup: true,
+                        duration: 1000,
+                        easing: 'out'
+                    }
+                };
+
+                const chart = new google.visualization.ComboChart(document.getElementById('main_chart_div'));
+                chart.draw(chartData, options);
+            })
+            .catch(error => console.error('Error loading chart data:', error));
+    }
+
+    // Load the treatment distribution chart
+    function loadTreatmentChart() {
+        fetch('{{ route('admin.chart.treatments') }}')
+            .then(response => response.json())
+            .then(data => {
+                const chartData = google.visualization.arrayToDataTable(data);
+
+                const options = {
+                    title: '',
+                    pieHole: 0.4,
+                    colors: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796', '#5a5c69', '#f8f9fc', '#d1d3e2', '#b7b9cc'],
+                    chartArea: {width: '90%', height: '80%'},
+                    legend: {position: 'right', alignment: 'center'},
+                    animation: {
+                        startup: true,
+                        duration: 1000,
+                        easing: 'out'
+                    }
+                };
+
+                const chart = new google.visualization.PieChart(document.getElementById('treatment_chart_div'));
+                chart.draw(chartData, options);
+            })
+            .catch(error => console.error('Error loading treatment chart data:', error));
+    }
+
+    // Load the appointment status chart
+    function loadAppointmentStatusChart() {
+        fetch('{{ route('admin.chart.appointments') }}')
+            .then(response => response.json())
+            .then(data => {
+                const chartData = google.visualization.arrayToDataTable(data.statusData);
+
+                const options = {
+                    title: '',
+                    pieHole: 0.4,
+                    colors: ['#1cc88a', '#f6c23e', '#e74a3b'],
+                    chartArea: {width: '90%', height: '80%'},
+                    legend: {position: 'right', alignment: 'center'},
+                    animation: {
+                        startup: true,
+                        duration: 1000,
+                        easing: 'out'
+                    }
+                };
+
+                const chart = new google.visualization.PieChart(document.getElementById('appointment_status_chart'));
+                chart.draw(chartData, options);
+            })
+            .catch(error => console.error('Error loading appointment status chart data:', error));
+    }
+
+    // Load the revenue chart
+    function loadRevenueChart() {
+        fetch('{{ route('admin.chart.revenue') }}')
+            .then(response => response.json())
+            .then(data => {
+                const chartData = google.visualization.arrayToDataTable(data);
+
+                const options = {
+                    title: '',
+                    hAxis: {title: 'Month'},
+                    vAxis: {title: 'Revenue', format: '$#,###'},
+                    colors: ['#4e73df', '#1cc88a'],
+                    chartArea: {width: '80%', height: '70%'},
+                    legend: {position: 'bottom'},
+                    animation: {
+                        startup: true,
+                        duration: 1000,
+                        easing: 'out'
+                    }
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById('revenue_chart_div'));
+                chart.draw(chartData, options);
+            })
+            .catch(error => console.error('Error loading revenue chart data:', error));
+    }
+
+    // Load the calendar chart
+    function loadCalendarChart() {
+        fetch('{{ route('admin.chart.appointments') }}')
+            .then(response => response.json())
+            .then(data => {
+                // Create a DataTable
+                const dataTable = new google.visualization.DataTable();
+                dataTable.addColumn({ type: 'date', id: 'Date' });
+                dataTable.addColumn({ type: 'number', id: 'Appointments' });
+
+                // Skip the header row (index 0) and add the data rows
+                for (let i = 1; i < data.calendarData.length; i++) {
+                    const row = data.calendarData[i];
+                    const dateParts = row[0].split('-');
+                    const year = parseInt(dateParts[0]);
+                    const month = parseInt(dateParts[1]) - 1; // JavaScript months are 0-based
+                    const day = parseInt(dateParts[2]);
+
+                    dataTable.addRow([new Date(year, month, day), row[1]]);
+                }
+
+                const options = {
+                    title: '',
+                    height: 350,
+                    calendar: {
+                        cellSize: 13,
+                        monthLabel: {
+                            fontName: 'Times-Roman',
+                            fontSize: 12,
+                            color: '#1a1a1a',
+                            bold: true
+                        },
+                        monthOutlineColor: {
+                            stroke: '#4e73df',
+                            strokeOpacity: 0.8,
+                            strokeWidth: 2
+                        },
+                        unusedMonthOutlineColor: {
+                            stroke: '#c0c0c0',
+                            strokeOpacity: 0.8,
+                            strokeWidth: 1
+                        },
+                        cellColor: {
+                            stroke: '#f5f5f5',
+                            strokeOpacity: 0.5,
+                            strokeWidth: 1
+                        },
+                        focusedCellColor: {
+                            stroke: '#4e73df'
+                        }
+                    },
+                    colorAxis: {
+                        colors: ['#e8f4f8', '#4e73df']
+                    },
+                    noDataPattern: {
+                        backgroundColor: '#eeeeee',
+                        color: '#eeeeee'
+                    }
+                };
+
+                const chart = new google.visualization.Calendar(document.getElementById('calendar_chart'));
+                chart.draw(dataTable, options);
+            })
+            .catch(error => {
+                console.error('Error loading calendar chart data:', error);
+                document.getElementById('calendar_chart').innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+                        <p>Failed to load calendar data</p>
+                    </div>
+                `;
+            });
+    }
+</script>
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
