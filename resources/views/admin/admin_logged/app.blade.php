@@ -177,7 +177,7 @@
         }
 
         .sidebar.collapsed {
-            width: 80px;
+            width: 70px;
         }
 
         .sidebar-brand {
@@ -190,14 +190,14 @@
         }
 
         .sidebar-brand img {
-            height: 60px; /* Increased from 40px */
+            height: 60px;
             width: auto;
             transition: all 0.3s ease;
             object-fit: contain;
         }
 
         .sidebar.collapsed .sidebar-brand img {
-            height: 45px; /* Increased from 35px */
+            height: 45px;
         }
 
         .sidebar-menu {
@@ -326,7 +326,7 @@
         }
 
         .main-content.expanded {
-            margin-left: 80px;
+            margin-left: 70px;
         }
 
         /* Navbar */
@@ -363,7 +363,7 @@
         .navbar-toggler:hover {
             background-color: var(--gray-100);
             color: var(--primary);
-            transform: rotate(180deg);
+            transform: rotate(90deg);
         }
 
         .navbar-profile {
@@ -512,7 +512,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E") center center;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rulesvg%3E%3C/svg%3E") center center;
             opacity: 0.2;
         }
 
@@ -1017,9 +1017,9 @@
             justify-content: center;
             width: 40px;
             height: 40px;
-            border-radius: var (--radius-full);
+            border-radius: var(--radius-full);
             background-color: var(--gray-100);
-            color: var (--gray-700);
+            color: var(--gray-700);
             cursor: pointer;
             transition: all 0.2s ease;
             margin-right: 1rem;
@@ -1073,14 +1073,12 @@
             transform: scale(0.95);
             transform-origin: top right;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
         }
 
         .notification-bell.show .notification-dropdown {
             opacity: 1;
             visibility: visible;
             transform: scale(1);
-            pointer-events: auto;
         }
 
         .notification-header {
@@ -1153,7 +1151,7 @@
         }
 
         .notification-item:hover {
-            background-color: var (--gray-50);
+            background-color: var(--gray-50);
         }
 
         .notification-item:last-child {
@@ -1174,7 +1172,7 @@
 
         .notification-icon.warning {
             background-color: var(--warning-light);
-            color: var (--warning);
+            color: var(--warning);
         }
 
         .notification-content {
@@ -1267,54 +1265,6 @@
         .notification-empty p {
             font-size: 0.875rem;
         }
-
-        /* Update sidebar transition styles */
-        .sidebar {
-            width: 280px;
-            transition: width 0.3s ease;
-        }
-
-        .sidebar.collapsed {
-            width: 70px;
-        }
-
-        .sidebar.collapsed .sidebar-menu-item {
-            padding: 0.875rem;
-            justify-content: center;
-        }
-
-        .sidebar.collapsed .sidebar-menu-item i {
-            margin-right: 0;
-        }
-
-        .sidebar.collapsed .sidebar-menu-item span,
-        .sidebar.collapsed .sidebar-group-header,
-        .sidebar.collapsed .sidebar-brand span {
-            display: none;
-        }
-
-        .sidebar.collapsed .sidebar-brand img {
-            width: 40px;
-        }
-
-        /* Update main content transition */
-        .main-content {
-            margin-left: 280px;
-            transition: margin-left 0.3s ease;
-        }
-
-        .main-content.expanded {
-            margin-left: 70px;
-        }
-
-        /* Update navbar toggler transition */
-        .navbar-toggler {
-            transition: transform 0.3s ease;
-        }
-
-        .navbar-toggler.rotated {
-            transform: rotate(180deg);
-        }
     </style>
 
     <!-- Scripts -->
@@ -1325,26 +1275,20 @@
     <script type="text/javascript">
         // Load the Visualization API and the controls package.
         google.charts.load('current', {'packages':['corechart', 'controls']});
-
-        // Set a callback to run when the Google Visualization API is loaded.
         google.charts.setOnLoadCallback(drawDashboard);
 
         function drawDashboard() {
-            // Fetch patient age data from the API
             fetch('/admin/chart/patient-ages')
                 .then(response => response.json())
                 .then(patientData => {
-                    // Create data table with patient data
                     var data = new google.visualization.DataTable();
                     data.addColumn('string', 'Patient');
                     data.addColumn('number', 'Age');
                     data.addRows(patientData);
 
-                    // Create a dashboard
                     var dashboard = new google.visualization.Dashboard(
                         document.getElementById('dashboard_div'));
 
-                    // Create a range slider for age filtering
                     var ageRangeSlider = new google.visualization.ControlWrapper({
                         'controlType': 'NumberRangeFilter',
                         'containerId': 'filter_div',
@@ -1355,7 +1299,6 @@
                         }
                     });
 
-                    // Create a column chart
                     var ageChart = new google.visualization.ChartWrapper({
                         'chartType': 'ColumnChart',
                         'containerId': 'chart_div',
@@ -1365,19 +1308,12 @@
                             'pieSliceText': 'value',
                             'legend': 'right',
                             'title': 'Patient Age Distribution',
-                            'hAxis': {
-                                'title': 'Patients'
-                            },
-                            'vAxis': {
-                                'title': 'Age'
-                            }
+                            'hAxis': {'title': 'Patients'},
+                            'vAxis': {'title': 'Age'}
                         }
                     });
 
-                    // Bind range slider to chart
                     dashboard.bind(ageRangeSlider, ageChart);
-
-                    // Draw the dashboard
                     dashboard.draw(data);
                 })
                 .catch(error => {
@@ -1386,55 +1322,97 @@
                         '<div class="text-center text-gray-500 py-4">Failed to load patient age data</div>';
                 });
         }
-    </script>
-    <script type="text/javascript">
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawTreatmentDistributionChart);
 
-    function drawTreatmentDistributionChart() {
-        fetch('/admin/chart/treatments')
-            .then(response => response.json())
-            .then(treatmentData => {
-                var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Treatment');
-                data.addColumn('number', 'Count');
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawTreatmentDistributionChart);
 
-                treatmentData.forEach(item => {
-                    data.addRow([item.treatment, item.count]);
-                });
+        function drawTreatmentDistributionChart() {
+            fetch('/admin/chart/treatments')
+                .then(response => response.json())
+                .then(treatmentData => {
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Treatment');
+                    data.addColumn('number', 'Count');
+                    treatmentData.forEach(item => {
+                        data.addRow([item.treatment, item.count]);
+                    });
 
-                var options = {
-                    title: 'Treatment Distribution',
-                    pieHole: 0.4,
-                    sliceVisibilityThreshold: .05,
-                    colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'],
-                    chartArea: {
-                        width: '100%',
-                        height: '80%'
-                    },
-                    legend: {
-                        position: 'bottom',
-                        alignment: 'center'
-                    }
-                };
+                    var options = {
+                        title: 'Treatment Distribution',
+                        pieHole: 0.4,
+                        sliceVisibilityThreshold: .05,
+                        colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'],
+                        chartArea: {width: '100%', height: '80%'},
+                        legend: {position: 'bottom', alignment: 'center'}
+                    };
 
-                var chart = new google.visualization.PieChart(document.getElementById('treatmentDistributionChart'));
-                chart.draw(data, options);
-
-                window.addEventListener('resize', function() {
+                    var chart = new google.visualization.PieChart(document.getElementById('treatmentDistributionChart'));
                     chart.draw(data, options);
+
+                    window.addEventListener('resize', function() {
+                        chart.draw(data, options);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading treatment data:', error);
+                    document.getElementById('treatmentDistributionChart').innerHTML = `
+                        <div class="text-center text-gray-500 py-4">
+                            Failed to load treatment data
+                        </div>
+                    `;
                 });
-            })
-            .catch(error => {
-                console.error('Error loading treatment data:', error);
-                document.getElementById('treatmentDistributionChart').innerHTML = `
-                    <div class="text-center text-gray-500 py-4">
-                        Failed to load treatment data
-                    </div>
-                `;
-            });
-    }
-</script>
+        }
+
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawAppointmentsPieChart);
+
+        function drawAppointmentsPieChart() {
+            fetch('/admin/appointment?status=all&format=json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(apiData => {
+                    var data = google.visualization.arrayToDataTable([
+                        ['Status', 'Count'],
+                        ['Confirmed', parseInt(apiData.confirmed) || 0],
+                        ['Pending', parseInt(apiData.pending) || 0],
+                        ['Cancelled', parseInt(apiData.cancelled) || 0]
+                    ]);
+
+                    var options = {
+                        pieHole: 0.4,
+                        colors: ['#10b981', '#f59e0b', '#ef4444'],
+                        chartArea: {width: '100%', height: '80%'},
+                        legend: {position: 'bottom', alignment: 'center'},
+                        pieSliceText: 'value',
+                        fontSize: 12,
+                        fontName: 'Poppins',
+                        tooltip: {showColorCode: true},
+                        animation: {startup: true, duration: 1000, easing: 'out'}
+                    };
+
+                    var chart = new google.visualization.PieChart(document.getElementById('appointmentsPieChart'));
+                    chart.draw(data, options);
+
+                    window.addEventListener('resize', function() {
+                        chart.draw(data, options);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading appointment data:', error);
+                    document.getElementById('appointmentsPieChart').innerHTML = `
+                        <div class="flex flex-col items-center justify-center p-4 text-gray-500">
+                            <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+                            <p>Failed to load appointment data</p>
+                            <button onclick="drawAppointmentsPieChart()" class="mt-2 text-sm text-blue-500 hover:text-blue-700">
+                                <i class="fas fa-redo mr-1"></i> Try again
+                            </button>
+                        </div>
+                    `;
+                });
+        }
+    </script>
 </head>
 <body>
     <!-- Global Loader -->
@@ -1458,15 +1436,11 @@
                     <i class="fas fa-chevron-left"></i>
                 </button>
             </div>
-            <!-- Sidebar menu section -->
             <div class="sidebar-menu">
-                <!-- Dashboard -->
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-menu-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
-
-                <!-- Patient Management -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-header">Patient Management</div>
                     <a href="{{ route('admin.patient.index') }}" class="sidebar-menu-item {{ request()->routeIs('admin.patient.*') ? 'active' : '' }}">
@@ -1478,8 +1452,6 @@
                         <span>Patient List</span>
                     </a>
                 </div>
-
-                <!-- Financial Management -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-header">Financial</div>
                     <a href="{{ route('admin.invoice.index') }}" class="sidebar-menu-item {{ request()->routeIs('admin.invoice.*') ? 'active' : '' }}">
@@ -1491,8 +1463,6 @@
                         <span>Reports</span>
                     </a>
                 </div>
-
-                <!-- Appointment Management -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-header">Appointments</div>
                     <a href="{{ route('admin.appointments.index') }}" class="sidebar-menu-item {{ request()->routeIs('admin.appointments.*') ? 'active' : '' }}">
@@ -1507,7 +1477,7 @@
         <div class="main-content" id="mainContent">
             <!-- Navbar -->
             <div class="navbar">
-                <button class="navbar-toggler" id="sidebarToggle">
+                <button class="navbar-toggler" id="sidebarToggle" aria-label="Toggle Sidebar">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="navbar-profile">
@@ -1517,8 +1487,6 @@
                         @if(isset($pendingAppointmentsCount) && $pendingAppointmentsCount > 0)
                             <span class="notification-badge">{{ $pendingAppointmentsCount }}</span>
                         @endif
-
-                        <!-- Notification Dropdown -->
                         <div class="notification-dropdown">
                             <div class="notification-header">
                                 <div class="notification-title">
@@ -1538,7 +1506,6 @@
                                 </div>
                             </div>
                             <div class="notification-body" id="notificationBody">
-                                <!-- Notifications will be loaded here via AJAX -->
                                 <div class="notification-loading">
                                     <div class="d-flex justify-content-center p-4">
                                         <div class="spinner-border text-primary" role="status">
@@ -1552,7 +1519,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="navbar-profile-img">
                         <img src="{{ asset('images/user.jpg') }}" alt="User">
                     </div>
@@ -1596,9 +1562,8 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js')}}"></script>
-    <script src="{{ asset('assets/vendors/chart.js/Chart.min.js')}}"></script>
-
+    <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js') }}"></script>
+    <script src="{{ asset('assets/vendors/chart.js/Chart.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Show loader on page load
@@ -1607,43 +1572,47 @@
 
             // Hide loader when page is fully loaded
             window.addEventListener('load', function() {
-                setTimeout(function() {
-                    globalLoader.classList.remove('show');
-                }, 500);
+                setTimeout(() => globalLoader.classList.remove('show'), 500);
             });
 
-            // Sidebar Toggle - Update this section
+            // Sidebar Toggle
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+            const isMobile = window.matchMedia("(max-width: 992px)").matches;
 
             function toggleSidebar() {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
-
-                // Store the state in localStorage
-                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+                if (isMobile) {
+                    sidebar.classList.toggle('show');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                    sidebarToggle.classList.toggle('rotated');
+                    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+                }
             }
 
-            // Initialize sidebar state from localStorage
-            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            // Initialize sidebar state
+            if (!isMobile && localStorage.getItem('sidebarCollapsed') === 'true') {
                 sidebar.classList.add('collapsed');
                 mainContent.classList.add('expanded');
+                sidebarToggle.classList.add('rotated');
             }
 
-            sidebarToggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                toggleSidebar();
-
-                // Add rotate animation to toggle button
-                this.style.transform = this.style.transform === 'rotate(180deg)' ? 'rotate(0)' : 'rotate(180deg)';
-            });
-
-            // Remove the old sidebarCollapseBtn code
-            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+            // Event listeners for toggle buttons
+            sidebarToggle.addEventListener('click', toggleSidebar);
             if (sidebarCollapseBtn) {
-                sidebarCollapseBtn.remove();
+                sidebarCollapseBtn.addEventListener('click', toggleSidebar);
             }
+
+            // Close sidebar on mobile when clicking outside
+            document.addEventListener('click', function(e) {
+                if (isMobile && sidebar.classList.contains('show') &&
+                    !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            });
 
             // Notification Bell Toggle
             const notificationBell = document.getElementById('notificationBell');
@@ -1651,9 +1620,7 @@
                 notificationBell.addEventListener('click', function(e) {
                     e.stopPropagation();
                     this.classList.toggle('show');
-
                     if (this.classList.contains('show')) {
-                        // Remove bell ring animation on manual click
                         loadPendingAppointments();
                     }
                 });
@@ -1668,9 +1635,7 @@
                 // Prevent closing when clicking inside dropdown
                 const notificationDropdown = notificationBell.querySelector('.notification-dropdown');
                 if (notificationDropdown) {
-                    notificationDropdown.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                    });
+                    notificationDropdown.addEventListener('click', e => e.stopPropagation());
                 }
 
                 // Refresh notifications
@@ -1679,9 +1644,7 @@
                     refreshBtn.addEventListener('click', function() {
                         loadPendingAppointments();
                         this.classList.add('animate-spin');
-                        setTimeout(() => {
-                            this.classList.remove('animate-spin');
-                        }, 1000);
+                        setTimeout(() => this.classList.remove('animate-spin'), 1000);
                     });
                 }
 
@@ -1689,17 +1652,30 @@
                 const markAllReadBtn = document.getElementById('markAllRead');
                 if (markAllReadBtn) {
                     markAllReadBtn.addEventListener('click', function() {
-                        // You can implement AJAX call to mark all as read
-                        showToast('Success', 'All notifications marked as read', 'success');
+                        fetch('/admin/appointments/mark-all-read', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToast('Success', 'All notifications marked as read', 'success');
+                                loadPendingAppointments();
+                            } else {
+                                showToast('Error', 'Failed to mark notifications as read', 'error');
+                            }
+                        })
+                        .catch(() => showToast('Error', 'An error occurred', 'error'));
                     });
                 }
             }
 
-            // Function to load pending appointments via AJAX
+            // Load pending appointments via AJAX
             function loadPendingAppointments() {
                 const notificationBody = document.getElementById('notificationBody');
-
-                // Show loading state
                 notificationBody.innerHTML = `
                     <div class="d-flex justify-content-center p-4">
                         <div class="spinner-border text-primary" role="status">
@@ -1708,30 +1684,25 @@
                     </div>
                 `;
 
-                // Fetch pending appointments
                 fetch('/admin/appointment?status=pending&format=json', {
                     headers: {
                         'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     }
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.appointments && data.appointments.length > 0) {
                         let html = '';
-
                         data.appointments.forEach(appointment => {
                             const date = new Date(appointment.appointment_date);
                             const formattedDate = date.toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric'
+                                month: 'short', day: 'numeric', year: 'numeric'
                             });
-
                             const time = appointment.appointment_time ?
                                 new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
-                                    hour: '2-digit',
-                                    minute: '2-digit'
+                                    hour: '2-digit', minute: '2-digit'
                                 }) : 'N/A';
 
                             html += `
@@ -1741,24 +1712,18 @@
                                     </div>
                                     <div class="notification-content">
                                         <div class="notification-message">
-                                            <strong>${appointment.user ? appointment.user.name : 'Unknown Patient'}</strong> has requested an appointment on <strong>${formattedDate}</strong></strong>
+                                            <strong>${appointment.user ? appointment.user.name : 'Unknown Patient'}</strong> has requested an appointment on <strong>${formattedDate}</strong>
                                         </div>
                                         <div class="notification-time">
                                             ${moment(appointment.created_at).fromNow()}
                                         </div>
                                         <div class="notification-actions-item">
-                                            <form action="/admin/appointment/${appointment.id}/confirm" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="notification-btn notification-btn-confirm">
-                                                    <i class="fas fa-check"></i> Confirm
-                                                </button>
-                                            </form>
-                                            <form action="/admin/appointment/${appointment.id}/cancel" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="notification-btn notification-btn-cancel">
-                                                    <i class="fas fa-times"></i> Cancel
-                                                </button>
-                                            </form>
+                                            <button class="notification-btn notification-btn-confirm" data-id="${appointment.id}">
+                                                <i class="fas fa-check"></i> Confirm
+                                            </button>
+                                            <button class="notification-btn notification-btn-cancel" data-id="${appointment.id}">
+                                                <i class="fas fa-times"></i> Cancel
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1767,20 +1732,15 @@
 
                         notificationBody.innerHTML = html;
 
-                        // Add event listeners to the confirm and cancel buttons
-                        const confirmButtons = notificationBody.querySelectorAll('.notification-btn-confirm');
-                        const cancelButtons = notificationBody.querySelectorAll('.notification-btn-cancel');
-
-                        confirmButtons.forEach(button => {
-                            button.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                const form = this.closest('form');
-
-                                fetch(form.action, {
+                        // Add event listeners for confirm and cancel buttons
+                        document.querySelectorAll('.notification-btn-confirm').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const id = this.dataset.id;
+                                fetch(`/admin/appointment/${id}/confirm`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                                     }
                                 })
                                 .then(response => response.json())
@@ -1792,22 +1752,18 @@
                                         showToast('Error', 'Failed to confirm appointment', 'error');
                                     }
                                 })
-                                .catch(error => {
-                                    showToast('Error', 'An error occurred', 'error');
-                                });
+                                .catch(() => showToast('Error', 'An error occurred', 'error'));
                             });
                         });
 
-                        cancelButtons.forEach(button => {
-                            button.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                const form = this.closest('form');
-
-                                fetch(form.action, {
+                        document.querySelectorAll('.notification-btn-cancel').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const id = this.dataset.id;
+                                fetch(`/admin/appointment/${id}/cancel`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                                     }
                                 })
                                 .then(response => response.json())
@@ -1819,12 +1775,9 @@
                                         showToast('Error', 'Failed to cancel appointment', 'error');
                                     }
                                 })
-                                .catch(error => {
-                                    showToast('Error', 'An error occurred', 'error');
-                                });
+                                .catch(() => showToast('Error', 'An error occurred', 'error'));
                             });
                         });
-
                     } else {
                         notificationBody.innerHTML = `
                             <div class="notification-empty">
@@ -1836,6 +1789,7 @@
                     }
                 })
                 .catch(error => {
+                    console.error('Error fetching notifications:', error);
                     notificationBody.innerHTML = `
                         <div class="notification-empty">
                             <i class="fas fa-exclamation-circle"></i>
@@ -1849,10 +1803,8 @@
             // Toast notification function
             window.showToast = function(title, message, type = 'success') {
                 const toastContainer = document.getElementById('toastContainer');
-
                 const toast = document.createElement('div');
                 toast.className = `toast toast-${type}`;
-
                 const iconClass = type === 'success' ? 'fa-check-circle' :
                                  type === 'warning' ? 'fa-exclamation-triangle' :
                                  type === 'error' ? 'fa-times-circle' : 'fa-info-circle';
@@ -1871,54 +1823,39 @@
                 `;
 
                 toastContainer.appendChild(toast);
-
-                // Auto remove after 5 seconds
                 setTimeout(() => {
                     toast.style.animation = 'slideOutRight 0.3s ease-out forwards';
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 300);
+                    setTimeout(() => toast.remove(), 300);
                 }, 5000);
 
-                // Close button
-                const closeBtn = toast.querySelector('.toast-close');
-                closeBtn.addEventListener('click', () => {
+                toast.querySelector('.toast-close').addEventListener('click', () => {
                     toast.style.animation = 'slideOutRight 0.3s ease-out forwards';
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 300);
+                    setTimeout(() => toast.remove(), 300);
                 });
-            }
+            };
 
             // Sweet Alert helper functions
             window.showAlert = function(title, text, icon = 'success') {
                 return Swal.fire({
-                    title: title,
-                    text: text,
-                    icon: icon,
+                    title, text, icon,
                     confirmButtonText: 'OK',
-                    customClass: {
-                        confirmButton: 'btn btn-primary'
-                    },
+                    customClass: { confirmButton: 'btn btn-primary' },
                     buttonsStyling: false
                 });
-            }
+            };
 
             window.showConfirm = function(title, text, confirmText = 'Yes', cancelText = 'No', icon = 'warning') {
                 return Swal.fire({
-                    title: title,
-                    text: text,
-                    icon: icon,
+                    title, text, icon,
                     showCancelButton: true,
-                    confirmButtonText: confirmText,
-                    cancelButtonText: cancelText,
+                    confirmButtonText, cancelButtonText,
                     customClass: {
                         confirmButton: 'btn btn-primary',
                         cancelButton: 'btn btn-outline-secondary'
                     },
                     buttonsStyling: false
                 });
-            }
+            };
 
             // Loader functions
             window.showLoader = function(message = 'Loading...') {
@@ -1926,19 +1863,19 @@
                 const loaderText = loader.querySelector('.loader-text');
                 loaderText.textContent = message;
                 loader.classList.add('show');
-            }
+            };
 
             window.hideLoader = function() {
                 const loader = document.getElementById('global-loader');
                 loader.classList.remove('show');
-            }
+            };
 
             // Welcome notification
             setTimeout(() => {
                 showToast('Welcome Back!', 'Your dashboard is ready', 'success');
             }, 1000);
 
-            // Load pending appointments count via AJAX
+            // Load pending appointments count
             fetch('/admin/appointment?status=pending&count=true', {
                 headers: {
                     'Accept': 'application/json',
@@ -1948,157 +1885,16 @@
             .then(response => response.json())
             .then(data => {
                 if (data.count && data.count > 0) {
-                    const notificationBell = document.getElementById('notificationBell');
-
-                    // Create or update badge
-                    let badge = notificationBell.querySelector('.notification-badge');
-                    if (!badge) {
-                        badge = document.createElement('span');
-                        badge.className = 'notification-badge';
-                        notificationBell.appendChild(badge);
-
-                        // Only animate when new notifications arrive
-                        notificationBell.classList.add('animate-bell');
-                        setTimeout(() => {
-                            notificationBell.classList.remove('animate-bell');
-                        }, 1000);
-                    }
+                    const badge = notificationBell.querySelector('.notification-badge') || document.createElement('span');
+                    badge.className = 'notification-badge';
                     badge.textContent = data.count;
+                    notificationBell.appendChild(badge);
+                    notificationBell.classList.add('animate-bell');
+                    setTimeout(() => notificationBell.classList.remove('animate-bell'), 1000);
                 }
             })
-            .catch(error => {
-                console.error('Error fetching pending appointments count:', error);
-            });
+            .catch(error => console.error('Error fetching pending appointments count:', error));
         });
-
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-
-      // Load the Visualization API and the controls package.
-      google.charts.load('current', {'packages':['corechart', 'controls']});
-
-      // Set a callback to run when the Google Visualization API is loaded.
-      google.charts.setOnLoadCallback(drawDashboard);
-
-      // Callback that creates and populates a data table,
-      // instantiates a dashboard, a range slider and a pie chart,
-      // passes in the data and draws it.
-      function drawDashboard() {
-
-        // Create our data table.
-        var data = google.visualization.arrayToDataTable([
-          ['Name', 'Donuts eaten'],
-          ['Michael' , 5],
-          ['Elisa', 7],
-          ['Robert', 3],
-          ['John', 2],
-          ['Jessica', 6],
-          ['Aaron', 1],
-          ['Margareth', 8]
-        ]);
-
-        // Create a dashboard.
-        var dashboard = new google.visualization.Dashboard(
-            document.getElementById('dashboard_div'));
-
-        // Create a range slider, passing some options
-        var donutRangeSlider = new google.visualization.ControlWrapper({
-          'controlType': 'NumberRangeFilter',
-          'containerId': 'filter_div',
-          'options': {
-            'filterColumnLabel': 'Donuts eaten'
-          }
-        });
-
-        // Create a pie chart, passing some options
-        var pieChart = new google.visualization.ChartWrapper({
-          'chartType': 'PieChart',
-          'containerId': 'chart_div',
-          'options': {
-            'width': 300,
-            'height': 300,
-            'pieSliceText': 'value',
-            'legend': 'right'
-          }
-        });
-
-        // Establish dependencies, declaring that 'filter' drives 'pieChart',
-        // so that the pie chart will only display entries that are let through
-        // given the chosen slider range.
-        dashboard.bind(donutRangeSlider, pieChart);
-
-        // Draw the dashboard.
-        dashboard.draw(data);
-      }
-    </script>
-    </script>
-
-    <script type="text/javascript">
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawAppointmentsPieChart);
-
-        function drawAppointmentsPieChart() {
-            fetch('/admin/appointment?status=all&format=json')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(apiData => {
-                    // Process the data
-                    var data = google.visualization.arrayToDataTable([
-                        ['Status', 'Count'],
-                        ['Confirmed', parseInt(apiData.confirmed) || 0],
-                        ['Pending', parseInt(apiData.pending) || 0],
-                        ['Cancelled', parseInt(apiData.cancelled) || 0]
-                    ]);
-
-                    var options = {
-                        pieHole: 0.4,
-                        colors: ['#10b981', '#f59e0b', '#ef4444'],
-                        chartArea: {
-                            width: '100%',
-                            height: '80%'
-                        },
-                        legend: {
-                            position: 'bottom',
-                            alignment: 'center'
-                        },
-                        pieSliceText: 'value',
-                        fontSize: 12,
-                        fontName: 'Poppins',
-                        tooltip: {
-                            showColorCode: true
-                        },
-                        animation: {
-                            startup: true,
-                            duration: 1000,
-                            easing: 'out'
-                        }
-                    };
-
-                    var chart = new google.visualization.PieChart(document.getElementById('appointmentsPieChart'));
-                    chart.draw(data, options);
-
-                    // Redraw on window resize
-                    window.addEventListener('resize', function() {
-                        chart.draw(data, options);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading appointment data:', error);
-                    document.getElementById('appointmentsPieChart').innerHTML = `
-                        <div class="flex flex-col items-center justify-center p-4 text-gray-500">
-                            <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
-                            <p>Failed to load appointment data</p>
-                            <button onclick="drawAppointmentsPieChart()" class="mt-2 text-sm text-blue-500 hover:text-blue-700">
-                                <i class="fas fa-redo mr-1"></i> Try again
-                            </button>
-                        </div>
-                    `;
-                });
-        }
     </script>
 </body>
 </html>

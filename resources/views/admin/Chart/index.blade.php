@@ -1,457 +1,620 @@
 @extends('admin.admin_logged.app')
 
+@section('title', 'Dashboard Analytics')
+
+@section('styles')
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<style>
+    .dashboard-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    .chart-container {
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background-color: white;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .filter-container {
+        background-color: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .filter-btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .filter-btn.active {
+        background-color: #4f46e5;
+        color: white;
+    }
+    .filter-btn:hover:not(.active) {
+        background-color: #e5e7eb;
+    }
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+    }
+    .stat-label {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    .trend-up {
+        color: #10b981;
+    }
+    .trend-down {
+        color: #ef4444;
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="animate-fadeIn">
-    <!-- Page Header -->
-    <div class="card mb-4">
-        <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-                <h4 class="card-title mb-0">
-                    <i class="fas fa-chart-line text-primary mr-2"></i>
-                    Financial Reports
-                </h4>
-                <p class="text-muted mb-0">Track your clinic's financial performance</p>
+<div class="container mx-auto px-4 py-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Appointment Analytics Dashboard</h1>
+
+    <!-- Date Range Filter -->
+    <div class="filter-container flex flex-wrap items-center justify-between mb-6">
+        <div>
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Filter by Date Range</h2>
+            <div class="flex space-x-2">
+                <button class="filter-btn active" data-range="today" id="todayBtn">Today</button>
+                <button class="filter-btn" data-range="week" id="weekBtn">This Week</button>
+                <button class="filter-btn" data-range="month" id="monthBtn">This Month</button>
+                <button class="filter-btn" data-range="year" id="yearBtn">This Year</button>
             </div>
-            <div class="d-flex align-items-center">
-                <div class="input-group date-picker-group">
-                    <input type="date" class="form-control" name="date" id="date" value="{{ request('date', date('Y-m-d')) }}">
-                    <div class="input-group-append">
-                        <button type="button" onclick="search_place()" class="btn btn-primary">
-                            <i class="fas fa-search mr-1"></i> Filter
-                        </button>
-                    </div>
-                </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <div class="relative">
+                <input type="date" id="startDate" class="border rounded-lg px-3 py-2">
             </div>
+            <span class="text-gray-500">to</span>
+            <div class="relative">
+                <input type="date" id="endDate" class="border rounded-lg px-3 py-2">
+            </div>
+            <button id="customRangeBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                Apply
+            </button>
         </div>
     </div>
 
-    <!-- Stats Overview -->
-    <div class="row mb-4">
-        <!-- Total Appointments -->
-        <div class="col-md-4">
-            <div class="card stats-card bg-primary text-white h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title text-white mb-0">Total Appointments</h5>
-                            <p class="text-white-50 mb-0">For selected date</p>
-                        </div>
-                        <div class="stats-icon">
-                            <i class="fas fa-calendar-check fa-2x"></i>
-                        </div>
-                    </div>
-                    <h2 class="mt-3 mb-0">{{ count($invoice) }}</h2>
-                    <div class="progress mt-3" style="height: 5px;">
-                        <div class="progress-bar bg-white" role="progressbar" style="width: {{ min(count($invoice) * 5, 100) }}%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Total Amount -->
-        <div class="col-md-4">
-            <div class="card stats-card bg-secondary text-white h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title text-white mb-0">Total Revenue</h5>
-                            <p class="text-white-50 mb-0">All transactions</p>
-                        </div>
-                        <div class="stats-icon">
-                            <i class="fas fa-dollar-sign fa-2x"></i>
-                        </div>
-                    </div>
-                    <h2 class="mt-3 mb-0">
-                        <?php
-                        $total = 0;
-                        foreach($invoice as $bD) {
-                            $total += ($bD['totalAmount']);
-                        }
-                        ?>
-                        ${{ number_format($total, 2) }}
-                    </h2>
-                    <div class="progress mt-3" style="height: 5px;">
-                        <div class="progress-bar bg-white" role="progressbar" style="width: {{ min($total/100, 100) }}%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Advance Amount -->
-        <div class="col-md-4">
-            <div class="card stats-card bg-accent text-white h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title text-white mb-0">Advance Payments</h5>
-                            <p class="text-white-50 mb-0">Pre-payments received</p>
-                        </div>
-                        <div class="stats-icon">
-                            <i class="fas fa-hand-holding-usd fa-2x"></i>
-                        </div>
-                    </div>
-                    <h2 class="mt-3 mb-0">
-                        <?php
-                        $advanceTotal = 0;
-                        foreach($invoice as $bD) {
-                            $advanceTotal += ($bD['advanceAmount']);
-                        }
-                        ?>
-                        ${{ number_format($advanceTotal, 2) }}
-                    </h2>
-                    <div class="progress mt-3" style="height: 5px;">
-                        <div class="progress-bar bg-white" role="progressbar" style="width: {{ min($advanceTotal/100, 100) }}%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Section -->
-    <div class="row">
-        <!-- Revenue Chart -->
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-chart-line text-primary mr-2"></i>
-                        Revenue Overview
-                    </h5>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-sm btn-outline-primary active" onclick="updateChartPeriod('daily')">Daily</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="updateChartPeriod('weekly')">Weekly</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="updateChartPeriod('monthly')">Monthly</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <canvas id="revenueChart" height="300"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Payment Distribution -->
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-chart-pie text-primary mr-2"></i>
-                        Payment Distribution
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="paymentDistributionChart" height="300"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Detailed Report -->
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="fas fa-list-alt text-primary mr-2"></i>
-                Detailed Report for <span id="date-label" class="font-weight-bold">{{ request('date', date('Y-m-d')) }}</span>
-            </h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Invoice #</th>
-                            <th>Patient</th>
-                            <th>Treatment</th>
-                            <th>Total Amount</th>
-                            <th>Advance</th>
-                            <th>Balance</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(count($invoice) > 0)
-                            @foreach($invoice as $index => $inv)
-                                <tr>
-                                    <td>INV-{{ str_pad($inv['id'], 5, '0', STR_PAD_LEFT) }}</td>
-                                    <td>{{ $inv['patient_name'] ?? 'N/A' }}</td>
-                                    <td>{{ $inv['treatment_name'] ?? 'General' }}</td>
-                                    <td>${{ number_format($inv['totalAmount'], 2) }}</td>
-                                    <td>${{ number_format($inv['advanceAmount'], 2) }}</td>
-                                    <td>${{ number_format($inv['totalAmount'] - $inv['advanceAmount'], 2) }}</td>
-                                    <td>
-                                        @if($inv['totalAmount'] == $inv['advanceAmount'])
-                                            <span class="badge bg-success text-white">Paid</span>
-                                        @elseif($inv['advanceAmount'] > 0)
-                                            <span class="badge bg-warning text-white">Partial</span>
-                                        @else
-                                            <span class="badge bg-danger text-white">Unpaid</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('admin.invoice.view', $inv['id']) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @else
-                            <tr>
-                                <td colspan="8" class="text-center">No invoices found for this date</td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card-footer">
-            <div class="d-flex justify-content-between align-items-center">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Appointments Card -->
+        <div class="dashboard-card bg-white p-6">
+            <div class="flex justify-between items-start">
                 <div>
-                    <button class="btn btn-outline-primary" onclick="exportReport()">
-                        <i class="fas fa-file-export mr-1"></i> Export Report
-                    </button>
+                    <p class="stat-label">Total Appointments</p>
+                    <p class="stat-value" id="totalAppointments">0</p>
+                    <p class="text-sm flex items-center mt-2">
+                        <span class="trend-up flex items-center" id="appointmentTrend">
+                            <i class="fas fa-arrow-up mr-1"></i> 0%
+                        </span>
+                        <span class="text-gray-500 ml-1">vs previous period</span>
+                    </p>
                 </div>
-                <div>
-                    <button class="btn btn-outline-secondary" onclick="printReport()">
-                        <i class="fas fa-print mr-1"></i> Print
-                    </button>
+                <div class="card-icon bg-blue-100 text-blue-600">
+                    <i class="fas fa-calendar-check"></i>
                 </div>
             </div>
+        </div>
+
+        <!-- Total Amount Card -->
+        <div class="dashboard-card bg-white p-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="stat-label">Total Amount</p>
+                    <p class="stat-value" id="totalAmount">$0</p>
+                    <p class="text-sm flex items-center mt-2">
+                        <span class="trend-up flex items-center" id="amountTrend">
+                            <i class="fas fa-arrow-up mr-1"></i> 0%
+                        </span>
+                        <span class="text-gray-500 ml-1">vs previous period</span>
+                    </p>
+                </div>
+                <div class="card-icon bg-green-100 text-green-600">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advance Amount Card -->
+        <div class="dashboard-card bg-white p-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="stat-label">Advance Amount</p>
+                    <p class="stat-value" id="advanceAmount">$0</p>
+                    <p class="text-sm flex items-center mt-2">
+                        <span class="trend-up flex items-center" id="advanceTrend">
+                            <i class="fas fa-arrow-up mr-1"></i> 0%
+                        </span>
+                        <span class="text-gray-500 ml-1">vs previous period</span>
+                    </p>
+                </div>
+                <div class="card-icon bg-purple-100 text-purple-600">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conversion Rate Card -->
+        <div class="dashboard-card bg-white p-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="stat-label">Conversion Rate</p>
+                    <p class="stat-value" id="conversionRate">0%</p>
+                    <p class="text-sm flex items-center mt-2">
+                        <span class="trend-up flex items-center" id="conversionTrend">
+                            <i class="fas fa-arrow-up mr-1"></i> 0%
+                        </span>
+                        <span class="text-gray-500 ml-1">vs previous period</span>
+                    </p>
+                </div>
+                <div class="card-icon bg-yellow-100 text-yellow-600">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Area Chart -->
+        <div class="chart-container">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Appointment Trends</h3>
+            <div id="appointmentTrendsChart" style="width: 100%; height: 350px;"></div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="chart-container">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Appointment Status Distribution</h3>
+            <div id="statusDistributionChart" style="width: 100%; height: 350px;"></div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Calendar Chart -->
+        <div class="chart-container">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Appointment Calendar Heatmap</h3>
+            <div id="calendar_basic" style="width: 100%; height: 350px;"></div>
+        </div>
+
+        <!-- Revenue by Service Type -->
+        <div class="chart-container">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Revenue by Service Type</h3>
+            <div id="revenueByServiceChart" style="width: 100%; height: 350px;"></div>
+        </div>
+    </div>
+
+    <!-- Recent Appointments Table -->
+    <div class="chart-container">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-700">Recent Appointments</h3>
+            <a href="{{ route('admin.appointments.index') }}" class="text-indigo-600 hover:text-indigo-800 transition">View All</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200" id="recentAppointmentsTable">
+                    <!-- Data will be loaded via JavaScript -->
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 @endsection
 
-@section('javascript')
-<script type="text/javascript">
-    // Initialize charts and data on page load
-    window.onload = function() {
-        // Set date label
-        const urlParams = new URLSearchParams(window.location.search);
-        const date = urlParams.get('date') || moment().format('YYYY-MM-DD');
-        document.getElementById('date-label').innerHTML = date;
+@section('scripts')
+<script>
+    // Load Google Charts
+    google.charts.load('current', {'packages':['corechart', 'calendar']});
+    google.charts.setOnLoadCallback(initCharts);
 
-        // Initialize charts
-        initializeCharts();
+    // Initialize date inputs with current date range
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date();
+        const endDateInput = document.getElementById('endDate');
+        const startDateInput = document.getElementById('startDate');
 
-        // Show welcome message
-        showToast('Report Loaded', 'Financial report data has been loaded successfully', 'success');
-    };
+        endDateInput.valueAsDate = today;
 
-    // Query parameters for search
-    var query = <?php echo json_encode((object)Request::only(['date'])); ?>;
+        // Set start date to beginning of current month
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        startDateInput.valueAsDate = startOfMonth;
 
-    // Search function
-    function search_place() {
-        showLoader('Loading report data...');
-        Object.assign(query, {
-            'date': $('#date').val()
+        // Set active filter button
+        document.getElementById('monthBtn').click();
+
+        // Fetch initial data
+        fetchDashboardData('month');
+    });
+
+    // Filter buttons event listeners
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            // Fetch data based on selected range
+            const range = this.getAttribute('data-range');
+            fetchDashboardData(range);
         });
-        window.location.href = "{{route('admin.chart.index')}}?" + $.param(query);
-    }
+    });
 
-    // Initialize all charts
-    function initializeCharts() {
-        // Sample data for charts - in a real app, this would come from the backend
-        const revenueData = generateSampleRevenueData();
-        const distributionData = {
-            labels: ['Advance Payments', 'Balance Due'],
-            datasets: [{
-                data: [
-                    <?php echo $advanceTotal ?? 0; ?>,
-                    <?php echo ($total - $advanceTotal) ?? 0; ?>
-                ],
-                backgroundColor: ['#0ea5e9', '#f59e0b'],
-                borderWidth: 0
-            }]
-        };
+    // Custom date range button
+    document.getElementById('customRangeBtn').addEventListener('click', function() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
 
-        // Revenue Chart
-        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-        window.revenueChart = new Chart(revenueCtx, {
-            type: 'line',
-            data: revenueData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        titleColor: '#1e293b',
-                        bodyColor: '#1e293b',
-                        borderColor: '#e2e8f0',
-                        borderWidth: 1,
-                        padding: 10,
-                        boxPadding: 5,
-                        usePointStyle: true,
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': $' + context.parsed.y;
-                            }
-                        }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
-                elements: {
-                    line: {
-                        tension: 0.4
-                    },
-                    point: {
-                        radius: 3,
-                        hoverRadius: 5
-                    }
-                }
-            }
-        });
+        if (startDate && endDate) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
 
-        // Payment Distribution Chart
-        const distributionCtx = document.getElementById('paymentDistributionChart').getContext('2d');
-        window.distributionChart = new Chart(distributionCtx, {
-            type: 'doughnut',
-            data: distributionData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '70%',
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        titleColor: '#1e293b',
-                        bodyColor: '#1e293b',
-                        borderColor: '#e2e8f0',
-                        borderWidth: 1,
-                        callbacks: {
-                            label: function(context) {
-                                const value = context.parsed;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = Math.round((value / total) * 100);
-                                return `${context.label}: $${value} (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
+            fetchDashboardData('custom', startDate, endDate);
+        } else {
+            alert('Please select both start and end dates');
+        }
+    });
 
-    // Generate sample data for the revenue chart
-    function generateSampleRevenueData() {
-        // In a real app, this would come from the backend
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const totalRevenue = [4500, 5200, 4800, 5800, 6000, 3500, 4200];
-        const advancePayments = [3000, 3500, 2800, 4000, 4200, 2000, 2500];
+    function fetchDashboardData(range, startDate = null, endDate = null) {
+        // Prepare the URL with query parameters
+        let url = '{{ route("admin.chart.data") }}?range=' + range;
 
-        return {
-            labels: days,
-            datasets: [
-                {
-                    label: 'Total Revenue',
-                    data: totalRevenue,
-                    borderColor: '#0ea5e9',
-                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                    fill: true
-                },
-                {
-                    label: 'Advance Payments',
-                    data: advancePayments,
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                    fill: true
-                }
-            ]
-        };
-    }
+        if (range === 'custom' && startDate && endDate) {
+            url += '&start_date=' + startDate + '&end_date=' + endDate;
+        }
 
-    // Update chart based on selected period
-    function updateChartPeriod(period) {
-        showLoader('Updating chart...');
+        // Fetch data from the server
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // Update stats cards
+                updateStatsCards(data.stats);
 
-        // Update active button
-        document.querySelectorAll('.btn-group .btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
+                // Update charts
+                updateAppointmentTrendsChart(data.appointmentTrends);
+                updateStatusDistributionChart(data.statusDistribution);
+                updateCalendarChart(data.calendarData);
+                updateRevenueByServiceChart(data.revenueByService);
 
-        // In a real app, you would fetch new data from the server
-        // For demo purposes, we'll just simulate a data change
-        setTimeout(() => {
-            let labels, totalRevenue, advancePayments;
-
-            switch(period) {
-                case 'weekly':
-                    labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-                    totalRevenue = [18000, 22000, 19500, 24000];
-                    advancePayments = [12000, 15000, 13000, 16000];
-                    break;
-                case 'monthly':
-                    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                    totalRevenue = [65000, 72000, 68000, 79000, 82000, 75000];
-                    advancePayments = [45000, 48000, 42000, 52000, 56000, 50000];
-                    break;
-                default: // daily
-                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                    totalRevenue = [4500, 5200, 4800, 5800, 6000, 3500, 4200];
-                    advancePayments = [3000, 3500, 2800, 4000, 4200, 2000, 2500];
-            }
-
-            window.revenueChart.data.labels = labels;
-            window.revenueChart.data.datasets[0].data = totalRevenue;
-            window.revenueChart.data.datasets[1].data = advancePayments;
-            window.revenueChart.update();
-
-            hideLoader();
-            showToast('Chart Updated', `Showing ${period} revenue data`, 'success');
-        }, 800);
-    }
-
-    // Export report function
-    function exportReport() {
-        showAlert('Export Report', 'Your report will be exported as Excel file.', 'info')
-            .then((result) => {
-                if (result.isConfirmed) {
-                    showLoader('Preparing export...');
-
-                    // Simulate export process
-                    setTimeout(() => {
-                        hideLoader();
-                        showToast('Export Complete', 'Your report has been exported successfully', 'success');
-                    }, 1500);
-                }
+                // Update recent appointments table
+                updateRecentAppointmentsTable(data.recentAppointments);
+            })
+            .catch(error => {
+                console.error('Error fetching dashboard data:', error);
             });
     }
 
-    // Print report function
-    function printReport() {
-        showLoader('Preparing print view...');
+    function updateStatsCards(stats) {
+        // Update total appointments
+        document.getElementById('totalAppointments').textContent = stats.totalAppointments;
 
-        // Simulate print preparation
-        setTimeout(() => {
-            hideLoader();
-            window.print();
-        }, 1000);
+        // Update appointment trend
+        const appointmentTrendEl = document.getElementById('appointmentTrend');
+        appointmentTrendEl.innerHTML = `<i class="fas fa-arrow-${stats.appointmentTrendUp ? 'up' : 'down'} mr-1"></i> ${Math.abs(stats.appointmentTrendPercentage)}%`;
+        appointmentTrendEl.className = stats.appointmentTrendUp ? 'trend-up flex items-center' : 'trend-down flex items-center';
+
+        // Update total amount
+        document.getElementById('totalAmount').textContent = '$' + stats.totalAmount.toLocaleString();
+
+        // Update amount trend
+        const amountTrendEl = document.getElementById('amountTrend');
+        amountTrendEl.innerHTML = `<i class="fas fa-arrow-${stats.amountTrendUp ? 'up' : 'down'} mr-1"></i> ${Math.abs(stats.amountTrendPercentage)}%`;
+        amountTrendEl.className = stats.amountTrendUp ? 'trend-up flex items-center' : 'trend-down flex items-center';
+
+        // Update advance amount
+        document.getElementById('advanceAmount').textContent = '$' + stats.advanceAmount.toLocaleString();
+
+        // Update advance trend
+        const advanceTrendEl = document.getElementById('advanceTrend');
+        advanceTrendEl.innerHTML = `<i class="fas fa-arrow-${stats.advanceTrendUp ? 'up' : 'down'} mr-1"></i> ${Math.abs(stats.advanceTrendPercentage)}%`;
+        advanceTrendEl.className = stats.advanceTrendUp ? 'trend-up flex items-center' : 'trend-down flex items-center';
+
+        // Update conversion rate
+        document.getElementById('conversionRate').textContent = stats.conversionRate + '%';
+
+        // Update conversion trend
+        const conversionTrendEl = document.getElementById('conversionTrend');
+        conversionTrendEl.innerHTML = `<i class="fas fa-arrow-${stats.conversionTrendUp ? 'up' : 'down'} mr-1"></i> ${Math.abs(stats.conversionTrendPercentage)}%`;
+        conversionTrendEl.className = stats.conversionTrendUp ? 'trend-up flex items-center' : 'trend-down flex items-center';
     }
+
+    function initCharts() {
+        // Initialize empty charts (they will be populated with data later)
+        initAppointmentTrendsChart();
+        initStatusDistributionChart();
+        initCalendarChart();
+        initRevenueByServiceChart();
+    }
+
+    function initAppointmentTrendsChart() {
+        const data = google.visualization.arrayToDataTable([
+            ['Period', 'Appointments', 'Revenue'],
+            ['Initial', 0, 0]
+        ]);
+
+        const options = {
+            title: '',
+            hAxis: {title: 'Period', titleTextStyle: {color: '#333'}},
+            vAxis: {minValue: 0},
+            chartArea: {width: '80%', height: '70%'},
+            colors: ['#4f46e5', '#10b981'],
+            legend: {position: 'top'},
+            animation: {
+                startup: true,
+                duration: 1000,
+                easing: 'out'
+            }
+        };
+
+        const chart = new google.visualization.AreaChart(document.getElementById('appointmentTrendsChart'));
+        chart.draw(data, options);
+
+        // Store chart instance for later updates
+        window.appointmentTrendsChart = chart;
+        window.appointmentTrendsChartOptions = options;
+    }
+
+    function updateAppointmentTrendsChart(trendsData) {
+        const data = google.visualization.arrayToDataTable(trendsData);
+        window.appointmentTrendsChart.draw(data, window.appointmentTrendsChartOptions);
+    }
+
+    function initStatusDistributionChart() {
+        const data = google.visualization.arrayToDataTable([
+            ['Status', 'Count'],
+            ['No Data', 1]
+        ]);
+
+        const options = {
+            title: '',
+            chartArea: {width: '90%', height: '80%'},
+            colors: ['#4f46e5', '#10b981', '#ef4444', '#f59e0b'],
+            legend: {position: 'right'},
+            pieHole: 0.4,
+            animation: {
+                startup: true,
+                duration: 1000,
+                easing: 'out'
+            }
+        };
+
+        const chart = new google.visualization.PieChart(document.getElementById('statusDistributionChart'));
+        chart.draw(data, options);
+
+        // Store chart instance for later updates
+        window.statusDistributionChart = chart;
+        window.statusDistributionChartOptions = options;
+    }
+
+    function updateStatusDistributionChart(distributionData) {
+        const data = google.visualization.arrayToDataTable(distributionData);
+        window.statusDistributionChart.draw(data, window.statusDistributionChartOptions);
+    }
+
+    function initCalendarChart() {
+        const dataTable = new google.visualization.DataTable();
+        dataTable.addColumn({ type: 'date', id: 'Date' });
+        dataTable.addColumn({ type: 'number', id: 'Appointments' });
+        dataTable.addRows([
+            [new Date(), 0]
+        ]);
+
+        const options = {
+            title: '',
+            height: 350,
+            calendar: {
+                cellSize: 13,
+                monthLabel: {
+                    fontName: 'Arial',
+                    fontSize: 12,
+                    color: '#333',
+                    bold: true
+                },
+                yearLabel: {
+                    fontName: 'Arial',
+                    fontSize: 14,
+                    color: '#333',
+                    bold: true
+                }
+            },
+            colorAxis: {
+                colors: ['#e5e7eb', '#4f46e5']
+            }
+        };
+
+        const chart = new google.visualization.Calendar(document.getElementById('calendarChart'));
+        chart.draw(dataTable, options);
+
+        // Store chart instance for later updates
+        window.calendarChart = chart;
+        window.calendarChartOptions = options;
+    }
+
+    function updateCalendarChart(calendarData) {
+        const dataTable = new google.visualization.DataTable();
+        dataTable.addColumn({ type: 'date', id: 'Date' });
+        dataTable.addColumn({ type: 'number', id: 'Appointments' });
+
+        // Convert string dates to Date objects
+        const rows = calendarData.map(item => {
+            return [new Date(item[0]), item[1]];
+        });
+
+        dataTable.addRows(rows);
+        window.calendarChart.draw(dataTable, window.calendarChartOptions);
+    }
+
+    function initRevenueByServiceChart() {
+        const data = google.visualization.arrayToDataTable([
+            ['Service', 'Revenue'],
+            ['No Data', 1]
+        ]);
+
+        const options = {
+            title: '',
+            chartArea: {width: '80%', height: '70%'},
+            legend: {position: 'right'},
+            colors: ['#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#ec4899'],
+            animation: {
+                startup: true,
+                duration: 1000,
+                easing: 'out'
+            }
+        };
+
+        const chart = new google.visualization.PieChart(document.getElementById('revenueByServiceChart'));
+        chart.draw(data, options);
+
+        // Store chart instance for later updates
+        window.revenueByServiceChart = chart;
+        window.revenueByServiceChartOptions = options;
+    }
+
+    function updateRevenueByServiceChart(revenueData) {
+        const data = google.visualization.arrayToDataTable(revenueData);
+        window.revenueByServiceChart.draw(data, window.revenueByServiceChartOptions);
+    }
+
+    function updateRecentAppointmentsTable(appointments) {
+        const tableBody = document.getElementById('recentAppointmentsTable');
+        tableBody.innerHTML = '';
+
+        if (appointments.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="5" class="py-4 px-4 text-center text-gray-500">No recent appointments found</td>
+            `;
+            tableBody.appendChild(row);
+            return;
+        }
+
+        appointments.forEach(appointment => {
+            const row = document.createElement('tr');
+
+            // Determine status badge color
+            let statusBadgeClass = '';
+            switch (appointment.status.toLowerCase()) {
+                case 'confirmed':
+                    statusBadgeClass = 'bg-green-100 text-green-800';
+                    break;
+                case 'pending':
+                    statusBadgeClass = 'bg-yellow-100 text-yellow-800';
+                    break;
+                case 'cancelled':
+                    statusBadgeClass = 'bg-red-100 text-red-800';
+                    break;
+                default:
+                    statusBadgeClass = 'bg-gray-100 text-gray-800';
+            }
+
+            row.innerHTML = `
+                <td class="py-3 px-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
+                            <span class="text-gray-500 font-medium">${appointment.patient_name.charAt(0)}</span>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${appointment.patient_name}</div>
+                            <div class="text-sm text-gray-500">${appointment.patient_email || 'No email'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${appointment.appointment_date}</div>
+                    <div class="text-sm text-gray-500">${appointment.appointment_time}</div>
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusBadgeClass}">
+                        ${appointment.status}
+                    </span>
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-900">
+                    $${appointment.amount ? appointment.amount.toLocaleString() : '0'}
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap text-sm font-medium">
+                    <a href="${appointment.view_url}" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>
+                    ${appointment.status.toLowerCase() === 'pending' ?
+                        `<a href="${appointment.confirm_url}" class="text-green-600 hover:text-green-900 mr-3">Confirm</a>` : ''}
+                    ${appointment.status.toLowerCase() !== 'cancelled' ?
+                        `<a href="${appointment.cancel_url}" class="text-red-600 hover:text-red-900">Cancel</a>` : ''}
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+</script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load("current", {packages:["calendar"]});
+  google.charts.setOnLoadCallback(drawChart);
+
+function drawChart() {
+   var dataTable = new google.visualization.DataTable();
+   dataTable.addColumn({ type: 'date', id: 'Date' });
+   dataTable.addColumn({ type: 'number', id: 'Won/Loss' });
+   dataTable.addRows([
+      [ new Date(2012, 3, 13), 37032 ],
+      [ new Date(2012, 3, 14), 38024 ],
+      [ new Date(2012, 3, 15), 38024 ],
+      [ new Date(2012, 3, 16), 38108 ],
+      [ new Date(2012, 3, 17), 38229 ],
+      // Many rows omitted for brevity.
+      [ new Date(2013, 9, 4), 38177 ],
+      [ new Date(2013, 9, 5), 38705 ],
+      [ new Date(2013, 9, 12), 38210 ],
+      [ new Date(2013, 9, 13), 38029 ],
+      [ new Date(2013, 9, 19), 38823 ],
+      [ new Date(2013, 9, 23), 38345 ],
+      [ new Date(2013, 9, 24), 38436 ],
+      [ new Date(2013, 9, 30), 38447 ]
+    ]);
+
+   var chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));
+
+   var options = {
+     title: "Red Sox Attendance",
+     height: 350,
+   };
+
+   chart.draw(dataTable, options);
+}
 </script>
 @endsection
