@@ -47,9 +47,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/appointment/{id}', [UserController::class, 'appointmentDetails'])->name('appointment.details');
         Route::post('/appointment/{id}/cancel', [UserController::class, 'cancelAppointment'])->name('appointment.cancel');
 
+        // Add this new route
+        Route::get('/appointments/confirmed', [AppointmentController::class, 'getConfirmedAppointments'])->name('appointments.confirmed');
+
         // User profile
         Route::get('/profile', [UserController::class, 'profile'])->name('profile');
         Route::post('/profile', [UserController::class, 'updateProfile'])->name('update.profile');
+
+        // User invoices
+        Route::get('/invoices', [App\Http\Controllers\User\InvoiceController::class, 'index'])->name('invoices');
+
+        // Help & Support
+        Route::get('/help', [App\Http\Controllers\User\HelpController::class, 'index'])->name('help');
     });
 
     // Profile routes
@@ -132,6 +141,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Add the PDF export route
     Route::post('/admin/analytics/export-pdf', [App\Http\Controllers\Admin\AnalyticsController::class, 'exportPdf'])->name('admin.export.analytics.pdf');
+});
+
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::get('/medical-history', [App\Http\Controllers\User\MedicalHistoryController::class, 'index'])->name('user.medical.history');
 });
 
 require __DIR__.'/auth.php';
