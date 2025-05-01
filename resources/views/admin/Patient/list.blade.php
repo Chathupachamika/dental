@@ -34,18 +34,18 @@
 
             <!-- Patient Table -->
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm text-left">
-                    <thead class="bg-gray-100 rounded-lg">
+                <table class="min-w-full text-sm text-left divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-4 py-2">Name</th>
-                            <th class="px-4 py-2">Address</th>
-                            <th class="px-4 py-2">Contact No</th>
-                            <th class="px-4 py-2">Last Visit</th>
-                            <th class="px-4 py-2">Balance</th>
-                            <th class="px-4 py-2 text-right">Actions</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Contact No</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Last Visit</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($patients as $place)
                         <tr class="border-t hover:bg-gray-50">
                             <td class="px-4 py-3">
@@ -101,14 +101,45 @@
                 </table>
             </div>
 
-            @if(count($patients))
-            <!-- Pagination Info & Links -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mt-6 text-sm text-gray-600">
-                <div class="mb-2 sm:mb-0">
-                    Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} patients
+            @if($patients->hasPages())
+            <div class="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    @if($patients->onFirstPage())
+                        <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default rounded-md">
+                            Previous
+                        </span>
+                    @else
+                        <a href="{{ $patients->previousPageUrl() }}" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                            Previous
+                        </a>
+                    @endif
+
+                    @if($patients->hasMorePages())
+                        <a href="{{ $patients->nextPageUrl() }}" class="ml-3 relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                            Next
+                        </a>
+                    @else
+                        <span class="ml-3 relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default rounded-md">
+                            Next
+                        </span>
+                    @endif
                 </div>
-                <div>
-                    {{ $patients->links() }}
+
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing
+                            <span class="font-medium">{{ $patients->firstItem() }}</span>
+                            to
+                            <span class="font-medium">{{ $patients->lastItem() }}</span>
+                            of
+                            <span class="font-medium">{{ $patients->total() }}</span>
+                            results
+                        </p>
+                    </div>
+                    <div>
+                        {{ $patients->onEachSide(2)->links('pagination::tailwind') }}
+                    </div>
                 </div>
             </div>
             @endif
