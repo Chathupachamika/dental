@@ -412,7 +412,7 @@
             right: 0;
             top: calc(100% + 0.5rem);
             background: var(--white);
-            border-radius: var (--radius-lg);
+            border-radius: var(--radius-lg);
             box-shadow: var(--shadow-lg);
             padding: 0.5rem;
             min-width: 180px;
@@ -478,7 +478,7 @@
         .card-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: var (--gray-800);
+            color: var(--gray-800);
             margin: 0;
             display: flex;
             align-items: center;
@@ -512,7 +512,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rulesvg%3E%3C/svg%3E") center center;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E") center center;
             opacity: 0.2;
         }
 
@@ -654,7 +654,7 @@
             width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid var(--gray-300);
-            border-radius: var (--radius-lg);
+            border-radius: var(--radius-lg);
             font-size: 1rem;
             transition: all 0.2s;
             background-color: var(--white);
@@ -727,7 +727,7 @@
         }
 
         .bg-success {
-            background-color: var (--success);
+            background-color: var(--success);
         }
 
         .bg-warning {
@@ -769,6 +769,10 @@
             align-items: center;
         }
 
+        .justify-content-center {
+            justify-content: center;
+        }
+
         .justify-content-between {
             justify-content: space-between;
         }
@@ -783,6 +787,44 @@
 
         .d-none {
             display: none;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-gray-500 {
+            color: var(--gray-500);
+        }
+
+        .spinner-border {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border .75s linear infinite;
+        }
+
+        @keyframes spinner-border {
+            to { transform: rotate(360deg); }
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         /* Loader */
@@ -958,7 +1000,7 @@
 
         .toast-success .toast-icon {
             background-color: var(--success-light);
-            color: var (--success);
+            color: var(--success);
         }
 
         .toast-warning .toast-icon {
@@ -1023,6 +1065,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             margin-right: 1rem;
+            z-index: 1001; /* Ensure bell stays above dropdown */
         }
 
         .notification-bell:hover {
@@ -1060,10 +1103,10 @@
 
         .notification-dropdown {
             position: absolute;
-            top: calc(100% + 10px);
-            right: -100px;
+            top: 50px;
+            right: -10px;
             width: 350px;
-            background-color: var(--white);
+            background-color: #ffffff;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-xl);
             z-index: 1000;
@@ -1073,15 +1116,14 @@
             transform: scale(0.95);
             transform-origin: top right;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: none;
+            pointer-events: none;
         }
 
         .notification-bell.show .notification-dropdown {
             opacity: 1;
             visibility: visible;
             transform: scale(1);
-            backdrop-filter: none;
-            background-color: var(--white);
+            pointer-events: auto;
         }
 
         .notification-header {
@@ -1089,7 +1131,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 1.5rem;
-            background: linear-gradient(to right, var(--primary-50), var(--white));
+            background-color: #f8fafc; /* Light solid background for header */
             border-bottom: 1px solid var(--gray-100);
         }
 
@@ -1148,14 +1190,11 @@
             padding: 1rem 1.5rem;
             border-bottom: 1px solid var(--gray-100);
             display: flex;
-            align-items: flex-start;
             gap: 1rem;
-            transition: all 0.2s;
         }
 
         .notification-item:hover {
             background-color: var(--gray-50);
-            opacity: 1;
         }
 
         .notification-item:last-child {
@@ -2124,5 +2163,6 @@
             .catch(error => console.error('Error fetching pending appointments count:', error));
         });
     </script>
+    @yield('javascript')
 </body>
 </html>

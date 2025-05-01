@@ -736,8 +736,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         2: {type: 'line', color: '#f59e0b', targetAxisIndex: 1}
                     },
                     vAxes: {
-                        0: {title: 'Amount (Rs.)', format: 'Rs.#,###', textStyle: {color: '#64748b'}},
-                        1: {title: 'Appointments', format: '#,###', textStyle: {color: '#64748b'}}
+                        0: {title: 'Amount (Rs.)', format: 'currency', formatOptions: {prefix: 'Rs.', decimalSymbol: '.', groupingSymbol: ','}},
+                        1: {title: 'Appointments', format: '#,##0', textStyle: {color: '#64748b'}}
                     },
                     hAxis: {
                         textStyle: {color: '#64748b'}
@@ -824,7 +824,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     fontName: 'Poppins',
                     hAxis: {textStyle: {color: '#64748b'}},
                     vAxis: {
-                        format: 'Rs.#,###',
+                        format: 'currency',
+                        formatOptions: {
+                            prefix: 'Rs.',
+                            decimalSymbol: '.',
+                            groupingSymbol: ','
+                        },
                         textStyle: {color: '#64748b'}
                     },
                     animation: {
