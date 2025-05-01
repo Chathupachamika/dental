@@ -127,7 +127,11 @@
                             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <input type="text" class="search-input block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 sm:text-sm transition-all duration-200" placeholder="Search appointments...">
+                    <input type="text"
+                           id="appointmentSearch"
+                           class="search-input block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 sm:text-sm transition-all duration-200"
+                           placeholder="Search appointments..."
+                           autocomplete="off">
                 </div>
             </div>
         </div>
@@ -291,13 +295,13 @@
             <p class="text-gray-600">Our team is ready to assist you with any questions or concerns.</p>
         </div>
         <div class="flex space-x-3">
-            <a href="#" class="inline-flex items-center px-4 py-2 border border-sky-300 text-sm font-medium rounded-md text-sky-700 bg-white hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-200">
+            <a href="{{ route('user.help') }}#contact-section" class="inline-flex items-center px-4 py-2 border border-sky-300 text-sm font-medium rounded-md text-sky-700 bg-white hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
                 Contact Us
             </a>
-            <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-200">
+            <a href="{{ route('user.help') }}#faq-section" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -561,6 +565,105 @@
         color: var(--danger);
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('appointmentSearch');
+        const appointmentRows = document.querySelectorAll('.appointment-row');
+
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            let hasResults = false;
+
+            appointmentRows.forEach(row => {
+                const searchableContent = [
+                    row.querySelector('td:nth-child(1)').textContent, // Date and time
+                    row.querySelector('td:nth-child(2)').textContent, // Status
+                    row.querySelector('td:nth-child(3)').textContent  // Notes
+                ].join(' ').toLowerCase();
+
+                if (searchableContent.includes(searchTerm)) {
+                    row.style.display = '';
+                    hasResults = true;
+
+                    // Highlight matching text
+                    if (searchTerm !== '') {
+                        highlightText(row, searchTerm);
+                    } else {
+                        // Remove highlights if search is cleared
+                        removeHighlights(row);
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Show/hide empty state message
+            const tableBody = document.querySelector('.appointments-table tbody');
+            const existingEmptyState = document.querySelector('.search-empty-state');
+
+            if (!hasResults) {
+                if (!existingEmptyState) {
+                    const emptyState = `
+                        <tr class="search-empty-state">
+                            <td colspan="4" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center">
+                                    <svg class="h-12 w-12 text-gray-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    <p class="text-gray-500 text-lg">No appointments found matching "${searchTerm}"</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', emptyState);
+                }
+            } else if (existingEmptyState) {
+                existingEmptyState.remove();
+            }
+        });
+
+        function highlightText(row, searchTerm) {
+            removeHighlights(row);
+
+            const textNodes = getTextNodes(row);
+            textNodes.forEach(node => {
+                const text = node.textContent.toLowerCase();
+                const index = text.indexOf(searchTerm);
+
+                if (index >= 0) {
+                    const span = document.createElement('span');
+                    span.innerHTML = node.textContent.substring(0, index) +
+                        `<span class="bg-yellow-100 rounded px-1">${node.textContent.substring(index, index + searchTerm.length)}</span>` +
+                        node.textContent.substring(index + searchTerm.length);
+                    node.parentNode.replaceChild(span, node);
+                }
+            });
+        }
+
+        function removeHighlights(element) {
+            const highlights = element.querySelectorAll('.bg-yellow-100');
+            highlights.forEach(highlight => {
+                const parent = highlight.parentNode;
+                parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+                // Normalize to combine adjacent text nodes
+                parent.normalize();
+            });
+        }
+
+        function getTextNodes(element) {
+            const textNodes = [];
+            const walk = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            while (node = walk.nextNode()) {
+                textNodes.push(node);
+            }
+            return textNodes;
+        }
+    });
+</script>
 @endpush
 
 @endsection
