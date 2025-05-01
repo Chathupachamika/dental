@@ -19,6 +19,11 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^6.7.2",
+        "@fullcalendar/bootstrap5": "^6.1.17",
+        "@fullcalendar/core": "^6.1.17",
+        "@fullcalendar/daygrid": "^6.1.17",
+        "@fullcalendar/interaction": "^6.1.17",
+        "@fullcalendar/timegrid": "^6.1.17",
         "@heroicons/react": "^2.2.0",
         "@heroicons/vue": "^2.2.0",
         "@mdi/font": "^7.4.47",

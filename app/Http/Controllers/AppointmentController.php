@@ -163,4 +163,64 @@ class AppointmentController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Get today's appointments
+     */
+    public function getTodayAppointments()
+    {
+        $appointments = Appointment::with('patient')
+            ->whereDate('appointment_date', Carbon::today())
+            ->orderBy('appointment_time')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'appointments' => $appointments
+        ]);
+    }
+
+    /**
+     * Store a new appointment
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'patient_id' => 'required|exists:patients,id',
+            'appointment_date' => 'required|date',
+            'appointment_time' => 'required',
+            'notes' => 'nullable|string'
+        ]);
+
+        $appointment = Appointment::create([
+            'patient_id' => $request->patient_id,
+            'appointment_date' => $request->appointment_date,
+            'appointment_time' => $request->appointment_time,
+            'status' => 'pending',
+            'notes' => $request->notes
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'appointment' => $appointment->load('patient')
+            ]);
+        }
+
+        return redirect()->route('admin.appointments.index')
+            ->with('success', 'Appointment created successfully');
+    }
+
+    /**
+     * Get appointment details
+     */
+    public function show($id)
+    {
+        $appointment = Appointment::with('patient')->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'appointment' => $appointment
+        ]);
+    }
 }

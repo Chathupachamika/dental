@@ -1,6 +1,7 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
 
+
 // Import vendor dependencies
 import Chart from 'chart.js/auto';
 import ApexCharts from 'apexcharts';

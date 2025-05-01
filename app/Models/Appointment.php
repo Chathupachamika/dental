@@ -73,4 +73,43 @@ class Appointment extends Model
         }
         return 'Confirmed';
     }
+
+    /**
+     * Get aggregated appointment statistics
+     */
+    public static function getStats()
+    {
+        $today = Carbon::today();
+        $weekStart = Carbon::now()->startOfWeek();
+        $weekEnd = Carbon::now()->endOfWeek();
+        $monthStart = Carbon::now()->startOfMonth();
+        $monthEnd = Carbon::now()->endOfMonth();
+
+        return [
+            'total' => static::count(),
+            'pending' => static::where('status', 'pending')->count(),
+            'confirmed' => static::where('status', 'confirmed')->count(),
+            'cancelled' => static::where('status', 'cancelled')->count(),
+            'today' => static::whereDate('appointment_date', $today)->count(),
+            'thisWeek' => static::whereBetween('appointment_date', [$weekStart, $weekEnd])->count(),
+            'thisMonth' => static::whereBetween('appointment_date', [$monthStart, $monthEnd])->count(),
+        ];
+    }
+
+    /**
+     * Get appointment data for calendar view
+     */
+    public static function getCalendarData()
+    {
+        $start = Carbon::now()->subMonths(3);
+        $end = Carbon::now()->addMonths(3);
+
+        return static::whereBetween('appointment_date', [$start, $end])
+            ->selectRaw('DATE(appointment_date) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->get()
+            ->map(function($item) {
+                return [$item->date, $item->count];
+            });
+    }
 }

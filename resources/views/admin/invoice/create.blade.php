@@ -139,22 +139,22 @@
                             <div class="group transition-all duration-300">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Total</label>
                                 <div class="relative">
-                                    <span class="absolute left-3 top-3 text-gray-500">$</span>
-                                    <input type="number" name="totalAmount" id="totalAmount" class="pl-8 w-full rounded-lg border-gray-200 bg-gray-100 shadow-sm" value="0.00" readonly>
+                                    <span class="absolute left-3 top-3 text-gray-500">Rs.</span>
+                                    <input type="number" name="totalAmount" id="totalAmount" class="pl-12 w-full rounded-lg border-gray-200 bg-gray-100 shadow-sm" value="0.00" readonly>
                                 </div>
                             </div>
                             <div class="group transition-all duration-300">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Advance</label>
                                 <div class="relative">
-                                    <span class="absolute left-3 top-3 text-gray-500">$</span>
-                                    <input type="number" name="advanceAmount" id="advanceAmount" class="pl-8 w-full rounded-lg border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500" value="0">
+                                    <span class="absolute left-3 top-3 text-gray-500">Rs.</span>
+                                    <input type="number" name="advanceAmount" id="advanceAmount" class="pl-12 w-full rounded-lg border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500" value="0">
                                 </div>
                             </div>
                             <div class="group transition-all duration-300">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Balance</label>
                                 <div class="relative">
-                                    <span class="absolute left-3 top-3 text-gray-500">$</span>
-                                    <input type="number" id="balanceAmount" class="pl-8 w-full rounded-lg border-gray-200 bg-gray-100 shadow-sm" value="0" readonly>
+                                    <span class="absolute left-3 top-3 text-gray-500">Rs.</span>
+                                    <input type="number" id="balanceAmount" class="pl-12 w-full rounded-lg border-gray-200 bg-gray-100 shadow-sm" value="0" readonly>
                                 </div>
                             </div>
                             <div class="col-span-2">
@@ -289,8 +289,8 @@
                 <div class="form-group">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Price</label>
                     <div class="relative">
-                        <span class="absolute left-3 top-3 text-gray-500">$</span>
-                        <input type="number" id="consultationPrice" class="pl-8 w-full rounded-lg border-gray-200 bg-white shadow-sm" value="50">
+                        <span class="absolute left-3 top-3 text-gray-500">Rs.</span>
+                        <input type="number" id="consultationPrice" class="pl-12 w-full rounded-lg border-gray-200 bg-white shadow-sm" value="50">
                     </div>
                 </div>
             </div>
@@ -561,6 +561,7 @@ button:hover:after {
 @section('javascript')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function () {
@@ -652,7 +653,7 @@ button:hover:after {
                                     ${t.subtype ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">${t.subtype}</span>` : ''}
                                     ${t.position ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ml-2">Position ${t.position}</span>` : ''}
                                 </p>
-                                <p class="text-lg font-medium text-blue-600 mt-2">$${t.price.toFixed(2)}</p>
+                                <p class="text-lg font-medium text-blue-600 mt-2">Rs.${t.price.toFixed(2)}</p>
                             </div>
                             <div class="flex space-x-2">
                                 <button type="button" class="btn-icon view-btn" data-tooltip="View Details">
@@ -684,7 +685,7 @@ button:hover:after {
                     </div>
                     <div class="flex items-center justify-between border-t pt-3">
                         <span class="text-sm font-medium text-gray-500">Price</span>
-                        <span class="text-sm font-semibold text-blue-600">$${t.price.toFixed(2)}</span>
+                        <span class="text-sm font-semibold text-blue-600">Rs.${t.price.toFixed(2)}</span>
                     </div>
                     ${t.notes ? `
                         <div class="border-t pt-3">
@@ -701,7 +702,7 @@ button:hover:after {
                     <p><strong>Treatment:</strong> ${t.treatment}</p>
                     ${t.subtype ? `<p><strong>Subtype:</strong> ${t.subtype}</p>` : ''}
                     ${t.position ? `<p><strong>Position:</strong> ${t.position}</p>` : ''}
-                    <p><strong>Price:</strong> $${t.price}</p>
+                    <p><strong>Price:</strong> Rs.${t.price}</p>
                 `);
                 $('#viewModal').removeClass('hidden');
             }
