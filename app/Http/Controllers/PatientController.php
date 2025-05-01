@@ -310,4 +310,17 @@ class PatientController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function getTotalPatients()
+    {
+        $count = Patient::count();
+        $lastMonth = Patient::whereMonth('created_at', '=', now()->subMonth()->month)->count();
+        $thisMonth = Patient::whereMonth('created_at', '=', now()->month)->count();
+        $percentageChange = $lastMonth > 0 ? (($thisMonth - $lastMonth) / $lastMonth) * 100 : 0;
+
+        return response()->json([
+            'total' => $count,
+            'percentageChange' => round($percentageChange, 1)
+        ]);
+    }
 }

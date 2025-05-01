@@ -180,22 +180,34 @@ class AppointmentController extends Controller
         ]);
     }
 
+    public function getTodayAppointmentsCount()
+    {
+        $today = Appointment::whereDate('appointment_date', today())->count();
+        $yesterday = Appointment::whereDate('appointment_date', yesterday())->count();
+        $percentageChange = $yesterday > 0 ? (($today - $yesterday) / $yesterday) * 100 : 0;
+
+        return response()->json([
+            'count' => $today,
+            'percentageChange' => round($percentageChange, 1)
+        ]);
+    }
+
     public function getConfirmedAppointments(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $appointments = Appointment::where('user_id', $user->id)
-        ->where('status', 'confirmed')
-        ->orderBy('appointment_date', 'desc')
-        ->orderBy('appointment_time', 'asc')
-        ->with('user')
-        ->get();
+        $appointments = Appointment::where('user_id', $user->id)
+            ->where('status', 'confirmed')
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'asc')
+            ->with('user')
+            ->get();
 
-    return response()->json([
-        'success' => true,
-        'appointments' => $appointments
-    ]);
-}
+        return response()->json([
+            'success' => true,
+            'appointments' => $appointments
+        ]);
+    }
 
     /**
      * Store a new appointment

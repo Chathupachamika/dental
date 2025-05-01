@@ -133,62 +133,6 @@
         </div>
     </div>
 
-    <!-- Recent Treatment History -->
-    <div class="dashboard-card full-width">
-        <div class="card-header">
-            <div class="header-icon">
-                <i class="fas fa-history"></i>
-            </div>
-            <h3 class="card-title">Recent Treatment History</h3>
-        </div>
-        <div class="card-body">
-            @if(!is_null($pastAppointments) && count($pastAppointments) > 0)
-                <div class="history-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Treatment</th>
-                                <th class="text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($pastAppointments as $appointment)
-                            <tr>
-                                <td>
-                                    <div class="appointment-date">
-                                        <span class="date">{{ \Carbon\Carbon::parse($appointment->visitDate)->format('M d, Y') }}</span>
-                                        <span class="day">{{ \Carbon\Carbon::parse($appointment->visitDate)->format('l') }}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    @if(count($appointment->invoiceTreatment) > 0)
-                                        <span class="treatment-badge">{{ $appointment->invoiceTreatment[0]->treatMent }}</span>
-                                    @else
-                                        <span class="treatment-badge empty">Not specified</span>
-                                    @endif
-                                </td>
-                                <td class="text-right">
-                                    <a href="{{ route('user.appointment.details', $appointment->id) }}" class="btn-view">
-                                        <i class="fas fa-eye"></i> Details
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <h4 class="empty-title">No Treatment History</h4>
-                    <p class="empty-description">Your treatment history will appear here after your first appointment.</p>
-                </div>
-            @endif
-        </div>
-    </div>
 </div>
 
 <style>

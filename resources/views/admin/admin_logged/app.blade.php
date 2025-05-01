@@ -1787,7 +1787,7 @@
                         </div>
                     </div>
                     <div class="navbar-profile-img">
-                        <img src="{{ asset('images/user.jpg') }}" alt="User">
+                        <img src="{{ asset('images/women.png') }}" alt="User">
                     </div>
                     <div class="navbar-profile-text">
                         <p class="mb-0">{{ Auth::user()->name }}</p>
