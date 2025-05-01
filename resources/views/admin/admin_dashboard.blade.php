@@ -38,7 +38,7 @@
                         <i class="fas fa-calendar-day mr-2"></i>
                         Today: {{ now()->format('d M, Y') }}
                     </button>
-                    <button class="px-4 py-2 text-sm font-medium text-indigo-700 bg-white rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all flex items-center" onclick="showLoader(); setTimeout(() => { hideLoader(); showAlert('Report Generated', 'Your daily report has been generated successfully!'); }, 1500);">
+                    <button class="px-4 py-2 text-sm font-medium text-indigo-700 bg-white rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all flex items-center" onclick="generateDailyReport()">
                         <i class="fas fa-file-alt mr-2"></i>
                         Generate Report
                     </button>
@@ -54,11 +54,11 @@
                         </div>
                         <div>
                             <p class="text-sm text-blue-100">Total Patients</p>
-                            <h3 class="text-2xl font-bold text-white">{{ number_format($totalPatients ?? 1250) }}</h3>
+                            <h3 class="text-2xl font-bold text-white" id="totalPatientsCount">...</h3>
                         </div>
                     </div>
-                    <div class="mt-2 text-xs text-blue-100">
-                        <span class="text-green-300"><i class="fas fa-arrow-up mr-1"></i>3.5%</span> vs last month
+                    <div class="mt-2 text-xs text-blue-100" id="patientsChange">
+                        <i class="fas fa-spinner fa-spin mr-1"></i> Loading...
                     </div>
                 </div>
 
@@ -69,11 +69,11 @@
                         </div>
                         <div>
                             <p class="text-sm text-blue-100">Today's Appointments</p>
-                            <h3 class="text-2xl font-bold text-white">{{ $todayAppointments ?? 8 }}</h3>
+                            <h3 class="text-2xl font-bold text-white" id="appointmentsCount">...</h3>
                         </div>
                     </div>
-                    <div class="mt-2 text-xs text-blue-100">
-                        <span class="text-green-300"><i class="fas fa-arrow-up mr-1"></i>12%</span> vs yesterday
+                    <div class="mt-2 text-xs text-blue-100" id="appointmentsChange">
+                        <i class="fas fa-spinner fa-spin mr-1"></i> Loading...
                     </div>
                 </div>
 
@@ -84,11 +84,11 @@
                         </div>
                         <div>
                             <p class="text-sm text-blue-100">Monthly Revenue</p>
-                            <h3 class="text-2xl font-bold text-white">Rs.{{ number_format($monthlyRevenue ?? 285000) }}</h3>
+                            <h3 class="text-2xl font-bold text-white" id="monthlyRevenue">...</h3>
                         </div>
                     </div>
-                    <div class="mt-2 text-xs text-blue-100">
-                        <span class="text-green-300"><i class="fas fa-arrow-up mr-1"></i>8.2%</span> vs last month
+                    <div class="mt-2 text-xs text-blue-100" id="revenueChange">
+                        <i class="fas fa-spinner fa-spin mr-1"></i> Loading...
                     </div>
                 </div>
 
@@ -99,14 +99,112 @@
                         </div>
                         <div>
                             <p class="text-sm text-blue-100">Pending Payments</p>
-                            <h3 class="text-2xl font-bold text-white">Rs.{{ number_format($pendingPayments ?? 42500) }}</h3>
+                            <h3 class="text-2xl font-bold text-white" id="pendingPayments">...</h3>
                         </div>
                     </div>
-                    <div class="mt-2 text-xs text-blue-100">
-                        <span class="text-red-300"><i class="fas fa-arrow-down mr-1"></i>2.3%</span> vs yesterday
+                    <div class="mt-2 text-xs text-blue-100" id="paymentsChange">
+                        <i class="fas fa-spinner fa-spin mr-1"></i> Loading...
                     </div>
                 </div>
             </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Helper function for error handling
+                    function handleFetchError(elementId, error) {
+                        console.error(`Error fetching data for ${elementId}:`, error);
+                        document.getElementById(elementId).textContent = 'Error';
+                        document.getElementById(elementId + 'Change').innerHTML = `
+                            <span class="text-red-300">
+                                <i class="fas fa-exclamation-circle mr-1"></i>Failed to load
+                            </span>
+                            <button onclick="location.reload()" class="ml-2 text-blue-300 hover:text-blue-200">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                        `;
+                    }
+
+                    // Fetch total patients with error handling
+                    fetch('/admin/api/patients/total')
+                        .then(res => {
+                            if (!res.ok) throw new Error('Network response was not ok');
+                            return res.json();
+                        })
+                        .then(data => {
+                            document.getElementById('totalPatientsCount').textContent = data.total.toLocaleString();
+                            const changeEl = document.getElementById('patientsChange');
+                            const isPositive = data.percentageChange >= 0;
+                            changeEl.innerHTML = `
+                                <span class="${isPositive ? 'text-green-300' : 'text-red-300'}">
+                                    <i class="fas fa-arrow-${isPositive ? 'up' : 'down'} mr-1"></i>${Math.abs(data.percentageChange)}%
+                                </span> vs last month
+                            `;
+                        })
+                        .catch(error => handleFetchError('totalPatientsCount', error));
+
+                    // Fetch appointments count with error handling
+                    fetch('/admin/api/appointments/today/count')
+                        .then(res => {
+                            if (!res.ok) throw new Error('Network response was not ok');
+                            return res.json();
+                        })
+                        .then(data => {
+                            document.getElementById('appointmentsCount').textContent = data.count;
+                            const changeEl = document.getElementById('appointmentsChange');
+                            const isPositive = data.percentageChange >= 0;
+                            changeEl.innerHTML = `
+                                <span class="${isPositive ? 'text-green-300' : 'text-red-300'}">
+                                    <i class="fas fa-arrow-${isPositive ? 'up' : 'down'} mr-1"></i>${Math.abs(data.percentageChange)}%
+                                </span> vs yesterday
+                            `;
+                        })
+                        .catch(error => handleFetchError('appointmentsCount', error));
+
+                    // Fetch monthly revenue with error handling
+                    fetch('/admin/revenue/monthly')
+                        .then(res => res.json())
+                        .then(data => {
+                            document.getElementById('monthlyRevenue').textContent = 'Rs.' + data.amount.toLocaleString();
+                            const revenueChangeEl = document.getElementById('revenueChange');
+                            const isPositive = data.percentageChange >= 0;
+                            revenueChangeEl.innerHTML = `
+                                <span class="${isPositive ? 'text-green-300' : 'text-red-300'}">
+                                    <i class="fas fa-arrow-${isPositive ? 'up' : 'down'} mr-1"></i>${Math.abs(data.percentageChange)}%
+                                </span> vs last month
+                            `;
+                        })
+                        .catch(error => {
+                            document.getElementById('monthlyRevenue').textContent = 'Error';
+                            document.getElementById('revenueChange').innerHTML = `
+                                <span class="text-red-300">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>Failed to load
+                                </span>
+                            `;
+                        });
+
+                    // Fetch pending payments with error handling
+                    fetch('/admin/payments/pending')
+                        .then(res => res.json())
+                        .then(data => {
+                            document.getElementById('pendingPayments').textContent = 'Rs.' + data.amount.toLocaleString();
+                            const paymentsChangeEl = document.getElementById('paymentsChange');
+                            const isPositive = data.percentageChange >= 0;
+                            paymentsChangeEl.innerHTML = `
+                                <span class="${isPositive ? 'text-green-300' : 'text-red-300'}">
+                                    <i class="fas fa-arrow-${isPositive ? 'up' : 'down'} mr-1"></i>${Math.abs(data.percentageChange)}%
+                                </span> vs yesterday
+                            `;
+                        })
+                        .catch(error => {
+                            document.getElementById('pendingPayments').textContent = 'Error';
+                            document.getElementById('paymentsChange').innerHTML = `
+                                <span class="text-red-300">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>Failed to load
+                                </span>
+                            `;
+                        });
+                });
+            </script>
         </div>
     </div>
 
@@ -284,7 +382,7 @@
                                                 ${moment(invoice.created_at).format('D MMM, YYYY')}
                                             </td>
                                             <td class="px-5 py-4 text-sm">
-                                                <span class="font-medium text-gray-900">₹${invoice.totalAmount ? invoice.totalAmount.toLocaleString() : '0'}</span>
+                                                <span class="font-medium text-gray-900">Rs.${invoice.totalAmount ? invoice.totalAmount.toLocaleString() : '0'}</span>
                                             </td>
                                             <td class="px-5 py-4 text-sm">
                                                 ${invoice.totalAmount <= invoice.advanceAmount ?
@@ -505,6 +603,34 @@
 
 @section('javascript')
 <script>
+function generateDailyReport() {
+    showLoader();
+
+    fetch('/admin/export/daily-report', {  // Changed from route() helper to direct path
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `daily-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        hideLoader();
+        showAlert('Success', 'Report downloaded successfully!', 'success');
+    })
+    .catch(error => {
+        console.error('Export failed:', error);
+        hideLoader();
+        showAlert('Error', 'Failed to generate report. Please try again.', 'error');
+    });
+}
+
     // Make sure Google Charts is loaded before using it
     if (typeof google !== 'undefined') {
         google.charts.load('current', {'packages':['corechart', 'controls']});

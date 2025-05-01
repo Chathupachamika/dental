@@ -1104,10 +1104,7 @@
                     <i class="fas fa-calendar-alt"></i>
                     <span>My Appointments</span>
                 </a>
-                <a href="{{ route('user.medical.history') }}" class="sidebar-menu-item {{ request()->routeIs('user.medical.history') ? 'active' : '' }}">
-                    <i class="fas fa-notes-medical"></i>
-                    <span>Medical History</span>
-                </a>
+
                 <a href="{{ route('user.invoices') }}" class="sidebar-menu-item {{ request()->routeIs('user.invoices') ? 'active' : '' }}">
                     <i class="fas fa-file-invoice-dollar"></i>
                     <span>My Invoices</span>
@@ -1162,7 +1159,14 @@
                         <div>{{ Auth::user()->name }}</div>
                         <div class="navbar-profile-role">Patient</div>
                     </div>
-                    <img src="{{ asset('images/user.jpg') }}" alt="User" class="navbar-profile-img">
+                    <img src="{{ Auth::user()->patient ?
+                            (Auth::user()->patient->gender === 'male'
+                                ? asset('images/man.png')
+                                : (Auth::user()->patient->gender === 'female'
+                                    ? asset('images/women.png')
+                                    : asset('images/man.png')))
+                            : asset('images/man.png') }}"
+                        alt="User" class="navbar-profile-img">
                     <a href="{{ route('logout') }}"
                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                        class="logout-btn">
@@ -1356,7 +1360,7 @@
                             <div class="notification-item-content">
                                 <div class="notification-item-title">Appointment Confirmed</div>
                                 <div class="notification-item-description">
-                                    ${formattedDate} at ${appointment.appointment_time}
+                                    ${formattedDate}
                                 </div>
                                 <div class="notification-item-time">
                                     ${appointment.notes ? appointment.notes : 'No additional notes'}

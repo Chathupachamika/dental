@@ -202,12 +202,25 @@ class InvoiceController extends Controller
 
     public function download($id)
     {
-        $invoice = Invoice::with(['patient', 'invoiceTreatment.subCategoryOne', 'invoiceTreatment.subCategoryTwo'])
-            ->findOrFail($id);
+        try {
+            $invoice = Invoice::with(['patient', 'invoiceTreatment.subCategoryOne', 'invoiceTreatment.subCategoryTwo'])
+                ->findOrFail($id);
 
-        $pdf = PDF::loadView('admin.invoice.pdf', compact('invoice'));
+            // Check if user is accessing their own invoice
+            if (auth()->guard('web')->check()) {
+                if ($invoice->patient->name !== auth()->user()->name) {
+                    abort(403);
+                }
+                $view = 'user.invoices.pdf';
+            } else {
+                $view = 'admin.invoice.pdf';
+            }
 
-        return $pdf->download('invoice-' . $invoice->id . '.pdf');
+            $pdf = PDF::loadView($view, compact('invoice'));
+            return $pdf->download('invoice-' . $invoice->id . '.pdf');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Unable to download invoice.');
+        }
     }
 
     public function getRecentInvoices()
@@ -229,6 +242,58 @@ class InvoiceController extends Controller
                 });
 
             return response()->json($invoices);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getMonthlyRevenue()
+    {
+        try {
+            $currentMonth = Invoice::whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->sum('totalAmount');
+
+            $lastMonth = Invoice::whereMonth('created_at', now()->subMonth()->month)
+                ->whereYear('created_at', now()->subMonth()->year)
+                ->sum('totalAmount');
+
+            $percentageChange = $lastMonth > 0
+                ? (($currentMonth - $lastMonth) / $lastMonth) * 100
+                : ($currentMonth > 0 ? 100 : 0);
+
+            return response()->json([
+                'amount' => $currentMonth,
+                'percentageChange' => round($percentageChange, 1)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getPendingPayments()
+    {
+        try {
+            $totalPending = Invoice::whereRaw('totalAmount > advanceAmount')
+                ->sum(DB::raw('totalAmount - advanceAmount'));
+
+            $todayPending = Invoice::whereRaw('totalAmount > advanceAmount')
+                ->whereDate('created_at', today())
+                ->sum(DB::raw('totalAmount - advanceAmount'));
+
+            $yesterdayPending = Invoice::whereRaw('totalAmount > advanceAmount')
+                ->whereDate('created_at', yesterday())
+                ->sum(DB::raw('totalAmount - advanceAmount'));
+
+            $percentageChange = $yesterdayPending > 0
+                ? (($todayPending - $yesterdayPending) / $yesterdayPending) * 100
+                : ($todayPending > 0 ? 100 : 0);
+
+            return response()->json([
+                'amount' => $totalPending,
+                'today' => $todayPending,
+                'percentageChange' => round($percentageChange, 1)
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }

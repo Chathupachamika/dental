@@ -56,9 +56,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // User invoices
         Route::get('/invoices', [App\Http\Controllers\User\InvoiceController::class, 'index'])->name('invoices');
+        Route::get('/invoices/view/{id}', [App\Http\Controllers\User\InvoiceController::class, 'view'])->name('invoices.view');
+        Route::get('/api/my-invoices', [App\Http\Controllers\User\InvoiceController::class, 'getMyInvoices'])->name('api.invoices');
+        Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
 
         // Help & Support
         Route::get('/help', [App\Http\Controllers\User\HelpController::class, 'index'])->name('help');
+        Route::post('/support/contact', [App\Http\Controllers\User\SupportController::class, 'contact'])->name('support.contact');
     });
 
     // Profile routes
@@ -117,9 +121,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/store', [AppointmentController::class, 'store'])->name('store');
         });
 
-        // Reports route
-        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-
         Route::get('/patients/export', [PatientController::class, 'export'])->name('patient.export');
 
         // Add this new route
@@ -129,6 +130,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/recent-invoices', [InvoiceController::class, 'getRecentInvoices'])->name('recent.invoices');
         Route::get('/treatment-stats', [PatientController::class, 'getTreatmentStats'])->name('treatment.stats');
         Route::get('/appointment-stats', [AppointmentController::class, 'getStats'])->name('appointment.stats');
+
+        // Add the export daily report route
+        Route::post('/export/daily-report', [App\Http\Controllers\Admin\ReportController::class, 'exportDailyReport'])
+            ->name('admin.export.daily.report');
+
+        // API Routes for Dashboard Stats
+        Route::get('/api/patients/total', [App\Http\Controllers\Admin\DashboardController::class, 'getTotalPatients']);
+        Route::get('/api/appointments/today/count', [App\Http\Controllers\Admin\DashboardController::class, 'getTodayAppointments']);
+        Route::get('/api/revenue/monthly', [App\Http\Controllers\Admin\DashboardController::class, 'getMonthlyRevenue']);
+        Route::get('/api/payments/pending', [App\Http\Controllers\Admin\DashboardController::class, 'getPendingPayments']);
+
+        // Dashboard Stats Routes
+        Route::get('/revenue/monthly', [App\Http\Controllers\Admin\DashboardController::class, 'getMonthlyRevenue'])
+            ->name('admin.revenue.monthly');
+        Route::get('/payments/pending', [App\Http\Controllers\Admin\DashboardController::class, 'getPendingPayments'])
+            ->name('admin.payments.pending');
     });
 
     // API routes for patient - accessible to both admin and users
@@ -141,10 +158,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Add the PDF export route
     Route::post('/admin/analytics/export-pdf', [App\Http\Controllers\Admin\AnalyticsController::class, 'exportPdf'])->name('admin.export.analytics.pdf');
-});
-
-Route::middleware(['auth'])->prefix('user')->group(function () {
-    Route::get('/medical-history', [App\Http\Controllers\User\MedicalHistoryController::class, 'index'])->name('user.medical.history');
 });
 
 require __DIR__.'/auth.php';

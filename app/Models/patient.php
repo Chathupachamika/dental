@@ -15,10 +15,15 @@ class patient extends Model
         'age',
         'gender',
         'nic',
-        'invoice'
+        'invoice',
+        'user_id' // Add user_id to fillable
     ];
     public function invoice()
     {
         return $this->hasMany(Invoice::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
