@@ -215,14 +215,15 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end space-x-2">
-                                        <a href="{{ route('user.appointment.details', $appointment->id) }}"
+                                        <button type="button"
+                                           onclick="openAppointmentModal({{ json_encode($appointment) }})"
                                            class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-sky-700 bg-sky-100 hover:bg-sky-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-200 transform hover:-translate-y-0.5">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                             <span class="hidden sm:inline">View</span>
-                                        </a>
+                                        </button>
 
                                         @if($appointment->status === 'pending')
                                             <form method="POST" action="{{ route('user.appointment.cancel', $appointment->id) }}" class="inline">
@@ -306,7 +307,67 @@
     </div>
 </div>
 
-<!-- Add Tailwind CSS CDN if not already included in your layout -->
+<!-- Appointment Details Modal -->
+<div id="appointmentModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="absolute top-0 right-0 pt-4 pr-4">
+                <button type="button" onclick="closeAppointmentModal()" class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+                    <span class="sr-only">Close</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Appointment Details
+                        </h3>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-500">Date & Time</span>
+                                    <span id="appointmentDateTime" class="text-sm font-semibold text-gray-900"></span>
+                                </div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-500">Status</span>
+                                    <span id="appointmentStatus" class="px-2.5 py-0.5 rounded-full text-xs font-medium"></span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-500">Service</span>
+                                    <span id="appointmentService" class="text-sm font-semibold text-gray-900"></span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                                <p id="appointmentNotes" class="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 min-h-[60px]"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="closeAppointmentModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('styles')
 <style>
     /* Custom animations */
@@ -502,216 +563,4 @@
 </style>
 @endpush
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Filter functionality
-        const filterTabs = document.querySelectorAll('.filter-tab');
-        const appointmentRows = document.querySelectorAll('.appointments-table tbody tr');
-
-        filterTabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Update active tab
-                filterTabs.forEach(t => {
-                    t.classList.remove('active');
-                });
-                this.classList.add('active');
-
-                const filter = this.getAttribute('data-filter');
-                let visibleCount = 0;
-
-                // Filter table rows with animation
-                appointmentRows.forEach(row => {
-                    const status = row.getAttribute('data-status');
-
-                    if (filter === 'all' || (filter === 'upcoming' && status === 'pending') || status === filter) {
-                        row.style.display = '';
-                        visibleCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                // Show empty state if no visible rows
-                const tableWrapper = document.querySelector('.appointments-table-wrapper');
-                const existingEmptyState = document.querySelector('.filter-empty-state');
-
-                if (visibleCount === 0) {
-                    if (!existingEmptyState) {
-                        const emptyState = document.createElement('div');
-                        emptyState.className = 'filter-empty-state';
-                        emptyState.innerHTML = `
-                            <div class="empty-state" style="padding: 2rem;">
-                                <div class="empty-icon">
-                                    <i class="fas fa-filter"></i>
-                                </div>
-                                <h3 class="empty-title">No ${filter} appointments</h3>
-                                <p class="empty-description">No appointments found with this filter.</p>
-                            </div>
-                        `;
-                        tableWrapper.appendChild(emptyState);
-                    }
-                } else if (existingEmptyState) {
-                    existingEmptyState.remove();
-                }
-            });
-        });
-
-        // Search functionality with highlighting
-        const searchInput = document.querySelector('.search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                let visibleCount = 0;
-
-                // Remove any existing filter-empty-state
-                const existingEmptyState = document.querySelector('.filter-empty-state');
-                if (existingEmptyState) {
-                    existingEmptyState.remove();
-                }
-
-                // Remove any existing search-empty-state
-                const existingSearchEmptyState = document.querySelector('.search-empty-state');
-                if (existingSearchEmptyState) {
-                    existingSearchEmptyState.remove();
-                }
-
-                // Remove previous highlights
-                document.querySelectorAll('.search-highlight').forEach(el => {
-                    el.outerHTML = el.innerHTML;
-                });
-
-                appointmentRows.forEach(row => {
-                    const rowText = row.textContent.toLowerCase();
-
-                    if (searchTerm === '') {
-                        // If search is empty, respect the current filter
-                        const activeFilter = document.querySelector('.filter-tab.active').getAttribute('data-filter');
-                        const status = row.getAttribute('data-status');
-
-                        if (activeFilter === 'all' || (activeFilter === 'upcoming' && status === 'pending') || status === activeFilter) {
-                            row.style.display = '';
-                            visibleCount++;
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    } else if (rowText.includes(searchTerm)) {
-                        row.style.display = '';
-                        visibleCount++;
-
-                        // Highlight matching text
-                        highlightText(row, searchTerm);
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                // Show empty state if no results
-                if (visibleCount === 0 && searchTerm !== '') {
-                    const tableWrapper = document.querySelector('.appointments-table-wrapper');
-                    const emptyState = document.createElement('div');
-                    emptyState.className = 'search-empty-state';
-                    emptyState.innerHTML = `
-                        <div class="empty-state" style="padding: 2rem;">
-                            <div class="empty-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <h3 class="empty-title">No Results Found</h3>
-                            <p class="empty-description">No appointments match your search for "${searchTerm}".</p>
-                        </div>
-                    `;
-                    tableWrapper.appendChild(emptyState);
-                }
-            });
-        }
-
-        // Function to highlight text in search results
-        function highlightText(element, term) {
-            if (!term) return;
-
-            const walker = document.createTreeWalker(
-                element,
-                NodeFilter.SHOW_TEXT,
-                {
-                    acceptNode: function(node) {
-                        // Skip script tags
-                        if (node.parentNode.tagName === 'SCRIPT') {
-                            return NodeFilter.FILTER_REJECT;
-                        }
-                        return NodeFilter.FILTER_ACCEPT;
-                    }
-                }
-            );
-
-            const textNodes = [];
-            let currentNode;
-
-            while (currentNode = walker.nextNode()) {
-                textNodes.push(currentNode);
-            }
-
-            textNodes.forEach(textNode => {
-                const text = textNode.nodeValue;
-                const lowerText = text.toLowerCase();
-                const index = lowerText.indexOf(term);
-
-                if (index >= 0) {
-                    const before = document.createTextNode(text.substring(0, index));
-                    const match = document.createElement('span');
-                    match.className = 'search-highlight';
-                    match.style.backgroundColor = 'rgba(245, 158, 11, 0.2)';
-                    match.style.padding = '0 2px';
-                    match.style.borderRadius = '2px';
-                    match.appendChild(document.createTextNode(text.substring(index, index + term.length)));
-                    const after = document.createTextNode(text.substring(index + term.length));
-
-                    const parent = textNode.parentNode;
-                    parent.replaceChild(after, textNode);
-                    parent.insertBefore(match, after);
-                    parent.insertBefore(before, match);
-                }
-            });
-        }
-
-        // Cancel appointment confirmation with SweetAlert2
-        const cancelForms = document.querySelectorAll('form[action*="appointment.cancel"]');
-        cancelForms.forEach(form => {
-            const submitButton = form.querySelector('button[type="submit"]');
-            if (submitButton) {
-                submitButton.type = 'button';
-                submitButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-
-                    Swal.fire({
-                        title: 'Cancel Appointment?',
-                        text: 'Are you sure you want to cancel this appointment? This action cannot be undone.',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#ef4444',
-                        cancelButtonColor: '#6b778c',
-                        confirmButtonText: 'Yes, cancel it',
-                        cancelButtonText: 'No, keep it'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Show loading state
-                            Swal.fire({
-                                title: 'Processing...',
-                                text: 'Cancelling your appointment',
-                                allowOutsideClick: false,
-                                didOpen: () => {
-                                    Swal.showLoading();
-                                }
-                            });
-
-                            // Submit the form
-                            form.submit();
-                        }
-                    });
-                });
-            }
-        });
-    });
-</script>
-@endpush
 @endsection
