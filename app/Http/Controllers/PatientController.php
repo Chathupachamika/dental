@@ -359,4 +359,31 @@ class PatientController extends Controller
         $pdf = PDF::loadView('admin.Patient.pdf', ['patient' => $patient]);
         return $pdf->download('patient-'.$patient->id.'.pdf');
     }
+
+    /**
+     * Get patient contact information
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getContactInfo($id)
+    {
+        $patient = Patient::find($id);
+        if (!$patient) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Patient not found',
+                'data' => null
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'name' => $patient->name,
+                'mobileNumber' => $patient->mobileNumber,
+                'id' => $patient->id
+            ]
+        ]);
+    }
 }
