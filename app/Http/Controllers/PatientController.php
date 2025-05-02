@@ -11,6 +11,7 @@ use App\Models\Treatment;
 use App\Models\TreatmentSubCategoriesOne;
 use App\Models\InvoiceTreatment;
 use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PatientController extends Controller
 {
@@ -30,19 +31,31 @@ class PatientController extends Controller
             $query->orderBy('name', $request->sortByName);
         }
 
-        $patients = $query->paginate(10);
+        $patients = $query->paginate(5);
 
         return view('admin.patient.index', compact('patients'));
     }
 
     public function list(Request $request)
     {
-
         $place_query = Patient::whereNotNull('name');
 
         if ($request->keyword) {
-            $place_query->where('name', 'LIKE', '%' . $request->keyword . '%')
-                ->orWhere('mobileNumber', 'LIKE', '%' . $request->keyword . '%');
+            $place_query->where(function($q) use ($request) {
+                $q->where('name', 'LIKE', '%' . $request->keyword . '%')
+                  ->orWhere('mobileNumber', 'LIKE', '%' . $request->keyword . '%');
+            });
+        }
+
+        if ($request->filter) {
+            switch ($request->filter) {
+                case 'recent':
+                    $place_query->orderBy('created_at', 'desc');
+                    break;
+                case 'pending':
+                    $place_query->where('balance', '>', 0);
+                    break;
+            }
         }
 
         if ($request->sortByName && in_array($request->sortByName, ['asc', 'desc'])) {
@@ -50,9 +63,25 @@ class PatientController extends Controller
         }
 
         $data['patients'] = $place_query->orderBy('id', 'DESC')->paginate(5);
-        return view('admin.patient.list', $data);
+        return view('admin.Patient.list', $data);
     }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Get the subcategory code for a treatment based on its properties.
+     *
+     * This function retrieves a Treatment model by its ID and evaluates its
+     * properties to determine the appropriate subcategory code. The function
+     * returns a string code based on the following conditions:
+     * - Returns "10001" if the treatment is marked as an end treatment and does not have a dropdown.
+     * - Returns "10002" if the treatment is marked as an end treatment and has a dropdown.
+     * - Returns "10003" if the treatment is not marked as an end treatment and does not have a dropdown.
+     *
+     * @param int $id The ID of the treatment to evaluate.
+     * @return string|bool The subcategory code or false if the treatment is not found.
+     */
+
+/*******  8ba95894-e6b1-453d-b94d-2e961583ffa0  *******/
     public function getSubCategory($id)
     {
         $treat = Treatment::find($id);
@@ -322,5 +351,12 @@ class PatientController extends Controller
             'total' => $count,
             'percentageChange' => round($percentageChange, 1)
         ]);
+    }
+
+    public function downloadPDF(Patient $patient)
+    {
+        $patient->load(['invoice.invoiceTreatment']);
+        $pdf = PDF::loadView('admin.Patient.pdf', ['patient' => $patient]);
+        return $pdf->download('patient-'.$patient->id.'.pdf');
     }
 }

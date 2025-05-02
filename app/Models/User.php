@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'mobile_number',
         'role',
+        'terms_agreed',
     ];
 
     /**
@@ -44,6 +45,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_admin' => 'boolean',
+        'terms_agreed' => 'boolean',
     ];
 
     /**
@@ -54,5 +56,15 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /**
+     * Get the associated patient.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function patient()
+    {
+        return $this->hasOne(Patient::class, 'mobileNumber', 'mobile_number');
     }
 }

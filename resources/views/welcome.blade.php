@@ -26,7 +26,7 @@
                 <div class="flex items-center">
                     <!-- Logo -->
                     <div class="text-2xl font-bold text-sky-600">
-                        DentalCare
+                        <img src="{{ asset('images/logo.png') }}" alt="DentalCare" class="h-12">
                     </div>
                 </div>
 

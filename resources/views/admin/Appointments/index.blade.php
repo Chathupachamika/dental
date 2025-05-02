@@ -116,9 +116,51 @@
                 </table>
             </div>
 
-            <div class="pagination-container">
-                {{ $appointments->links() }}
+            @if($appointments->hasPages())
+            <div class="pagination-wrapper">
+                <div class="pagination-info">
+                    <p>
+                        Showing
+                        <span class="font-semibold">{{ $appointments->firstItem() }}</span>
+                        to
+                        <span class="font-semibold">{{ $appointments->lastItem() }}</span>
+                        of
+                        <span class="font-semibold">{{ $appointments->total() }}</span>
+                        appointments
+                    </p>
+                </div>
+
+                <div class="pagination-controls">
+                    @if ($appointments->onFirstPage())
+                        <span class="pagination-btn disabled">
+                            <i class="fas fa-chevron-left"></i>
+                        </span>
+                    @else
+                        <a href="{{ $appointments->previousPageUrl() }}" class="pagination-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    @endif
+
+                    @foreach ($appointments->onEachSide(1)->links()->elements[0] as $page => $url)
+                        @if ($page == $appointments->currentPage())
+                            <span class="pagination-btn active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="pagination-btn">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    @if ($appointments->hasMorePages())
+                        <a href="{{ $appointments->nextPageUrl() }}" class="pagination-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    @else
+                        <span class="pagination-btn disabled">
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                    @endif
+                </div>
             </div>
+            @endif
         @else
             <div class="empty-state">
                 <div class="empty-icon">
@@ -343,34 +385,69 @@
     margin-bottom: 1rem;
 }
 
-.pagination-container {
-    padding: 1rem;
-    border-top: 1px solid var(--gray-light);
-    text-align: center;
+.pagination-wrapper {
+    padding: 1.5rem;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.pagination-container .pagination {
+.pagination-info {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.pagination-info span {
+    color: #374151;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.pagination-btn {
     display: inline-flex;
-    gap: 0.5rem;
-}
-
-.pagination-container .pagination a {
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-sm);
-    background: var(--gray-light);
-    color: var(--dark);
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    background: white;
+    color: #4b5563;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
     text-decoration: none;
-    transition: var(--transition);
 }
 
-.pagination-container .pagination a:hover {
-    background: var(--gray-lighter);
-    color: var(--primary);
+.pagination-btn:hover {
+    background: #f3f4f6;
+    color: #2563eb;
+    border-color: #93c5fd;
 }
 
-.pagination-container .pagination .active {
-    background: var(--primary);
-    color: white;
+.pagination-btn.active {
+    background: #93c5fd;
+    color: #1e40af;
+    border-color: #60a5fa;
+    font-weight: 600;
+}
+
+.pagination-btn.disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+    border-color: #e5e7eb;
+}
+
+.pagination-btn i {
+    font-size: 0.75rem;
 }
 </style>
 

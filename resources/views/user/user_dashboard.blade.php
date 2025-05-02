@@ -1,6 +1,55 @@
 @extends('user.layouts.app')
 
 @section('content')
+<!-- Add this at the beginning of content section -->
+<script>
+    window.onload = function() {
+        // First check terms agreement status
+        fetch('{{ route("user.api.terms.status") }}')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.terms_agreed) {
+                    Swal.fire({
+                        title: 'Incomplete Profile',
+                        text: 'Please fill in all required data about you to proceed smoothly.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#4361ee',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Go to Profile',
+                        cancelButtonText: 'Later'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '{{ route("user.profile") }}';
+                        }
+                    });
+                } else {
+                    // Only check profile completion if terms are agreed
+                    fetch('{{ route("user.check.profile") }}')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.isComplete) {
+                                Swal.fire({
+                                    title: 'Complete Your Profile',
+                                    text: 'Please complete your profile details to better serve you.',
+                                    icon: 'info',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#4361ee',
+                                    cancelButtonColor: '#6c757d',
+                                    confirmButtonText: 'Go to Profile',
+                                    cancelButtonText: 'Later'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = '{{ route("user.profile") }}';
+                                    }
+                                });
+                            }
+                        });
+                }
+            });
+    }
+</script>
+
 <div class="dashboard-container">
     <!-- Welcome Section -->
     <div class="welcome-card">

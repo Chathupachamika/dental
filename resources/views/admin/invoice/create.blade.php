@@ -95,7 +95,7 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Treatment Type</label>
                                 <select id="treatmentSelect" class="w-full rounded-lg border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 transition-all">
                                     <option value="">Select Treatment</option>
-                                    @foreach(['Consultation', 'Extraction', 'Surgical removal', 'Restoration', 'Full mouth scaling', 'Denture', 'OtherDenticles', 'Crowns', 'Bridges', 'Implant'] as $treatment)
+                                    @foreach(['Consultation', 'Extraction', 'Surgical removal', 'Restoration', 'Full mouth scaling', 'Denture', 'OtherDenticles', 'Crowns', 'Bridges', 'Implant','Other'] as $treatment)
                                         <option value="{{ $treatment }}" class="py-2">{{ $treatment }}</option>
                                     @endforeach
                                 </select>
@@ -215,7 +215,7 @@
                 <div class="form-group">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Treatment Type</label>
                     <select id="editTreatmentSelect" class="w-full rounded-lg border-gray-200 bg-white shadow-sm">
-                        @foreach(['Consultation', 'Extraction', 'Surgical removal', 'Restoration', 'Full mouth scaling', 'Denture', 'OtherDenticles', 'Crowns', 'Bridges', 'Implant'] as $treatment)
+                        @foreach(['Consultation', 'Extraction', 'Surgical removal', 'Restoration', 'Full mouth scaling', 'Denture', 'OtherDenticles', 'Crowns', 'Bridges', 'Implant','Other'] as $treatment)
                             <option value="{{ $treatment }}">{{ $treatment }}</option>
                         @endforeach
                     </select>
@@ -231,6 +231,13 @@
                     <select id="editPositionSelect" class="w-full rounded-lg border-gray-200 bg-white shadow-sm">
                         <option value="">Select Position</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Price (Rs.)</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-500">Rs.</span>
+                        <input type="number" id="editPriceInput" class="pl-12 w-full rounded-lg border-gray-200 bg-white shadow-sm" min="0" step="0.01">
+                    </div>
                 </div>
             </div>
             <div class="mt-6 flex space-x-3">
@@ -575,7 +582,8 @@ button:hover:after {
             'OtherDenticles': { subtypes: ['URA', 'LRA', 'FA', 'Anderson Type FA', 'Twin Bloc'], positions: [], price: 250 },
             'Crowns': { subtypes: ['PFM', 'Metal', 'Cercornium'], positions: [], price: 400 },
             'Bridges': { subtypes: ['PFM', 'Cercornium'], positions: [], price: 500 },
-            'Implant': { subtypes: ['UL', 'UR', 'LL', 'LR'], positions: ['1', '2', '3', '4', '5', '6', '7', '8'], price: 1000 }
+            'Implant': { subtypes: ['UL', 'UR', 'LL', 'LR'], positions: ['1', '2', '3', '4', '5', '6', '7', '8'], price: 1000 },
+            'Other': { subtypes: [], positions: [], price: 0 }
         };
 
         let treatments = [];
@@ -721,9 +729,9 @@ button:hover:after {
                 $('#consultationPrice').val(t.price);
                 $('#consultationEditModal').removeClass('hidden');
             } else {
-                // Handle other treatment types with existing edit modal
                 editIndex = index;
                 $('#editTreatmentSelect').val(t.treatment);
+                $('#editPriceInput').val(t.price);
                 populateEditDropdowns(t.treatment, t.subtype, t.position);
                 $('#editModal').removeClass('hidden');
             }
@@ -758,7 +766,7 @@ button:hover:after {
                 treatment: $('#editTreatmentSelect').val(),
                 subtype: $('#editSubtypeSelect').val(),
                 position: $('#editPositionSelect').val(),
-                price: treatmentData[$('#editTreatmentSelect').val()].price,
+                price: parseFloat($('#editPriceInput').val()) || treatmentData[$('#editTreatmentSelect').val()].price,
                 status: treatments[editIndex].status || 'pending'
             };
             renderTreatmentCards();

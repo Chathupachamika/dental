@@ -1798,12 +1798,6 @@
                             <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-menu">
-                            <a href="#" class="dropdown-item">
-                                <i class="fas fa-user"></i> Profile
-                            </a>
-                            <a href="#" class="dropdown-item">
-                                <i class="fas fa-cog"></i> Settings
-                            </a>
                             <hr class="dropdown-divider">
                             <a href="{{ route('logout') }}"
                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
@@ -2205,6 +2199,7 @@
             .catch(error => console.error('Error fetching pending appointments count:', error));
         });
     </script>
+    
     @yield('javascript')
 </body>
 </html>

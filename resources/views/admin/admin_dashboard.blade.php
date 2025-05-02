@@ -604,9 +604,7 @@
 @section('javascript')
 <script>
 function generateDailyReport() {
-    showLoader();
-
-    fetch('/admin/export/daily-report', {  // Changed from route() helper to direct path
+    fetch('{{ route("admin.export.analytics.pdf") }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -618,16 +616,27 @@ function generateDailyReport() {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `daily-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        link.download = `dental-analytics-${new Date().toISOString().split('T')[0]}.pdf`;
         link.click();
         window.URL.revokeObjectURL(url);
-        hideLoader();
-        showAlert('Success', 'Report downloaded successfully!', 'success');
+
+        // Show success message
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Report generated successfully',
+            timer: 2000,
+            showConfirmButton: false
+        });
     })
     .catch(error => {
         console.error('Export failed:', error);
-        hideLoader();
-        showAlert('Error', 'Failed to generate report. Please try again.', 'error');
+        Swal.fire({
+            icon: 'error',
+            title: 'Export Failed',
+            text: 'Unable to generate report. Please try again.',
+            confirmButtonText: 'OK'
+        });
     });
 }
 

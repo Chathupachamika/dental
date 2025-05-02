@@ -34,18 +34,18 @@
 
             <!-- Patient Table -->
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm text-left">
-                    <thead class="bg-gray-100 rounded-lg">
+                <table class="min-w-full text-sm text-left divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-4 py-2">Name</th>
-                            <th class="px-4 py-2">Address</th>
-                            <th class="px-4 py-2">Contact No</th>
-                            <th class="px-4 py-2">Last Visit</th>
-                            <th class="px-4 py-2">Balance</th>
-                            <th class="px-4 py-2 text-right">Actions</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Contact No</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Last Visit</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($patients as $place)
                         <tr class="border-t hover:bg-gray-50">
                             <td class="px-4 py-3">
@@ -101,14 +101,84 @@
                 </table>
             </div>
 
-            @if(count($patients))
-            <!-- Pagination Info & Links -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mt-6 text-sm text-gray-600">
-                <div class="mb-2 sm:mb-0">
-                    Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} patients
+            @if($patients->hasPages())
+            <div class="px-4 py-3 flex items-center justify-between border-t border-gray-200 bg-white sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    @if($patients->onFirstPage())
+                        <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 cursor-not-allowed rounded-md">
+                            Previous
+                        </span>
+                    @else
+                        <a href="{{ $patients->previousPageUrl() }}" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-gray-200 rounded-md hover:bg-blue-50">
+                            Previous
+                        </a>
+                    @endif
+
+                    @if($patients->hasMorePages())
+                        <a href="{{ $patients->nextPageUrl() }}" class="ml-3 relative inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-gray-200 rounded-md hover:bg-blue-50">
+                            Next
+                        </a>
+                    @else
+                        <span class="ml-3 relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 cursor-not-allowed rounded-md">
+                            Next
+                        </span>
+                    @endif
                 </div>
-                <div>
-                    {{ $patients->links() }}
+
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing
+                            <span class="font-medium text-gray-900">{{ $patients->firstItem() }}</span>
+                            to
+                            <span class="font-medium text-gray-900">{{ $patients->lastItem() }}</span>
+                            of
+                            <span class="font-medium text-gray-900">{{ $patients->total() }}</span>
+                            results
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {{-- Previous Page Link --}}
+                            @if ($patients->onFirstPage())
+                                <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-200 bg-gray-50 text-sm font-medium text-gray-400 cursor-not-allowed">
+                                    <span class="sr-only">Previous</span>
+                                    <i class="fas fa-chevron-left h-5 w-5"></i>
+                                </span>
+                            @else
+                                <a href="{{ $patients->previousPageUrl() }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-200 bg-white text-sm font-medium text-blue-600 hover:bg-blue-50">
+                                    <span class="sr-only">Previous</span>
+                                    <i class="fas fa-chevron-left h-5 w-5"></i>
+                                </a>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach ($patients->onEachSide(1)->links()->elements[0] as $page => $url)
+                                @if ($page == $patients->currentPage())
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                                        {{ $page }}
+                                    </span>
+                                @else
+                                    <a href="{{ $url }}" class="relative inline-flex items-center px-4 py-2 border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-blue-50">
+                                        {{ $page }}
+                                    </a>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($patients->hasMorePages())
+                                <a href="{{ $patients->nextPageUrl() }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-200 bg-white text-sm font-medium text-blue-600 hover:bg-blue-50">
+                                    <span class="sr-only">Next</span>
+                                    <i class="fas fa-chevron-right h-5 w-5"></i>
+                                </a>
+                            @else
+                                <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-200 bg-gray-50 text-sm font-medium text-gray-400 cursor-not-allowed">
+                                    <span class="sr-only">Next</span>
+                                    <i class="fas fa-chevron-right h-5 w-5"></i>
+                                </span>
+                            @endif
+                        </nav>
+                    </div>
                 </div>
             </div>
             @endif

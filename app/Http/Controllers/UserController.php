@@ -211,33 +211,73 @@ class UserController extends Controller
             'address' => 'nullable|string|max:255',
             'age' => 'nullable|numeric|min:1|max:120',
             'gender' => 'nullable|in:Male,Female,Other',
+            'terms_agreed' => 'required|accepted',
         ]);
 
         $user = Auth::user();
         $user->name = $request->name;
         $user->mobile_number = $request->mobile_number;
+        $user->terms_agreed = true; // Save terms agreement
         $user->save();
 
         // Update or create patient record
-        $patient = Patient::where('mobileNumber', $user->mobile_number)->first();
-
-        if ($patient) {
-            $patient->name = $request->name;
-            $patient->address = $request->address;
-            $patient->age = $request->age;
-            $patient->gender = $request->gender;
-            $patient->save();
-        } else {
-            Patient::create([
+        $patient = Patient::updateOrCreate(
+            ['mobileNumber' => $user->mobile_number],
+            [
                 'name' => $request->name,
-                'mobileNumber' => $request->mobile_number,
                 'address' => $request->address,
                 'age' => $request->age,
                 'gender' => $request->gender,
-            ]);
-        }
+                'user_id' => $user->id
+            ]
+        );
 
         return redirect()->route('user.profile')
             ->with('success', 'Profile updated successfully.');
+    }
+
+    /**
+     * Check profile completion.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkProfileCompletion()
+    {
+        $user = Auth::user();
+        $patient = $user->patient;
+
+        // Check if all required fields are filled
+        $isComplete = !empty($user->mobile_number) &&
+                     !empty($patient->address) &&
+                     !empty($patient->age) &&
+                     !empty($patient->gender);
+
+        return response()->json([
+            'isComplete' => $isComplete
+        ]);
+    }
+
+    /**
+     * Clear login session.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function clearLoginSession()
+    {
+        session()->forget('first_login');
+        return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * Get terms agreement status.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getTermsStatus()
+    {
+        $user = Auth::user();
+        return response()->json([
+            'terms_agreed' => $user->terms_agreed
+        ]);
     }
 }

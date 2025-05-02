@@ -12,6 +12,9 @@
                 <p class="text-sm text-blue-100">View detailed information about the patient</p>
             </div>
             <div class="flex space-x-2 mt-4 sm:mt-0">
+                <a href="{{ route('admin.patient.download', $patient->id) }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow flex items-center">
+                    <i class="fas fa-download mr-2"></i> Download
+                </a>
                 <button onclick="window.print()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow flex items-center">
                     <i class="fas fa-print mr-2"></i> Print
                 </button>
