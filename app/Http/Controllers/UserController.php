@@ -240,4 +240,25 @@ class UserController extends Controller
         return redirect()->route('user.profile')
             ->with('success', 'Profile updated successfully.');
     }
+
+    /**
+     * Check profile completion.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkProfileCompletion()
+    {
+        $user = Auth::user();
+        $patient = $user->patient;
+
+        // Check if all required fields are filled
+        $isComplete = !empty($user->mobile_number) &&
+                     !empty($patient->address) &&
+                     !empty($patient->age) &&
+                     !empty($patient->gender);
+
+        return response()->json([
+            'isComplete' => $isComplete
+        ]);
+    }
 }

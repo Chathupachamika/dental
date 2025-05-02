@@ -1,6 +1,33 @@
 @extends('user.layouts.app')
 
 @section('content')
+<!-- Add this at the beginning of content section -->
+<script>
+    window.onload = function() {
+        // Check if profile is incomplete
+        fetch('{{ route("user.check.profile") }}')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.isComplete) {
+                    Swal.fire({
+                        title: 'Complete Your Profile',
+                        text: 'Please complete your profile details to better serve you.',
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonColor: '#4361ee',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Go to Profile',
+                        cancelButtonText: 'Later'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '{{ route("user.profile") }}';
+                        }
+                    });
+                }
+            });
+    }
+</script>
+
 <div class="dashboard-container">
     <!-- Welcome Section -->
     <div class="welcome-card">

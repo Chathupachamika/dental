@@ -61,6 +61,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/profile', [UserController::class, 'profile'])->name('profile');
         Route::post('/profile', [UserController::class, 'updateProfile'])->name('update.profile');
 
+        // Add this new route
+        Route::get('/check-profile', [UserController::class, 'checkProfileCompletion'])->name('check.profile');
+
         // User invoices
         Route::get('/invoices', [App\Http\Controllers\User\InvoiceController::class, 'index'])->name('invoices');
         Route::get('/invoices/view/{id}', [App\Http\Controllers\User\InvoiceController::class, 'view'])->name('invoices.view');
