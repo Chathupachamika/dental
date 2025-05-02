@@ -57,12 +57,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/api/appointments/cancelled', [AppointmentController::class, 'getCancelledAppointments'])->name('api.appointments.cancelled');
         Route::get('/api/appointments/search', [AppointmentController::class, 'searchAppointments'])->name('api.appointments.search');
 
+        // Add this new route
+        Route::get('/api/terms-status', [UserController::class, 'getTermsStatus'])->name('api.terms.status');
+
         // User profile
         Route::get('/profile', [UserController::class, 'profile'])->name('profile');
         Route::post('/profile', [UserController::class, 'updateProfile'])->name('update.profile');
 
-        // Add this new route
+        // Add these new routes
         Route::get('/check-profile', [UserController::class, 'checkProfileCompletion'])->name('check.profile');
+        Route::get('/clear-login-session', [UserController::class, 'clearLoginSession'])->name('clear.login.session');
 
         // User invoices
         Route::get('/invoices', [App\Http\Controllers\User\InvoiceController::class, 'index'])->name('invoices');
