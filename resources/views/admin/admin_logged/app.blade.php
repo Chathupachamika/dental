@@ -2199,7 +2199,350 @@
             .catch(error => console.error('Error fetching pending appointments count:', error));
         });
     </script>
-    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('tbody tr.appointment-row');
+
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        if (text.includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Load patients for the appointment modal
+            loadPatients();
+        });
+
+        // Modal functions
+        function openNewAppointmentModal() {
+            document.getElementById('newAppointmentModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        function closeNewAppointmentModal() {
+            document.getElementById('newAppointmentModal').classList.add('hidden');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        }
+
+        // Notify Modal functions
+        function openNotifyModal(appointmentId) {
+            const modal = document.getElementById('notifyModal');
+            const overlay = modal.querySelector('.modal-overlay');
+            const container = modal.querySelector('.modal-container');
+
+            // Get patient data from the row
+            const row = document.querySelector(`tr[data-appointment-id="${appointmentId}"]`);
+            const patientName = row.getAttribute('data-patient-name');
+            const contactNumber = row.getAttribute('data-contact');
+
+            // Update modal content
+            document.getElementById('patientName').textContent = patientName;
+            document.getElementById('patientInitial').textContent = patientName.charAt(0);
+            document.getElementById('contactNumber').textContent = contactNumber;
+            document.getElementById('messagePatientName').textContent = patientName.split(' ')[0]; // First name only
+            document.getElementById('callPatientBtn').href = `tel:${contactNumber}`;
+
+            // Show modal with animation
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.add('active');
+                container.classList.add('active');
+            }, 10);
+
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        function closeNotifyModal() {
+            const modal = document.getElementById('notifyModal');
+            const overlay = modal.querySelector('.modal-overlay');
+            const container = modal.querySelector('.modal-container');
+
+            // Hide with animation
+            overlay.classList.remove('active');
+            container.classList.remove('active');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = ''; // Re-enable scrolling
+            }, 300);
+        }
+
+        // Copy notification message to clipboard
+        function copyMessage() {
+            const message = document.querySelector('.bg-white.rounded-lg.p-4.border.border-gray-200 p').innerText;
+            navigator.clipboard.writeText(message).then(() => {
+                // Show success message
+                const btn = document.querySelector('button[onclick="copyMessage()"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Copied!
+                `;
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        // Today's Schedule Modal functions
+        function openTodayScheduleModal() {
+        const modal = document.getElementById('todayScheduleModal');
+        modal.classList.remove('hidden');
+        loadTodaySchedule();
+    }
+
+    function closeTodayScheduleModal() {
+        const modal = document.getElementById('todayScheduleModal');
+        modal.classList.add('hidden');
+        document.getElementById('todayAppointmentsList').innerHTML = '';
+        document.getElementById('noAppointmentsToday').classList.add('hidden');
+    }
+
+    // Load today's appointments
+    function loadTodaySchedule() {
+        const appointmentsList = document.getElementById('todayAppointmentsList');
+        const noAppointments = document.getElementById('noAppointmentsToday');
+        const appointmentCount = document.getElementById('todayAppointmentCount');
+
+        // Show loading state
+        appointmentsList.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-4">
+                    <div class="spinner-border text-sky-600" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        fetch('{{ route("admin.appointments.today.schedule") }}', {
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch appointments');
+            return response.json();
+        })
+        .then(data => {
+            appointmentsList.innerHTML = '';
+            if (data.success && data.appointments.length > 0) {
+                appointmentCount.textContent = data.count;
+                noAppointments.classList.add('hidden');
+                data.appointments.forEach(appointment => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${appointment.time}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${appointment.patient_name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${appointment.status_class}">
+                                ${appointment.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">${appointment.notes}</td>
+                    `;
+                    appointmentsList.appendChild(row);
+                });
+            } else {
+                appointmentCount.textContent = '0';
+                noAppointments.classList.remove('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching today\'s schedule:', error);
+            appointmentsList.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-red-600">
+                        Failed to load appointments. <button onclick="loadTodaySchedule()" class="underline">Retry</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+    function confirmAppointment(id) {
+        showConfirm('Confirm Appointment', 'Are you sure you want to confirm this appointment?', 'Yes, Confirm', 'Cancel')
+        .then(result => {
+            if (result.isConfirmed) {
+                fetch(`/admin/appointment/${id}/confirm`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Success', 'Appointment confirmed successfully', 'success');
+                        loadTodaySchedule();
+                    } else {
+                        showToast('Error', 'Failed to confirm appointment', 'error');
+                    }
+                })
+                .catch(() => showToast('Error', 'An error occurred', 'error'));
+            }
+        });
+    }
+
+    // Cancel appointment
+    function cancelAppointment(id) {
+        showConfirm('Cancel Appointment', 'Are you sure you want to cancel this appointment?', 'Yes, Cancel', 'No')
+        .then(result => {
+            if (result.isConfirmed) {
+                fetch(`/admin/appointment/${id}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Success', 'Appointment cancelled successfully', 'success');
+                        loadTodaySchedule();
+                    } else {
+                        showToast('Error', 'Failed to cancel appointment', 'error');
+                    }
+                })
+                .catch(() => showToast('Error', 'An error occurred', 'error'));
+            }
+        });
+    }
+
+    // Print schedule
+    function printSchedule() {
+        const appointmentsList = document.getElementById('todayAppointmentsList').innerHTML;
+        const date = '{{ \Carbon\Carbon::now()->format('F d, Y') }}';
+        const count = document.getElementById('todayAppointmentCount').textContent;
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Today's Schedule - ${date}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { text-align: center; color: #1e40af; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f3f4f6; text-transform: uppercase; }
+                        .status { padding: 4px 8px; border-radius: 9999px; font-size: 0.75rem; }
+                        .bg-amber-100 { background-color: #fef3c7; }
+                        .bg-emerald-100 { background-color: #d1fae5; }
+                        .bg-red-100 { background-color: #fee2e2; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Today's Schedule - ${date}</h1>
+                    <p>${count} appointments scheduled for today</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Patient</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>${appointmentsList}</tbody>
+                    </table>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    }
+
+    // Export schedule as CSV
+    function exportSchedule() {
+        fetch('{{ route("admin.appointments.today.schedule") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.appointments.length > 0) {
+                const headers = ['Time,Patient,Status,Notes'];
+                const rows = data.appointments.map(appointment =>
+                    `"${appointment.time}","${appointment.patient_name.replace(/"/g, '""')}","${appointment.status}","${appointment.notes.replace(/"/g, '""')}"`
+                );
+                const csvContent = headers.concat(rows).join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `today_schedule_${new Date().toISOString().split('T')[0]}.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } else {
+                showToast('Info', 'No appointments to export', 'warning');
+            }
+        })
+        .catch(() => showToast('Error', 'Failed to export schedule', 'error'));
+    }
+        // Load patients for the dropdown
+        function loadPatients() {
+            fetch('/patient/patientList')
+                .then(response => response.json())
+                .then(data => {
+                    const patientSelect = document.getElementById('patient_id');
+                    if (patientSelect) {
+                        data.forEach(patient => {
+                            const option = document.createElement('option');
+                            option.value = patient.id;
+                            option.textContent = `${patient.name} (${patient.mobileNumber || 'No phone'})`;
+                            patientSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading patients:', error));
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const newAppointmentModal = document.getElementById('newAppointmentModal');
+            const notifyModal = document.getElementById('notifyModal');
+            const todayScheduleModal = document.getElementById('todayScheduleModal');
+
+            if (event.target === newAppointmentModal) {
+                closeNewAppointmentModal();
+            }
+
+            if (event.target === notifyModal) {
+                closeNotifyModal();
+            }
+
+            if (event.target === todayScheduleModal) {
+                closeTodayScheduleModal();
+            }
+        });
+
+        // Set default date to today for new appointments
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('appointment_date');
+            if (dateInput) {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                dateInput.value = `${year}-${month}-${day}`;
+                dateInput.min = `${year}-${month}-${day}`; // Prevent past dates
+            }
+        });
+    </script>
     @yield('javascript')
 </body>
 </html>

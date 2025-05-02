@@ -604,7 +604,7 @@
 @section('javascript')
 <script>
 function generateDailyReport() {
-    fetch('{{ route("admin.export.analytics.pdf") }}', {
+    fetch('{{ route("admin.charts.export") }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

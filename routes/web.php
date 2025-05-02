@@ -113,26 +113,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/update/{id}', [InvoiceController::class, 'update'])->name('update');
         });
 
-        // Chart routes
+        // Chart routes - update to use single consistent route
         Route::prefix('chart')->name('chart.')->group(function () {
             Route::get('/', [ChartController::class, 'index'])->name('index');
             Route::get('/data', [ChartController::class, 'getData'])->name('data');
             Route::get('/revenue', [ChartController::class, 'revenue'])->name('revenue');
             Route::get('/treatments', [ChartController::class, 'treatments'])->name('treatments');
             Route::get('/appointments', [ChartController::class, 'appointments'])->name('appointments');
+            Route::post('/export', [ChartController::class, 'export'])->name('export'); // Add this line
         });
 
         // Appointment routes
         Route::prefix('appointment')->name('appointments.')->group(function () {
             Route::get('/', [AppointmentController::class, 'index'])->name('index');
+            Route::get('/today-schedule', [AppointmentController::class, 'getTodaySchedule'])->name('today.schedule');
+            Route::get('/today', [AppointmentController::class, 'getTodayAppointments'])->name('today');
+            Route::post('/store', [AppointmentController::class, 'store'])->name('store');
+            Route::post('/api/store', [AppointmentController::class, 'apiStore'])->name('api.store');
+
+            // ID-specific routes should come last
             Route::post('/{id}/confirm', [AppointmentController::class, 'confirm'])->name('confirm');
             Route::get('/{id}/edit', [AppointmentController::class, 'edit'])->name('edit');
             Route::put('/{id}', [AppointmentController::class, 'update'])->name('update');
             Route::post('/{id}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
             Route::get('/{id}/notify', [AppointmentController::class, 'notify'])->name('notify');
-            Route::get('/today', [AppointmentController::class, 'getTodayAppointments'])->name('today');
             Route::get('/{id}', [AppointmentController::class, 'show'])->name('show');
-            Route::post('/store', [AppointmentController::class, 'store'])->name('store');
         });
 
         Route::get('/patients/export', [PatientController::class, 'export'])->name('patient.export');
@@ -144,6 +149,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/recent-invoices', [InvoiceController::class, 'getRecentInvoices'])->name('recent.invoices');
         Route::get('/treatment-stats', [PatientController::class, 'getTreatmentStats'])->name('treatment.stats');
         Route::get('/appointment-stats', [AppointmentController::class, 'getStats'])->name('appointment.stats');
+        Route::get('/api/appointments/stats', [AppointmentController::class, 'getAppointmentStats'])->name('appointments.stats');
 
         // Add the export daily report route
         Route::post('/export/daily-report', [App\Http\Controllers\Admin\ReportController::class, 'exportDailyReport'])
@@ -167,6 +173,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Add the patient PDF download route
         Route::get('/admin/patient/{patient}/download', [App\Http\Controllers\Admin\PatientController::class, 'downloadPDF'])->name('admin.patient.download');
+
+        // Add the dashboard stats route
+        Route::get('/dashboard-stats', [AppointmentController::class, 'getDashboardStats'])->name('dashboard.stats');
+
+        // Add this new route
+        Route::get('/appointments/counts', [AppointmentController::class, 'getDashboardCounts'])
+            ->name('appointments.counts');
+
+        // Add the charts export route
+        Route::post('/admin/charts/export', [App\Http\Controllers\Admin\ChartController::class, 'export'])->name('admin.charts.export-pdf');
+
+        // Add the new chart export route
+        Route::post('/charts/export', [App\Http\Controllers\Admin\ChartController::class, 'exportPDF'])->name('admin.charts.export-pdf');
+
+        // Add the new reports export route
+        Route::post('/reports/export', [App\Http\Controllers\Admin\ChartController::class, 'exportPDF'])->name('admin.reports.export');
     });
 
     // API routes for patient - accessible to both admin and users
@@ -175,7 +197,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/patient/getSubTreatDataById/{id}', [PatientController::class, 'getSubTreatDataById']);
     Route::get('/patient/getSubCategory/{id}', [PatientController::class, 'getSubCategory']);
     Route::get('/patient/getPatientByID/{id}', [PatientController::class, 'getPatientByID']);
-    Route::get('/patient/patientList', [PatientController::class, 'patientList']);
+    Route::get('/patient/getContactInfo/{id}', [PatientController::class, 'getContactInfo']); // Add this new route
 
     // Add the PDF export route
     Route::post('/admin/analytics/export-pdf', [App\Http\Controllers\Admin\AnalyticsController::class, 'exportPdf'])->name('admin.export.analytics.pdf');

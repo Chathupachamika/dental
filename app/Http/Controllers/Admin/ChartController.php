@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
+use App\Models\Appointment;
+use App\Models\Patient;
 use Illuminate\Http\Request;
+use PDF;
 
 class ChartController extends Controller
 {
@@ -44,5 +47,42 @@ class ChartController extends Controller
         }
 
         return response()->json($chartData);
+    }
+
+    public function export()
+    {
+        $appointments = Appointment::selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->get();
+
+        $revenue = (object)[
+            'total' => Invoice::sum('totalAmount'),
+            'advance' => Invoice::sum('advanceAmount')
+        ];
+
+        $patients = Patient::count();
+        $invoices = Invoice::with('patient')
+            ->latest()
+            ->take(10)
+            ->get();
+
+        $pdf = PDF::loadView('admin.charts.export-pdf', compact(
+            'appointments',
+            'revenue',
+            'patients',
+            'invoices'
+        ));
+
+        // Configure PDF options
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => true,
+            'isRemoteEnabled' => true,
+            'dpi' => 150,
+            'defaultFont' => 'DejaVu Sans'
+        ]);
+
+        return $pdf->download('dental-analytics-'.now()->format('Y-m-d').'.pdf');
     }
 }

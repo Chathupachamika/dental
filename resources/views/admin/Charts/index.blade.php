@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.disabled = true;
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
 
-        fetch('{{ route("admin.export.analytics.pdf") }}', {
+        fetch('{{ route("admin.chart.export") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

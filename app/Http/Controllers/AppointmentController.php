@@ -56,9 +56,10 @@ class AppointmentController extends Controller
             }
         }
 
-        $appointments = $query->paginate(10); // Paginate the results
+        $appointments = $query->paginate(5); // Paginate the results
+        $patients = Patient::select('id', 'name', 'mobileNumber')->orderBy('name')->get();
 
-        return view('admin.Appointments.index', compact('appointments'));
+        return view('admin.Appointments.index', compact('appointments', 'patients'));
     }
 
     public function edit($id)
@@ -184,7 +185,7 @@ class AppointmentController extends Controller
     {
         $today = Appointment::whereDate('appointment_date', today())->count();
         $yesterday = Appointment::whereDate('appointment_date', yesterday())->count();
-        $percentageChange = $yesterday > 0 ? (($today - $yesterday) / $yesterday) * 100 : 0;
+        $percentageChange = $yesterday > 0 ? (($today - $yesterday) / $yesterday) * 50 : 0;
 
         return response()->json([
             'count' => $today,
@@ -226,12 +227,14 @@ class AppointmentController extends Controller
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
             'status' => 'pending',
-            'notes' => $request->notes
+            'notes' => $request->notes,
+            'user_id' => Auth::id()
         ]);
 
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
+                'message' => 'Appointment created successfully',
                 'appointment' => $appointment->load('patient')
             ]);
         }
@@ -241,12 +244,47 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Store a new appointment via API
+     */
+    public function apiStore(Request $request)
+    {
+        try {
+            $request->validate([
+                'patient_id' => 'required|exists:patients,id',
+                'appointment_date' => 'required|date',
+                'appointment_time' => 'required',
+                'notes' => 'nullable|string'
+            ]);
+
+            $appointment = Appointment::create([
+                'patient_id' => $request->patient_id,
+                'user_id' => Auth::id(), // Add user_id
+                'appointment_date' => $request->appointment_date,
+                'appointment_time' => $request->appointment_time,
+                'status' => 'pending',
+                'notes' => $request->notes
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment created successfully',
+                'appointment' => $appointment->load('patient', 'user')
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating appointment',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
      * Get appointment details
      */
     public function show($id)
     {
         $appointment = Appointment::with('patient')->findOrFail($id);
-
         return response()->json([
             'success' => true,
             'appointment' => $appointment
@@ -258,7 +296,7 @@ class AppointmentController extends Controller
         $user = Auth::user();
         return Appointment::where('user_id', $user->id)
             ->orderBy('appointment_date', 'desc')
-            ->paginate(10);
+            ->paginate(5);
     }
 
     public function getUpcomingAppointments(Request $request)
@@ -268,7 +306,7 @@ class AppointmentController extends Controller
             ->where('status', 'pending')
             ->where('appointment_date', '>=', now())
             ->orderBy('appointment_date', 'asc')
-            ->paginate(10);
+            ->paginate(5);
     }
 
     public function getCompletedAppointments(Request $request)
@@ -277,7 +315,7 @@ class AppointmentController extends Controller
         return Appointment::where('user_id', $user->id)
             ->where('status', 'completed')
             ->orderBy('appointment_date', 'desc')
-            ->paginate(10);
+            ->paginate(5);
     }
 
     public function getCancelledAppointments(Request $request)
@@ -286,14 +324,13 @@ class AppointmentController extends Controller
         return Appointment::where('user_id', $user->id)
             ->where('status', 'cancelled')
             ->orderBy('appointment_date', 'desc')
-            ->paginate(10);
+            ->paginate(5);
     }
 
     public function searchAppointments(Request $request)
     {
         $user = Auth::user();
         $search = $request->get('query');
-
         return Appointment::where('user_id', $user->id)
             ->where(function($query) use ($search) {
                 $query->where('notes', 'like', "%{$search}%")
@@ -301,6 +338,107 @@ class AppointmentController extends Controller
                       ->orWhere('status', 'like', "%{$search}%");
             })
             ->orderBy('appointment_date', 'desc')
-            ->paginate(10);
+            ->paginate(5);
+    }
+
+    public function getAppointmentStats()
+    {
+        $stats = [
+            'pending' => Appointment::where('status', 'pending')->count(),
+            'confirmed' => Appointment::where('status', 'confirmed')->count(),
+            'cancelled' => Appointment::where('status', 'cancelled')->count(),
+            'today' => Appointment::whereDate('appointment_date', Carbon::today())->count()
+        ];
+        return response()->json($stats);
+    }
+
+    public function getDashboardStats()
+    {
+        try {
+            $today = Carbon::today();
+            $stats = [
+                'pending' => Appointment::where('status', 'pending')->count(),
+                'confirmed' => Appointment::where('status', 'confirmed')->count(),
+                'cancelled' => Appointment::where('status', 'cancelled')->count(),
+                'today' => Appointment::whereDate('appointment_date', $today)->count()
+            ];
+            return response()->json($stats);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getDashboardCounts()
+    {
+        $today = Carbon::today();
+        $counts = [
+            'pending' => Appointment::where('status', 'pending')->count(),
+            'confirmed' => Appointment::where('status', 'confirmed')->count(),
+            'cancelled' => Appointment::where('status', 'cancelled')->count(),
+            'today' => Appointment::whereDate('appointment_date', $today)->count()
+        ];
+        return response()->json($counts);
+    }
+
+    public function getTodaySchedule()
+    {
+        try {
+            $appointments = Appointment::with(['patient', 'user'])
+                ->whereDate('appointment_date', Carbon::today())
+                ->orderBy('appointment_time', 'asc')
+                ->get()
+                ->map(function ($appointment) {
+                    $statusClass = match($appointment->status) {
+                        'pending' => 'bg-amber-100 text-amber-800',
+                        'confirmed' => 'bg-emerald-100 text-emerald-800',
+                        'cancelled' => 'bg-red-100 text-red-800',
+                        default => 'bg-gray-100 text-gray-800'
+                    };
+
+                    $patientName = $appointment->patient?->name ?? $appointment->user?->name ?? 'N/A';
+                    $formattedTime = $appointment->appointment_time
+                        ? Carbon::parse($appointment->appointment_time)->format('h:i A')
+                        : 'N/A';
+
+                    return [
+                        'id' => $appointment->id,
+                        'time' => $formattedTime,
+                        'patient_name' => $patientName,
+                        'status' => ucfirst($appointment->status),
+                        'notes' => $appointment->notes ?? 'No notes',
+                        'status_class' => $statusClass,
+                        'contact' => $appointment->patient?->mobileNumber ?? $appointment->user?->mobile_number ?? 'N/A'
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'count' => $appointments->count(),
+                'appointments' => $appointments,
+                'date' => Carbon::today()->format('F d, Y')
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error in getTodaySchedule: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch appointments',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function getStatusClass($status)
+    {
+        switch ($status) {
+            case 'pending':
+                return 'bg-amber-100 text-amber-800';
+            case 'confirmed':
+                return 'bg-emerald-100 text-emerald-800';
+            case 'cancelled':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
     }
 }
