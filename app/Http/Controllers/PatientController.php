@@ -31,7 +31,7 @@ class PatientController extends Controller
             $query->orderBy('name', $request->sortByName);
         }
 
-        $patients = $query->paginate(10);
+        $patients = $query->paginate(5);
 
         return view('admin.patient.index', compact('patients'));
     }
@@ -66,6 +66,22 @@ class PatientController extends Controller
         return view('admin.Patient.list', $data);
     }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Get the subcategory code for a treatment based on its properties.
+     *
+     * This function retrieves a Treatment model by its ID and evaluates its
+     * properties to determine the appropriate subcategory code. The function
+     * returns a string code based on the following conditions:
+     * - Returns "10001" if the treatment is marked as an end treatment and does not have a dropdown.
+     * - Returns "10002" if the treatment is marked as an end treatment and has a dropdown.
+     * - Returns "10003" if the treatment is not marked as an end treatment and does not have a dropdown.
+     *
+     * @param int $id The ID of the treatment to evaluate.
+     * @return string|bool The subcategory code or false if the treatment is not found.
+     */
+
+/*******  8ba95894-e6b1-453d-b94d-2e961583ffa0  *******/
     public function getSubCategory($id)
     {
         $treat = Treatment::find($id);

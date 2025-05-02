@@ -11,20 +11,20 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Invoice::with('patient')->latest();
+        $query = Invoice::with('patient');
 
-        if ($request->has('keyword') && $request->keyword) {
+        if ($request->has('keyword')) {
             $keyword = $request->keyword;
-            $query->where(function ($q) use ($keyword) {
+            $query->where(function($q) use ($keyword) {
                 $q->where('id', 'LIKE', "%{$keyword}%")
-                  ->orWhereHas('patient', function ($query) use ($keyword) {
-                      $query->where('name', 'LIKE', "%{$keyword}%");
+                  ->orWhereHas('patient', function($q) use ($keyword) {
+                      $q->where('name', 'LIKE', "%{$keyword}%");
                   });
             });
         }
 
-        if ($request->has('filter') && $request->filter) {
-            switch ($request->filter) {
+        if ($request->has('filter')) {
+            switch($request->filter) {
                 case 'paid':
                     $query->whereRaw('totalAmount = advanceAmount');
                     break;
@@ -34,8 +34,7 @@ class InvoiceController extends Controller
             }
         }
 
-        $invoices = $query->paginate(10)->withQueryString();
-
+        $invoices = $query->latest()->paginate(5);
         return view('admin.invoice.index', compact('invoices'));
     }
 

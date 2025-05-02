@@ -2199,6 +2199,7 @@
             .catch(error => console.error('Error fetching pending appointments count:', error));
         });
     </script>
+    
     @yield('javascript')
 </body>
 </html>

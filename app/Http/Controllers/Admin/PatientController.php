@@ -35,7 +35,7 @@ class PatientController extends Controller
             }
         }
 
-        $patients = $query->paginate(10);
+        $patients = Patient::paginate(5);
 
         return view('admin.Patient.list', compact('patients'));
     }

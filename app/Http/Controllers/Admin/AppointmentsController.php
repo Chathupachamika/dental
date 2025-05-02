@@ -21,7 +21,7 @@ class AppointmentsController extends Controller
             $query->whereDate('appointment_date', $request->date);
         }
 
-        $appointments = $query->paginate(5)->withQueryString();
+        $appointments = Appointment::paginate(5);
 
         return view('admin.Appointments.index', compact('appointments'));
     }
