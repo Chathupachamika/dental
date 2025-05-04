@@ -16,6 +16,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         :root {
@@ -23,163 +24,406 @@
             --primary-dark: #1d4ed8;
             --secondary: #0ea5e9;
             --secondary-dark: #0284c7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f3f4f6;
+            --dark: #1f2937;
         }
 
+        /* Base Styles */
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
-        }
-
-        .verify-container {
+            min-height: 100vh;
+            background-image: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            background-size: cover;
+            background-position: center;
             display: flex;
-            height: 100vh;
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow-x: hidden;
         }
 
-        .verify-card {
+        /* Animated Background */
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -200px;
+            right: -200px;
+            animation-delay: 2s;
+        }
+
+        .shape-3 {
+            width: 200px;
+            height: 200px;
+            bottom: 30%;
+            left: 10%;
+            animation-delay: 4s;
+        }
+
+        .shape-4 {
+            width: 150px;
+            height: 150px;
+            top: 20%;
+            right: 10%;
+            animation-delay: 6s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+            50% {
+                transform: translateY(10px) rotate(-5deg);
+            }
+            75% {
+                transform: translateY(-15px) rotate(3deg);
+            }
+        }
+
+        /* Card Styles */
+        .auth-card {
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            width: 500px;
-            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1),
+                        0 20px 48px rgba(0, 0, 0, 0.1),
+                        0 1px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
             position: relative;
             z-index: 10;
+            overflow: hidden;
+            margin: 1.5rem;
+            transition: all 0.3s ease;
         }
 
-        .verify-heading {
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+
+        .auth-heading {
             font-size: 1.75rem;
-            font-weight: 600;
+            font-weight: 700;
             color: #1e3a8a;
             margin-bottom: 0.5rem;
+            position: relative;
         }
 
-        .verify-subheading {
+        .auth-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        .auth-subheading {
             color: #64748b;
             margin-bottom: 2rem;
-            font-size: 0.875rem;
-            line-height: 1.5;
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
+        /* Button Styles */
         .btn {
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             cursor: pointer;
             border: none;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.5s;
+        }
+
+        .btn:active::after {
+            transform: scale(0, 0);
+            opacity: 0.3;
+            transition: 0s;
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background-image: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2),
+                        0 2px 4px -1px rgba(37, 99, 235, 0.1);
         }
 
         .btn-primary:hover {
-            background-color: var(--primary-dark);
+            background-image: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2),
+                        0 4px 6px -2px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-link {
             background: none;
             color: var(--primary);
             text-decoration: underline;
-            padding: 0;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
         }
 
+        .btn-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .btn-icon {
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Alert Styles */
         .alert {
-            padding: 1rem;
-            border-radius: 0.5rem;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
             margin-bottom: 1.5rem;
-            font-size: 0.875rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            line-height: 1.5;
         }
 
         .alert-success {
-            background-color: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
+            background-color: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
         }
 
-        .actions {
+        .alert-icon {
+            font-size: 1.25rem;
+            margin-top: 0.125rem;
+        }
+
+        /* Actions Container */
+        .actions-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-top: 2rem;
+            gap: 1rem;
         }
 
-        .shape-1 {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            top: -150px;
-            left: -150px;
-        }
-
-        .shape-2 {
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            bottom: -200px;
-            right: -200px;
-        }
-
-        @media (max-width: 576px) {
-            .verify-card {
-                width: 90%;
+        /* Responsive Adjustments */
+        @media (max-width: 640px) {
+            .auth-card {
                 padding: 2rem;
+                margin: 1rem;
             }
 
-            .actions {
+            .auth-heading {
+                font-size: 1.5rem;
+            }
+
+            .auth-subheading {
+                font-size: 0.875rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.875rem;
+            }
+
+            .actions-container {
                 flex-direction: column;
                 gap: 1rem;
+            }
+
+            .actions-container .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .auth-card {
+                padding: 1.5rem;
+                margin: 0.75rem;
+            }
+        }
+
+        /* Animation Utilities */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Email Verification Illustration */
+        .email-illustration {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .email-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
             }
         }
     </style>
 </head>
-<body>
-    <div class="verify-container">
-        <div class="shape-1"></div>
-        <div class="shape-2"></div>
+<body class="bg-gradient-to-br from-blue-500 to-indigo-600">
+    <div class="animated-bg">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
 
-        <div class="verify-card">
-            <div class="verify-heading">Verify Your Email</div>
-            <div class="verify-subheading">
+    <div class="w-full max-w-lg mx-auto px-4">
+        <div class="auth-card animate-fade-in">
+            <div class="email-illustration animate-slide-up">
+                <div class="email-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+            </div>
+
+            <div class="auth-heading animate-slide-up">Verify Your Email</div>
+            <div class="auth-subheading animate-slide-up">
                 Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.
             </div>
 
             @if (session('status') == 'verification-link-sent')
-                <div class="alert alert-success" role="alert">
-                    A new verification link has been sent to the email address you provided during registration.
+                <div class="alert alert-success animate-slide-up" role="alert">
+                    <i class="fas fa-check-circle alert-icon"></i>
+                    <div>A new verification link has been sent to the email address you provided during registration.</div>
                 </div>
             @endif
 
-            <div class="actions">
-                <form method="POST" action="{{ route('verification.send') }}">
+            <div class="actions-container animate-slide-up">
+                <form method="POST" action="{{ route('verification.send') }}" class="w-full">
                     @csrf
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane mr-2"></i> Resend Verification Email
+                    <button type="submit" class="btn btn-primary w-full">
+                        <i class="fas fa-paper-plane btn-icon"></i> Resend Verification Email
                     </button>
                 </form>
 
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
-                    <button type="submit" class="btn btn-link">
-                        Log Out
+                    <button type="submit" class="btn btn-link w-full">
+                        <i class="fas fa-sign-out-alt btn-icon"></i> Log Out
                     </button>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        // Add subtle animation to form elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const formElements = document.querySelectorAll('form, .alert');
+            formElements.forEach((element, index) => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(10px)';
+
+                setTimeout(() => {
+                    element.style.transition = 'all 0.5s ease';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, 300 + (index * 100));
+            });
+        });
+    </script>
 </body>
 </html>
