@@ -200,26 +200,17 @@ class InvoiceController extends Controller
         }
     }
 
-    public function download($id)
+    public function downloadPDF($id)
     {
         try {
             $invoice = Invoice::with(['patient', 'invoiceTreatment.subCategoryOne', 'invoiceTreatment.subCategoryTwo'])
                 ->findOrFail($id);
 
-            // Check if user is accessing their own invoice
-            if (auth()->guard('web')->check()) {
-                if ($invoice->patient->name !== auth()->user()->name) {
-                    abort(403);
-                }
-                $view = 'user.invoices.pdf';
-            } else {
-                $view = 'admin.invoice.pdf';
-            }
-
-            $pdf = PDF::loadView($view, compact('invoice'));
+            $pdf = PDF::loadView('admin.invoice.pdf', compact('invoice'));
             return $pdf->download('invoice-' . $invoice->id . '.pdf');
+
         } catch (\Exception $e) {
-            return back()->with('error', 'Unable to download invoice.');
+            return back()->with('error', 'Unable to download invoice: ' . $e->getMessage());
         }
     }
 

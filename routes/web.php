@@ -109,7 +109,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/create/{id?}', [InvoiceController::class, 'create'])->name('create');
             Route::get('/view/{id}', [InvoiceController::class, 'view'])->name('view');
             Route::post('/create', [InvoiceController::class, 'store'])->name('store');
-            Route::get('/{invoice}/download', [InvoiceController::class, 'download'])->name('download');
+            Route::get('/{invoice}/download', [InvoiceController::class, 'downloadPDF'])->name('download');
             Route::put('/update/{id}', [InvoiceController::class, 'update'])->name('update');
         });
 
@@ -154,6 +154,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Add the export daily report route
         Route::post('/export/daily-report', [App\Http\Controllers\Admin\ReportController::class, 'exportDailyReport'])
             ->name('admin.export.daily.report');
+
+        // Add this new route for daily report
+        Route::post('/daily-report', [AdminController::class, 'generateDailyReport'])->name('daily.report');
 
         // API Routes for Dashboard Stats
         Route::get('/api/patients/total', [App\Http\Controllers\Admin\DashboardController::class, 'getTotalPatients']);

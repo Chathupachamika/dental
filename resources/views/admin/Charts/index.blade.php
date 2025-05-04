@@ -491,52 +491,61 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Export button functionality
-    document.getElementById('exportBtn').addEventListener('click', function() {
-        this.disabled = true;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
-
-        fetch('{{ route("admin.chart.export") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        })
-        .then(response => response.blob())
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `dental-analytics-${new Date().toISOString().split('T')[0]}.pdf`;
-            link.click();
-            window.URL.revokeObjectURL(url);
-
-            this.disabled = false;
-            this.innerHTML = '<i class="fas fa-file-export"></i> Export Data';
-
-            // Success alert
+    // Add this event listener for export button
+    document.getElementById('exportBtn').addEventListener('click', async function() {
+        try {
+            // Show loading alert
             Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'Report exported successfully',
-                timer: 2000,
-                showConfirmButton: false
+                title: 'Generating PDF',
+                text: 'Please wait while we prepare your report...',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
             });
-        })
-        .catch(error => {
-            console.error('Export failed:', error);
-            this.disabled = false;
-            this.innerHTML = '<i class="fas fa-file-export"></i> Export Data';
 
-            // Error alert
+            // Get current period from active button
+            const activePeriod = document.querySelector('.period-btn.active').dataset.period;
+
+            // Create form and submit it
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("admin.chart.export") }}';
+
+            // Add CSRF token
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            form.appendChild(csrfToken);
+
+            // Add period
+            const periodInput = document.createElement('input');
+            periodInput.type = 'hidden';
+            periodInput.name = 'period';
+            periodInput.value = activePeriod;
+            form.appendChild(periodInput);
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            // Close loading alert after a short delay
+            setTimeout(() => {
+                Swal.close();
+            }, 2000);
+
+        } catch (error) {
+            console.error('Export failed:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Export Failed',
-                text: 'Unable to export the report. Please try again.',
+                text: 'Unable to generate PDF report. Please try again.',
                 confirmButtonText: 'OK'
             });
-        });
+        }
     });
 
     // Refresh button functionality

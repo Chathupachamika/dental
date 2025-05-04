@@ -11,10 +11,12 @@ class Appointment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'patient_id',
         'appointment_date',
+        'appointment_time',
+        'status',
         'notes',
-        'status'
+        'user_id'
     ];
 
     protected $dates = [
@@ -23,24 +25,31 @@ class Appointment extends Model
         'updated_at'
     ];
 
-    // Relationship with Patient
     public function patient()
     {
-        return $this->belongsTo(Patient::class, 'patient_id');
+        return $this->belongsTo(Patient::class);
     }
 
-    // Relationship with InvoiceTreatment
     public function invoiceTreatment()
     {
-        return $this->hasMany(InvoiceTreatment::class);
+        return $this->hasOne(InvoiceTreatment::class);
     }
 
-    /**
-     * Define the relationship between Appointment and User.
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Get appointments by user
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    // Get full appointment details
+    public function getFullDetails()
+    {
+        return $this->load(['patient', 'invoiceTreatment.treatment']);
     }
 
     // Check if appointment is pending
