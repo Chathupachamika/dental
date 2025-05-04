@@ -77,6 +77,10 @@
                                         class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm shadow inline-flex items-center">
                                     <i class="fas fa-pencil-alt mr-1"></i> Edit
                                 </button>
+                                <a href="{{ route('admin.invoice.download', $invoice->id) }}"
+                                   class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-lg text-sm shadow inline-flex items-center">
+                                    <i class="fas fa-download mr-1"></i> PDF
+                                </a>
                             </td>
                         </tr>
                         @empty

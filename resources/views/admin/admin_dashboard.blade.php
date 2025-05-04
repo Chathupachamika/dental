@@ -604,40 +604,61 @@
 @section('javascript')
 <script>
 function generateDailyReport() {
-    fetch('{{ route("admin.charts.export") }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        }
-    })
-    .then(response => response.blob())
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `dental-analytics-${new Date().toISOString().split('T')[0]}.pdf`;
-        link.click();
-        window.URL.revokeObjectURL(url);
-
-        // Show success message
+    try {
+        // Show loading alert
         Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: 'Report generated successfully',
-            timer: 2000,
-            showConfirmButton: false
+            title: 'Generating PDF',
+            text: 'Please wait while we prepare your report...',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
-    })
-    .catch(error => {
+
+        // Create form and submit it
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("admin.daily.report") }}';
+
+        // Add CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+
+        // Add date
+        const dateInput = document.createElement('input');
+        dateInput.type = 'hidden';
+        dateInput.name = 'date';
+        dateInput.value = new Date().toISOString().split('T')[0];
+        form.appendChild(dateInput);
+
+        document.body.appendChild(form);
+        form.submit();
+
+        // Show success message after a short delay
+        setTimeout(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Report Generated',
+                text: 'Your daily report has been generated successfully.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }, 2000);
+
+    } catch (error) {
         console.error('Export failed:', error);
         Swal.fire({
             icon: 'error',
             title: 'Export Failed',
-            text: 'Unable to generate report. Please try again.',
+            text: 'Unable to generate PDF report. Please try again.',
             confirmButtonText: 'OK'
         });
-    });
+    }
 }
 
     // Make sure Google Charts is loaded before using it

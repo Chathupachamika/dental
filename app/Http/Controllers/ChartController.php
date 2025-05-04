@@ -9,6 +9,7 @@ use App\Models\Patient;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDF;
 
 class ChartController extends Controller
 {
@@ -275,5 +276,48 @@ class ChartController extends Controller
     public function calendar()
     {
         return view('admin.calendar.index');
+    }
+
+    public function export(Request $request)
+    {
+        // Get all necessary data for the PDF
+        $period = $request->period ?? 'monthly';
+        $mainChartData = $this->getData($request)->getData();
+        $treatmentData = $this->treatments($request)->getData();
+        $appointmentData = $this->appointments($request)->getData();
+        $revenueData = $this->revenue($request)->getData();
+
+        // Get summary data
+        $totalAppointments = Appointment::count();
+        $totalPatients = Patient::count();
+        $totalInvoices = Invoice::count();
+        $totalAmount = Invoice::sum('totalAmount');
+        $advanceAmount = Invoice::sum('advanceAmount');
+        $pendingAmount = $totalAmount - $advanceAmount;
+
+        // Get recent invoices
+        $recentInvoices = Invoice::with('patient')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        $data = [
+            'mainChartData' => $mainChartData,
+            'treatmentData' => $treatmentData,
+            'appointmentData' => $appointmentData,
+            'revenueData' => $revenueData,
+            'totalAppointments' => $totalAppointments,
+            'totalPatients' => $totalPatients,
+            'totalInvoices' => $totalInvoices,
+            'totalAmount' => $totalAmount,
+            'advanceAmount' => $advanceAmount,
+            'pendingAmount' => $pendingAmount,
+            'recentInvoices' => $recentInvoices,
+            'period' => $period,
+            'exportDate' => now()->format('Y-m-d H:i:s')
+        ];
+
+        $pdf = PDF::loadView('admin.Charts.export', $data);
+        return $pdf->download('analytics-report-' . now()->format('Y-m-d') . '.pdf');
     }
 }
