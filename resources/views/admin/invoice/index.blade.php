@@ -182,7 +182,7 @@
 
 <!-- Improved Edit Invoice Modal -->
 <div id="editInvoiceModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 transition-opacity duration-300 ease-in-out">
-    <div class="relative top-20 mx-auto p-0 max-w-2xl shadow-2xl rounded-lg bg-white transform transition-all duration-300 ease-in-out scale-95 opacity-0" id="modalContent">
+    <div class="relative top-10 mx-auto p-0 max-w-2xl shadow-2xl rounded-lg bg-white transform transition-all duration-300 ease-in-out scale-95 opacity-0" id="modalContent">
         <!-- Modal Header -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
             <div class="flex items-center">

@@ -44,8 +44,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Appointment management
         Route::get('/appointments', [UserController::class, 'appointments'])->name('appointments');
-        Route::get('/appointment/{id}', [UserController::class, 'appointmentDetails'])->name('appointment.details');
-        Route::post('/appointment/{id}/cancel', [UserController::class, 'cancelAppointment'])->name('appointment.cancel');
+        Route::get('/appointment/{appointment}', [UserController::class, 'appointmentDetails'])->name('appointment.details');
+        Route::post('/appointment/{appointment}/cancel', [UserController::class, 'cancelAppointment'])->name('appointment.cancel');
 
         // Add this new route
         Route::get('/appointments/confirmed', [AppointmentController::class, 'getConfirmedAppointments'])->name('appointments.confirmed');

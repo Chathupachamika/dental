@@ -1534,7 +1534,7 @@
 
                     <!-- Google Map Embed -->
                     <div class="rounded-xl overflow-hidden shadow-md h-[300px]">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.2219901290355!2d-74.00369674829017!3d40.71277287932888!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a23e28c1191%3A0x49324989e1d54767!2s123%20Broadway%2C%20New%20York%2C%20NY%2010007!5e0!3m2!1sen!2sus!4v1651234567890!5m2!1sen!2sus" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        <iframe src=""></iframe>
                     </div>
                 </div>
             </div>
