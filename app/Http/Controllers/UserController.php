@@ -197,17 +197,12 @@ class UserController extends Controller
         return view('user.profile', compact('user', 'patient'));
     }
 
-    /**
-     * Update user profile.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function updateProfile(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'mobile_number' => 'required|string|max:20',
+            'nic' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
             'age' => 'nullable|numeric|min:1|max:120',
             'gender' => 'nullable|in:Male,Female,Other',
@@ -217,6 +212,7 @@ class UserController extends Controller
         $user = Auth::user();
         $user->name = $request->name;
         $user->mobile_number = $request->mobile_number;
+        $user->nic = $request->nic;
         $user->terms_agreed = true; // Save terms agreement
         $user->save();
 
@@ -236,11 +232,7 @@ class UserController extends Controller
             ->with('success', 'Profile updated successfully.');
     }
 
-    /**
-     * Check profile completion.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function checkProfileCompletion()
     {
         $user = Auth::user();
@@ -257,22 +249,13 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Clear login session.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function clearLoginSession()
     {
         session()->forget('first_login');
         return response()->json(['status' => 'success']);
     }
 
-    /**
-     * Get terms agreement status.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function getTermsStatus()
     {
         $user = Auth::user();

@@ -19,11 +19,15 @@ class Patient extends Model  // Changed from 'patient' to 'Patient'
         'user_id'
     ];
 
-    public function invoices()
+    public function invoice()
     {
         return $this->hasMany(Invoice::class);
     }
 
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
