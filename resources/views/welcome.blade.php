@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Dental Management') }}</title>
+    <title>{{ config('app.name', 'MediPlus Dental Surgery') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -931,10 +931,7 @@
                 <!-- Logo -->
                 <div class="flex items-center">
                     <a href="#" class="flex items-center space-x-2">
-                        <div class="h-10 w-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
-                            <i class="fas fa-tooth text-white text-xl"></i>
-                        </div>
-                        <span class="text-xl font-bold text-gray-800">DentalCare</span>
+                        <img src="{{ asset('images/logo.png') }}" alt="MediPlus Dental Surgery Logo" class="h-10 w-auto">
                     </a>
                 </div>
 
@@ -984,7 +981,7 @@
                         <div class="h-10 w-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
                             <i class="fas fa-tooth text-white text-xl"></i>
                         </div>
-                        <span class="text-xl font-bold text-gray-800">DentalCare</span>
+                        <span class="text-xl font-bold text-gray-800">MediPlus Dental Surgery</span>
                     </div>
                     <button id="close-menu" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
                         <i class="fas fa-times text-gray-500 text-xl"></i>
@@ -1094,7 +1091,7 @@
                         Experience top-quality dental services with our team of experienced professionals dedicated to your oral health and beautiful smile.
                     </p>
                     <div class="hero-buttons flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 animate-fade-in-up stagger-2">
-                        <a href="#appointment" class="ripple-btn btn-primary py-3 px-8 rounded-lg text-base font-medium text-white flex items-center justify-center">
+                        <a href="{{ url('user/book-appointment') }}" class="ripple-btn btn-primary py-3 px-8 rounded-lg text-base font-medium text-white flex items-center justify-center">
                             <i class="fas fa-calendar-check mr-2"></i>
                             Book Appointment
                         </a>
@@ -1202,7 +1199,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Convenient Scheduling</h3>
                     <p class="text-gray-600 mb-4">Easy online booking and flexible appointment times to accommodate your busy schedule.</p>
-                    <a href="#" class="text-primary-500 hover:text-primary-600 flex items-center font-medium hover-underline">
+                    <a href="{{ url('user/book-appointment') }}" class="text-primary-500 hover:text-primary-600 flex items-center font-medium hover-underline">
                         Book now
                         <i class="fas fa-arrow-right ml-1 text-sm"></i>
                     </a>
@@ -1393,7 +1390,7 @@
                 <!-- Testimonial 1 -->
                 <div class="testimonial-card bg-white rounded-xl shadow-md p-6 relative reveal">
                     <div class="flex items-center mb-4">
-                        <img src="{{ asset('images/patient-1.jpg') }}" alt="Patient" class="w-12 h-12 rounded-full mr-4" onerror="this.src='https://via.placeholder.com/48?text=P'">
+                        <img src="{{ asset('images/avatar-1.jpg') }}" alt="Patient" class="w-12 h-12 rounded-full mr-4" onerror="this.src='https://via.placeholder.com/48?text=P'">
                         <div>
                             <h4 class="font-semibold text-gray-800">Sarah Johnson</h4>
                             <p class="text-sm text-gray-500">Regular Patient</p>
@@ -1412,7 +1409,7 @@
                 <!-- Testimonial 2 -->
                 <div class="testimonial-card bg-white rounded-xl shadow-md p-6 relative reveal">
                     <div class="flex items-center mb-4">
-                        <img src="{{ asset('images/patient-2.jpg') }}" alt="Patient" class="w-12 h-12 rounded-full mr-4" onerror="this.src='https://via.placeholder.com/48?text=P'">
+                        <img src="{{ asset('images/avatar-2.jpg') }}" alt="Patient" class="w-12 h-12 rounded-full mr-4" onerror="this.src='https://via.placeholder.com/48?text=P'">
                         <div>
                             <h4 class="font-semibold text-gray-800">Michael Thompson</h4>
                             <p class="text-sm text-gray-500">Cosmetic Dentistry Patient</p>
@@ -1431,7 +1428,7 @@
                 <!-- Testimonial 3 -->
                 <div class="testimonial-card bg-white rounded-xl shadow-md p-6 relative reveal">
                     <div class="flex items-center mb-4">
-                        <img src="{{ asset('images/patient-3.jpg') }}" alt="Patient" class="w-12 h-12 rounded-full mr-4" onerror="this.src='https://via.placeholder.com/48?text=P'">
+                        <img src="{{ asset('images/avatar-3.jpg') }}" alt="Patient" class="w-12 h-12 rounded-full mr-4" onerror="this.src='https://via.placeholder.com/48?text=P'">
                         <div>
                             <h4 class="font-semibold text-gray-800">Jennifer Davis</h4>
                             <p class="text-sm text-gray-500">Parent of Pediatric Patient</p>
@@ -1552,7 +1549,7 @@
                 Take the first step towards a healthier smile. Our team is ready to provide you with exceptional dental care.
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="#appointment" class="ripple-btn bg-white text-primary-600 hover:bg-gray-100 py-3 px-8 rounded-lg text-base font-medium inline-flex items-center justify-center">
+                <a href="{{ url('user/book-appointment') }}" class="ripple-btn bg-white text-primary-600 hover:bg-gray-100 py-3 px-8 rounded-lg text-base font-medium inline-flex items-center justify-center">
                     <i class="fas fa-calendar-check mr-2"></i>
                     Book Appointment
                 </a>
@@ -1573,7 +1570,7 @@
                         <div class="h-10 w-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
                             <i class="fas fa-tooth text-white text-xl"></i>
                         </div>
-                        <span class="text-xl font-bold">DentalCare</span>
+                        <span class="text-xl font-bold">MediPlus Dental Surgery</span>
                     </div>
                     <p class="text-gray-400 mb-6">
                         Providing quality dental care with a focus on patient comfort and satisfaction. Our modern practice combines advanced technology with personalized attention.
@@ -1639,7 +1636,7 @@
 
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-gray-500 text-sm mb-4 md:mb-0">
-                    &copy; {{ date('Y') }} DentalCare. All rights reserved.
+                    &copy; {{ date('Y') }} MediPlus Dental Surgery. All rights reserved.
                 </p>
                 <div class="flex space-x-6">
                     <a href="#" class="text-gray-500 hover:text-white text-sm transition-colors hover-underline">Privacy Policy</a>
@@ -1758,7 +1755,7 @@
 
         // Scroll Reveal Animation
         const revealElements = document.querySelectorAll('.reveal');
-        
+
         function checkReveal() {
             const windowHeight = window.innerHeight;
             const revealPoint = 150;
