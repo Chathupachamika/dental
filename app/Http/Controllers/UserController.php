@@ -202,7 +202,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'mobile_number' => 'required|string|max:20',
-            'nic' => 'nullable|string|max:20',
+            'nic' => 'required|string|max:20',  // Add NIC validation
             'address' => 'nullable|string|max:255',
             'age' => 'nullable|numeric|min:1|max:120',
             'gender' => 'nullable|in:Male,Female,Other',
@@ -212,8 +212,8 @@ class UserController extends Controller
         $user = Auth::user();
         $user->name = $request->name;
         $user->mobile_number = $request->mobile_number;
-        $user->nic = $request->nic;
-        $user->terms_agreed = true; // Save terms agreement
+        $user->nic = $request->nic;  // Save NIC to user record
+        $user->terms_agreed = true;
         $user->save();
 
         // Update or create patient record
@@ -224,14 +224,14 @@ class UserController extends Controller
                 'address' => $request->address,
                 'age' => $request->age,
                 'gender' => $request->gender,
-                'user_id' => $user->id
+                'user_id' => $user->id,
+                'nic' => $request->nic  // Save NIC to patient record
             ]
         );
 
         return redirect()->route('user.profile')
             ->with('success', 'Profile updated successfully.');
     }
-
 
     public function checkProfileCompletion()
     {
@@ -254,7 +254,6 @@ class UserController extends Controller
         session()->forget('first_login');
         return response()->json(['status' => 'success']);
     }
-
 
     public function getTermsStatus()
     {
